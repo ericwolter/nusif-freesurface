@@ -19,47 +19,47 @@ class ArrayTemplate
 {
 public:
 
-   // Constructors for 1D,2D and 3D
-   ArrayTemplate();
-   ArrayTemplate( int xSize );
-   ArrayTemplate( int xSize, int ySize );
-   ArrayTemplate( int xSize, int ySize, int zSize );
-   // Depending on your implementation you might need the following:
-   ~ArrayTemplate();
-   ArrayTemplate(const ArrayTemplate& s);
+    // Constructors for 1D,2D and 3D
+    ArrayTemplate();
+    ArrayTemplate( int xSize );
+    ArrayTemplate( int xSize, int ySize );
+    ArrayTemplate( int xSize, int ySize, int zSize );
+    // Depending on your implementation you might need the following:
+    ~ArrayTemplate();
+    ArrayTemplate(const ArrayTemplate &s);
 
 
-   // Access Operators for 1D, 2D and 3D
-   inline T & operator () ( int i );
-   inline T & operator () ( int i ,int j );
-   inline T & operator () ( int i, int j, int k );
+    // Access Operators for 1D, 2D and 3D
+    inline T &operator () ( int i );
+    inline T &operator () ( int i , int j );
+    inline T &operator () ( int i, int j, int k );
 
 
-   // Assignment Operator
-   inline ArrayTemplate<T> & operator = ( const ArrayTemplate<T>& s );
+    // Assignment Operator
+    inline ArrayTemplate<T> &operator = ( const ArrayTemplate<T> &s );
 
-   // for const Arrays the following access operators are required
-   inline const T & operator () ( int i ) const;
-   inline const T & operator () ( int i ,int j ) const;
-   inline const T & operator () ( int i, int j, int k ) const;
+    // for const Arrays the following access operators are required
+    inline const T &operator () ( int i ) const;
+    inline const T &operator () ( int i , int j ) const;
+    inline const T &operator () ( int i, int j, int k ) const;
 
-   // get max element of the array
-   T maxE();
+    // get max element of the array
+    T maxE();
 
-   // initialize the whole array with a constant value
-   void fill( T value );
-
-
-   // return total size of the array
-   int getSize() const;
-
-   // return xSize for dimension==0, ySize for dimension==1 and zSize for dimension==2
-   // other dimension values are not allowed
-   int getSize(int dimension ) const;
+    // initialize the whole array with a constant value
+    void fill( T value );
 
 
-   // Print the whole array ( for debugging purposes )
-   void print();
+    // return total size of the array
+    int getSize() const;
+
+    // return xSize for dimension==0, ySize for dimension==1 and zSize for dimension==2
+    // other dimension values are not allowed
+    int getSize(int dimension ) const;
+
+
+    // Print the whole array ( for debugging purposes )
+    void print();
 
 private:
 
@@ -84,7 +84,7 @@ typedef ArrayTemplate<flag> FlagArray;
 
 // Operator() 1D
 template<typename T>
-inline T& ArrayTemplate<T>::operator ()(int i)
+inline T &ArrayTemplate<T>::operator ()(int i)
 {
     ASSERT_MSG( (i >= 0), "wrong input for i:" << i);
     ASSERT_MSG( (i < x), "wrong input for i:" << i << ", with maxlength = " << x);
@@ -94,19 +94,19 @@ inline T& ArrayTemplate<T>::operator ()(int i)
 
 // Operator() 2D
 template<typename T>
-inline T& ArrayTemplate<T>::operator ()(int i, int j)
+inline T &ArrayTemplate<T>::operator ()(int i, int j)
 {
     ASSERT_MSG( (i >= 0), "wrong input for i:" << i);
     ASSERT_MSG( (i < x), "wrong input for i:" << i << ", with maxlength = " << x);
     ASSERT_MSG( (j >= 0), "wrong input for j:" << j);
     ASSERT_MSG( (j < y), "wrong input for j:" << j << ", with maxlength = " << y);
 
-    return arr[i+j*x];
+    return arr[i + j * x];
 }
 
 // Operator() 3D
 template<typename T>
-inline T& ArrayTemplate<T>::operator ()(int i, int j, int k)
+inline T &ArrayTemplate<T>::operator ()(int i, int j, int k)
 {
     ASSERT_MSG( (i >= 0), "wrong input for i:" << i);
     ASSERT_MSG( (i < x), "wrong input for i:" << i << ", with maxlength = " << x);
@@ -115,12 +115,12 @@ inline T& ArrayTemplate<T>::operator ()(int i, int j, int k)
     ASSERT_MSG( (k >= 0), "wrong input for k:" << k);
     ASSERT_MSG( (k < z), "wrong input for k:" << k << ", with maxlength = " << z);
 
-    return arr[i+j*x+k*x*y];
+    return arr[i + j * x + k * x * y];
 }
 
 // Operator() 1D
 template<typename T>
-inline const T& ArrayTemplate<T>::operator ()(int i) const
+inline const T &ArrayTemplate<T>::operator ()(int i) const
 {
     ASSERT_MSG( (i >= 0), "wrong input for i:" << i);
     ASSERT_MSG( (i < x), "wrong input for i:" << i << ", with maxlength = " << x);
@@ -130,19 +130,19 @@ inline const T& ArrayTemplate<T>::operator ()(int i) const
 
 // Operator() 2D
 template<typename T>
-inline const T& ArrayTemplate<T>::operator ()(int i, int j) const
+inline const T &ArrayTemplate<T>::operator ()(int i, int j) const
 {
     ASSERT_MSG( (i >= 0), "wrong input for i:" << i);
     ASSERT_MSG( (i < x), "wrong input for i:" << i << ", with maxlength = " << x);
     ASSERT_MSG( (j >= 0), "wrong input for j:" << j);
     ASSERT_MSG( (j < y), "wrong input for j:" << j << ", with maxlength = " << y);
 
-    return arr[i+j*x];
+    return arr[i + j * x];
 }
 
 // Operator() 3D
 template<typename T>
-inline const T& ArrayTemplate<T>::operator ()(int i, int j, int k) const
+inline const T &ArrayTemplate<T>::operator ()(int i, int j, int k) const
 {
     ASSERT_MSG( (i >= 0), "wrong input for i:" << i);
     ASSERT_MSG( (i < x), "wrong input for i:" << i << ", with maxlength = " << x);
@@ -151,11 +151,11 @@ inline const T& ArrayTemplate<T>::operator ()(int i, int j, int k) const
     ASSERT_MSG( (k >= 0), "wrong input for k:" << k);
     ASSERT_MSG( (k < z), "wrong input for k:" << k << ", with maxlength = " << z);
 
-    return arr[i+j*x+k*x*y];
+    return arr[i + j * x + k * x * y];
 }
 
 template<typename T>
-inline ArrayTemplate<T>& ArrayTemplate<T>::operator = (const ArrayTemplate<T>& s)
+inline ArrayTemplate<T> &ArrayTemplate<T>::operator = (const ArrayTemplate<T> &s)
 {
     PROG("assign array");
     CHECK_MSG(s.arr != NULL, "assignment with NULL"); // check s.arr
@@ -166,7 +166,7 @@ inline ArrayTemplate<T>& ArrayTemplate<T>::operator = (const ArrayTemplate<T>& s
     z = s.getSize(2);
 
     if ( arr != NULL )
-      delete[] arr;
+        delete[] arr;
 
     arr = new T[s.getSize()];
     ASSERT_MSG(arr != NULL, "malloc failed"); // check if malloc was successful

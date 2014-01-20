@@ -5,12 +5,12 @@
 
 
 // constructor for FluidSimulator
-FluidSimulator::FluidSimulator( const FileReader & conf )
-: grid_(conf), solver_(conf)
+FluidSimulator::FluidSimulator( const FileReader &conf )
+    : grid_(conf), solver_(conf)
 {
     PROG("construct FluidSimulator with a file");
     gamma_ = conf.getRealParameter("gamma");
-    CHECK_MSG( (gamma_ >= 0 && gamma_ <= 1), "wrong input for gamma: " << gamma_); 
+    CHECK_MSG( (gamma_ >= 0 && gamma_ <= 1), "wrong input for gamma: " << gamma_);
     Re_ = conf.getRealParameter("Re");
     CHECK_MSG( (Re_ > 0), "wrong input for Re: " << Re_);
     gx_ = conf.getRealParameter("GX");
@@ -28,58 +28,78 @@ FluidSimulator::FluidSimulator( const FileReader & conf )
     std::string we = conf.getStringParameter("boundary_condition_W");
     std::string es = conf.getStringParameter("boundary_condition_E");
 
-    if ( no == "inflow" ) {
+    if ( no == "inflow" )
+    {
         cond_N = INFLOW;
-    } else if ( no == "outflow" ) {
+    }
+    else if ( no == "outflow" )
+    {
         ASSERT_MSG(vel_N == 0.0, "there should be no velocity values for an outflow boundary!");
-	cond_N = OUTFLOW;
-    } else {
+        cond_N = OUTFLOW;
+    }
+    else
+    {
         cond_N = NOSLIP;
     }
 
-    if ( so == "inflow" ) {
+    if ( so == "inflow" )
+    {
         cond_S = INFLOW;
-    } else if ( so == "outflow" ) {
+    }
+    else if ( so == "outflow" )
+    {
         ASSERT_MSG(vel_S == 0.0, "there should be no velocity values for an outflow boundary!");
-	cond_S = OUTFLOW;
-    } else {
+        cond_S = OUTFLOW;
+    }
+    else
+    {
         cond_S = NOSLIP;
     }
 
-    if ( we == "inflow" ) {
+    if ( we == "inflow" )
+    {
         cond_W = INFLOW;
-    } else if ( we == "outflow" ) {
+    }
+    else if ( we == "outflow" )
+    {
         ASSERT_MSG(vel_W == 0.0, "there should be no velocity values for an outflow boundary!");
-	cond_W = OUTFLOW;
-    } else {
+        cond_W = OUTFLOW;
+    }
+    else
+    {
         cond_W = NOSLIP;
     }
 
-    if ( es == "inflow" ) {
+    if ( es == "inflow" )
+    {
         cond_E = INFLOW;
-    } else if ( es == "outflow" ) {
+    }
+    else if ( es == "outflow" )
+    {
         ASSERT_MSG(vel_E == 0.0, "there should be no velocity values for an outflow boundary!");
-	cond_E = OUTFLOW;
-    } else {
+        cond_E = OUTFLOW;
+    }
+    else
+    {
         cond_E = NOSLIP;
     }
-    
+
     safetyfac_ = conf.getRealParameter("safetyfactor");
     timeStepNr = conf.getIntParameter("timesteps");
     CHECK_MSG( (timeStepNr >= 0), "wrong input for timesteps: " << timeStepNr);
     outPutInt = conf.getIntParameter("outputinterval");
-    CHECK_MSG( (outPutInt > 0), "wrong input for outputinterval: " << outPutInt); 
+    CHECK_MSG( (outPutInt > 0), "wrong input for outputinterval: " << outPutInt);
     normfreq = conf.getIntParameter("normalizationfrequency");
     CHECK_MSG( (normfreq > 0), "wrong input for normalizationfrequency: " << normfreq);
     uInit_ = conf.getRealParameter("U_INIT");
     vInit_ = conf.getRealParameter("V_INIT");
     pInit_ = conf.getRealParameter("P_INIT");
     imax = conf.getIntParameter("imax");
-    CHECK_MSG( (imax > 0), "wrong input for imax: " << imax); 
+    CHECK_MSG( (imax > 0), "wrong input for imax: " << imax);
     jmax = conf.getIntParameter("jmax");
     CHECK_MSG( (jmax > 0), "wrong input for jmax: " << jmax);
-    
-    // obstacles: 
+
+    // obstacles:
     // rectangle
     rectX_ = conf.getRealParameter("RectangleX1");
     CHECK_MSG( (rectX_ >= 0), "wrong input for RectangleX1: " << rectX_);
@@ -101,161 +121,213 @@ FluidSimulator::FluidSimulator( const FileReader & conf )
 
 void FluidSimulator::composeRHS()
 {
-  // formula 3.38
-  for ( int i = 1; i <= imax; i++ ) {
-      for ( int j = 1; j <= jmax; j++ )
-        grid_.rhs()(i-1,j-1) = ( (grid_.f()(i,j-1)-grid_.f()(i-1,j-1))/grid_.dx() + (grid_.g()(i-1,j)-grid_.g()(i-1,j-1))/grid_.dy() )/dt_;
-  }
+    // formula 3.38
+    for ( int i = 1; i <= imax; i++ )
+    {
+        for ( int j = 1; j <= jmax; j++ )
+            grid_.rhs()(i - 1, j - 1) = ( (grid_.f()(i, j - 1) - grid_.f()(i - 1, j - 1)) / grid_.dx() + (grid_.g()(i - 1, j) - grid_.g()(i - 1, j - 1)) / grid_.dy() ) / dt_;
+    }
 }
 
 void FluidSimulator::updateVelocities()
 {
-  real dtdx = dt_/grid_.dx();
-  real dtdy = dt_/grid_.dy();
+    real dtdx = dt_ / grid_.dx();
+    real dtdy = dt_ / grid_.dy();
 
-  for ( int i = 1; i <= imax; i++ ) {
-    for ( int j = 1; j <= jmax; j++ ) {
-      
-      if ( grid_.isFluid(i,j) ) { // update obly for fluid cells
+    for ( int i = 1; i <= imax; i++ )
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
 
-	if ( i != imax && grid_.isFluid(i+1,j) )  // formula 3.34
-	  grid_.u()(i,j) = grid_.f()(i,j-1) - ( grid_.p(i+1,j,WEST) - grid_.p()(i,j) ) * dtdx;
-     
-	if ( j != jmax && grid_.isFluid(i,j+1) )  // formula 3.35
-	  grid_.v()(i,j) = grid_.g()(i-1,j) - ( grid_.p(i,j+1,SOUTH) - grid_.p()(i,j) ) * dtdy;
-	
-      }
+            if ( grid_.isFluid(i, j) )  // update obly for fluid cells
+            {
+
+                if ( i != imax && grid_.isFluid(i + 1, j) ) // formula 3.34
+                    grid_.u()(i, j) = grid_.f()(i, j - 1) - ( grid_.p(i + 1, j, WEST) - grid_.p()(i, j) ) * dtdx;
+
+                if ( j != jmax && grid_.isFluid(i, j + 1) ) // formula 3.35
+                    grid_.v()(i, j) = grid_.g()(i - 1, j) - ( grid_.p(i, j + 1, SOUTH) - grid_.p()(i, j) ) * dtdy;
+
+            }
+        }
     }
-  }
 }
 
-void FluidSimulator::determineNextDT( real const & limit )
-{ 
-  // first stability condition  
-  real one = Re_/ ( 2/ pow(grid_.dx(),2) + 2/ pow(grid_.dy(),2) );
-  bool first = dt_ < one;
-  // CFL / 3.49
-  real two = grid_.dx() / grid_.u().maxE();
-  bool second = dt_ < two;
-  real three = grid_.dy() / grid_.v().maxE();
-  bool third = dt_ < three;
-  // control step size
-  if ( !(first && second && third) ) { // 3.50
-    real minimum = std::min(one, two);
-    minimum = std::min(minimum,three);
-    
-    if ( limit > 0 && limit <= 1 ) { // check safety factor  
-      dt_ = limit*minimum;
-    } else {
-      dt_ = minimum*0.5;
+void FluidSimulator::determineNextDT( real const &limit )
+{
+    // first stability condition
+    real one = Re_ / ( 2 / pow(grid_.dx(), 2) + 2 / pow(grid_.dy(), 2) );
+    bool first = dt_ < one;
+    // CFL / 3.49
+    real two = grid_.dx() / grid_.u().maxE();
+    bool second = dt_ < two;
+    real three = grid_.dy() / grid_.v().maxE();
+    bool third = dt_ < three;
+    // control step size
+    if ( !(first && second && third) )   // 3.50
+    {
+        real minimum = std::min(one, two);
+        minimum = std::min(minimum, three);
+
+        if ( limit > 0 && limit <= 1 )   // check safety factor
+        {
+            dt_ = limit * minimum;
+        }
+        else
+        {
+            dt_ = minimum * 0.5;
+        }
+        PROG("dt is now: " << dt_);
     }
-    PROG("dt is now: "<<dt_);
-  }
 
 }
 
 void FluidSimulator::refreshBoundaries()
 {
     // conditions for north border
-    if ( cond_N == NOSLIP ) { // no-slip
-      for ( int i = 1; i <= imax; i++ ) {
-	grid_.v()(i,jmax) = 0;
-	grid_.u()(i,jmax+1) = 2*vel_N-grid_.u()(i,jmax);
-      }
+    if ( cond_N == NOSLIP )   // no-slip
+    {
+        for ( int i = 1; i <= imax; i++ )
+        {
+            grid_.v()(i, jmax) = 0;
+            grid_.u()(i, jmax + 1) = 2 * vel_N - grid_.u()(i, jmax);
+        }
 
-    } else if ( cond_N == INFLOW ) { // inflow
-      for ( int i = 1; i <= imax; i++ ) {
-	if ( grid_.isFluid(i,jmax) ) { 
-	  grid_.v()(i,jmax) = vel_N;
-	  grid_.u()(i,jmax+1) = 0;
-	} else {
-	  grid_.v()(i,jmax) = 0;
-	  grid_.u()(i,jmax+1) = 2*vel_N-grid_.u()(i,jmax);
-	}
-      }
+    }
+    else if ( cond_N == INFLOW )     // inflow
+    {
+        for ( int i = 1; i <= imax; i++ )
+        {
+            if ( grid_.isFluid(i, jmax) )
+            {
+                grid_.v()(i, jmax) = vel_N;
+                grid_.u()(i, jmax + 1) = 0;
+            }
+            else
+            {
+                grid_.v()(i, jmax) = 0;
+                grid_.u()(i, jmax + 1) = 2 * vel_N - grid_.u()(i, jmax);
+            }
+        }
 
-    } else { // outflow
-      for ( int i = 1; i <= imax; i++ ) {
-	grid_.v()(i,jmax) = grid_.v()(i,jmax-1);
-	grid_.u()(i,jmax+1) = grid_.u()(i,jmax);
-      }
+    }
+    else     // outflow
+    {
+        for ( int i = 1; i <= imax; i++ )
+        {
+            grid_.v()(i, jmax) = grid_.v()(i, jmax - 1);
+            grid_.u()(i, jmax + 1) = grid_.u()(i, jmax);
+        }
     }
 
     // conditions for south border
-    if ( cond_S == NOSLIP ) { // no-slip
-      for ( int i = 1; i <= imax; i++ ) {
-	grid_.v()(i,0) = 0;
-	grid_.u()(i,0) = 2*vel_S-grid_.u()(i,1);
-      }
+    if ( cond_S == NOSLIP )   // no-slip
+    {
+        for ( int i = 1; i <= imax; i++ )
+        {
+            grid_.v()(i, 0) = 0;
+            grid_.u()(i, 0) = 2 * vel_S - grid_.u()(i, 1);
+        }
 
-    } else if ( cond_S == INFLOW ) { // inflow
-      for ( int i = 1; i <= imax; i++ ) {
-	if ( grid_.isFluid(i,1) ) { 
-	  grid_.v()(i,0) = vel_S;
-	  grid_.u()(i,0) = 0;
-	} else {
-	  grid_.v()(i,0) = 0;
-	  grid_.u()(i,0) = 2*vel_S-grid_.u()(i,1); 
-	}
-      }  
+    }
+    else if ( cond_S == INFLOW )     // inflow
+    {
+        for ( int i = 1; i <= imax; i++ )
+        {
+            if ( grid_.isFluid(i, 1) )
+            {
+                grid_.v()(i, 0) = vel_S;
+                grid_.u()(i, 0) = 0;
+            }
+            else
+            {
+                grid_.v()(i, 0) = 0;
+                grid_.u()(i, 0) = 2 * vel_S - grid_.u()(i, 1);
+            }
+        }
 
-    } else { // outflow
-      for ( int i = 1; i <= imax; i++ ) {
-	grid_.v()(i,0) = grid_.v()(i,1);
-	grid_.u()(i,0) = grid_.u()(i,1);     
-      }
+    }
+    else     // outflow
+    {
+        for ( int i = 1; i <= imax; i++ )
+        {
+            grid_.v()(i, 0) = grid_.v()(i, 1);
+            grid_.u()(i, 0) = grid_.u()(i, 1);
+        }
     }
 
     // conditions for west border
-    if ( cond_W == NOSLIP ) { // no-slip
-      for ( int j = 1; j <= jmax; j++ ) {
-	grid_.u()(0,j) = 0;
-	grid_.v()(0,j) = 2*vel_W-grid_.v()(1,j);
-      }
+    if ( cond_W == NOSLIP )   // no-slip
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
+            grid_.u()(0, j) = 0;
+            grid_.v()(0, j) = 2 * vel_W - grid_.v()(1, j);
+        }
 
-    } else if ( cond_W == INFLOW ) { // inflow
-      for ( int j = 1; j <= jmax; j++ ) {
-	if ( grid_.isFluid(1,j) ) { 
-	  grid_.u()(0,j) = vel_W;
-	  grid_.v()(0,j) = 0;
- 	} else {
- 	  grid_.u()(0,j) = 0;
- 	  grid_.v()(0,j) = 2*vel_W-grid_.v()(1,j);
- 	}
+    }
+    else if ( cond_W == INFLOW )     // inflow
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
+            if ( grid_.isFluid(1, j) )
+            {
+                grid_.u()(0, j) = vel_W;
+                grid_.v()(0, j) = 0;
+            }
+            else
+            {
+                grid_.u()(0, j) = 0;
+                grid_.v()(0, j) = 2 * vel_W - grid_.v()(1, j);
+            }
 
-      }
-      
-    } else { // outflow
-      for ( int j = 1; j <= jmax; j++ ) {
-	grid_.u()(0,j) = grid_.u()(1,j);
-	grid_.v()(0,j) = grid_.v()(1,j); 	   
-      }
+        }
+
+    }
+    else     // outflow
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
+            grid_.u()(0, j) = grid_.u()(1, j);
+            grid_.v()(0, j) = grid_.v()(1, j);
+        }
     }
 
     // conditions for east border
-    if ( cond_E == NOSLIP ) { // no-slip
-      for ( int j = 1; j <= jmax; j++ ) {
-	grid_.u()(imax, j) = 0;
-	grid_.v()(imax+1,j) = 2*vel_E-grid_.v()(imax,j);
-      }
+    if ( cond_E == NOSLIP )   // no-slip
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
+            grid_.u()(imax, j) = 0;
+            grid_.v()(imax + 1, j) = 2 * vel_E - grid_.v()(imax, j);
+        }
 
-    } else if ( cond_E == INFLOW ) { // inflow
-      for ( int j = 1; j <= jmax; j++ ) {
-	if ( grid_.isFluid(imax,j) ) { 
-	  grid_.u()(imax, j) = vel_E;
-	  grid_.v()(imax+1,j) = 0;
-	} else {
-	  grid_.u()(imax, j) = 0;
-	  grid_.v()(imax+1,j) = 2*vel_E-grid_.v()(imax,j);
-	}
+    }
+    else if ( cond_E == INFLOW )     // inflow
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
+            if ( grid_.isFluid(imax, j) )
+            {
+                grid_.u()(imax, j) = vel_E;
+                grid_.v()(imax + 1, j) = 0;
+            }
+            else
+            {
+                grid_.u()(imax, j) = 0;
+                grid_.v()(imax + 1, j) = 2 * vel_E - grid_.v()(imax, j);
+            }
 
-      }	  
+        }
 
-    } else { // outflow
-      for ( int j = 1; j <= jmax; j++ ) {
-	grid_.u()(imax,j) = grid_.u()(imax-1,j); 
-	grid_.v()(imax+1,j) = grid_.v()(imax,j);      
-      }
+    }
+    else     // outflow
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
+            grid_.u()(imax, j) = grid_.u()(imax - 1, j);
+            grid_.v()(imax + 1, j) = grid_.v()(imax, j);
+        }
     }
 
 }
@@ -267,30 +339,36 @@ void FluidSimulator::simulate( real duration )
     int n = 0;
 
     PROG("initialize u, v, p, rhs");
-    int half = (int) ( rectYY_/grid_.dy() );
-    for ( int i = 0; i < grid_.u().getSize(0); ++i ) {
-      for ( int j = 0; j < grid_.u().getSize(1); ++j ) {
-	if ( j > half ) {
-	  grid_.u()(i,j) = 1;
-	} else {
-	  grid_.u()(i,j) = 0;
-	}
-      }
+    int half = (int) ( rectYY_ / grid_.dy() );
+    for ( int i = 0; i < grid_.u().getSize(0); ++i )
+    {
+        for ( int j = 0; j < grid_.u().getSize(1); ++j )
+        {
+            if ( j > half )
+            {
+                grid_.u()(i, j) = 1;
+            }
+            else
+            {
+                grid_.u()(i, j) = 0;
+            }
+        }
     }
-    
+
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
     grid_.rhs().fill(0);
     PROG("set inner obstacles");
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
-    
+
     refreshBoundaries();
 
-    while (t <= duration ) {
-	// without 0th step:
-	// if ( n%outPutInt == 0 && n != 0 )
-        if ( n%outPutInt == 0 )
+    while (t <= duration )
+    {
+        // without 0th step:
+        // if ( n%outPutInt == 0 && n != 0 )
+        if ( n % outPutInt == 0 )
             vtkWriter.write();
         PROG(n << "'th timestep: determine next dt");
         determineNextDT( safetyfac_ );
@@ -303,8 +381,8 @@ void FluidSimulator::simulate( real duration )
         solv().solve( grid_ );
         PROG(n << "'th timestep: update u and v; " );
         updateVelocities();
-	if ( n%normfreq == 0 )
-	  normalization(); 
+        if ( n % normfreq == 0 )
+            normalization();
         t += dt_;
         n++;
     }
@@ -314,19 +392,24 @@ void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
 {
     VTKWriter vtkWriter ( grid_, "lidDrivenCavity", true, true );
     unsigned int n = 0;
-    
+
     PROG("initialize u, v, p, rhs");
-    int half = (int) ( rectYY_/grid_.dy() );
-    for ( int i = 0; i < grid_.u().getSize(0); ++i ) {
-      for ( int j = 0; j < grid_.u().getSize(1); ++j ) {
-	if ( j > half ) {
-	  grid_.u()(i,j) = 1;
-	} else {
-	  grid_.u()(i,j) = 0;
-	}
-      }
+    int half = (int) ( rectYY_ / grid_.dy() );
+    for ( int i = 0; i < grid_.u().getSize(0); ++i )
+    {
+        for ( int j = 0; j < grid_.u().getSize(1); ++j )
+        {
+            if ( j > half )
+            {
+                grid_.u()(i, j) = 1;
+            }
+            else
+            {
+                grid_.u()(i, j) = 0;
+            }
+        }
     }
-	    
+
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
     grid_.rhs().fill(0);
@@ -334,14 +417,15 @@ void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     grid_.createPng("test.png");
-    
+
     refreshBoundaries();
-    
-    while (n <= nrOfTimeSteps ) {
-	// without 0th step:
-	// if ( n%outPutInt == 0 && n != 0 )
-        if ( n%outPutInt == 0 ) 
-          vtkWriter.write();
+
+    while (n <= nrOfTimeSteps )
+    {
+        // without 0th step:
+        // if ( n%outPutInt == 0 && n != 0 )
+        if ( n % outPutInt == 0 )
+            vtkWriter.write();
         PROG(n << "'th timestep: determine next dt");
         determineNextDT( safetyfac_ );
         PROG(n << "'th timestep: refresh boundaries");
@@ -353,140 +437,158 @@ void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
         solv().solve( grid_ );
         PROG(n << "'th timestep: update u and v");
         updateVelocities();
-	if ( n%normfreq == 0 )
-	  normalization(); 
+        if ( n % normfreq == 0 )
+            normalization();
         n++;
     }
 
 }
 
-void FluidSimulator::normalization() 
+void FluidSimulator::normalization()
 {
-  real psum = 0;
+    real psum = 0;
 
-  for ( int i = 1; i <= imax; i++ ) {
-      for ( int j = 1; j <= jmax; j++ ) {
-	
-	if ( grid_.isFluid(i,j) )
-	  psum += grid_.p()(i,j);
-      }
-  }
+    for ( int i = 1; i <= imax; i++ )
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
 
-  real pMean = psum/grid_.getNumFluid();
-  // substract the mean
-  for ( int i = 1; i <= imax; i++ ) {
-      for ( int j = 1; j <= jmax; j++ ) {
-	
-	if ( grid_.isFluid(i,j) )
-	  grid_.p()(i,j) -= pMean;
-      }
-  }
+            if ( grid_.isFluid(i, j) )
+                psum += grid_.p()(i, j);
+        }
+    }
+
+    real pMean = psum / grid_.getNumFluid();
+    // substract the mean
+    for ( int i = 1; i <= imax; i++ )
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
+
+            if ( grid_.isFluid(i, j) )
+                grid_.p()(i, j) -= pMean;
+        }
+    }
 
 }
 
 // help functions for derivatives
 // d(u^2)/dx
-real FluidSimulator::dxuu(int i, int j) {
+real FluidSimulator::dxuu(int i, int j)
+{
     ASSERT_MSG( (i - 1 >= 0), "wrong input for i: " << i);
     ASSERT_MSG( (i + 1 < grid_.u().getSize(0)), "wrong input for i: " << i);
-    ASSERT_MSG( (j >= 0), "wrong input for j: " << j); 
-    real res = (grid_.u()(i,j)+grid_.u(i+1,j,WEST))*(grid_.u()(i,j)+grid_.u(i+1,j,WEST))/(4*grid_.dx()); 
-    res -= (grid_.u(i-1,j,EAST)+grid_.u()(i,j))*(grid_.u(i-1,j,EAST)+grid_.u()(i,j))/(4*grid_.dx());
-    res += gamma_*( fabs(grid_.u()(i,j)+grid_.u(i+1,j,WEST))*(grid_.u()(i,j)-grid_.u(i+1,j,WEST))*0.25 )/grid_.dx();
-    res -= gamma_*( fabs(grid_.u(i-1,j,EAST)+grid_.u()(i,j))*(grid_.u(i-1,j,EAST)-grid_.u()(i,j))*0.25 )/grid_.dx();
+    ASSERT_MSG( (j >= 0), "wrong input for j: " << j);
+    real res = (grid_.u()(i, j) + grid_.u(i + 1, j, WEST)) * (grid_.u()(i, j) + grid_.u(i + 1, j, WEST)) / (4 * grid_.dx());
+    res -= (grid_.u(i - 1, j, EAST) + grid_.u()(i, j)) * (grid_.u(i - 1, j, EAST) + grid_.u()(i, j)) / (4 * grid_.dx());
+    res += gamma_ * ( fabs(grid_.u()(i, j) + grid_.u(i + 1, j, WEST)) * (grid_.u()(i, j) - grid_.u(i + 1, j, WEST)) * 0.25 ) / grid_.dx();
+    res -= gamma_ * ( fabs(grid_.u(i - 1, j, EAST) + grid_.u()(i, j)) * (grid_.u(i - 1, j, EAST) - grid_.u()(i, j)) * 0.25 ) / grid_.dx();
 
     return res;
 }
 
 // d(v^2)/dy
-real FluidSimulator::dyvv(int i, int j) {
-    ASSERT_MSG( (i >= 0), "wrong input for i: " << i); 
+real FluidSimulator::dyvv(int i, int j)
+{
+    ASSERT_MSG( (i >= 0), "wrong input for i: " << i);
     ASSERT_MSG( (j - 1 >= 0), "wrong input for j: " << j);
     ASSERT_MSG( (j + 1 < grid_.v().getSize(1)), "wrong input for j: " << j);
-    real res = (grid_.v()(i,j)+grid_.v(i,j+1,SOUTH))*(grid_.v()(i,j)+grid_.v(i,j+1,SOUTH))/(4*grid_.dy());
-    res -= (grid_.v(i,j-1,NORTH)+grid_.v()(i,j))*(grid_.v(i,j-1,NORTH)+grid_.v()(i,j))/(4*grid_.dy());
-    res += gamma_*( fabs(grid_.v()(i,j)+grid_.v(i,j+1,SOUTH))*(grid_.v()(i,j)-grid_.v(i,j+1,SOUTH))*0.25 )/grid_.dy();
-    res -= gamma_*( fabs(grid_.v(i,j-1,NORTH)+grid_.v()(i,j))*(grid_.v(i,j-1,NORTH)-grid_.v()(i,j))*0.25 )/grid_.dy();
+    real res = (grid_.v()(i, j) + grid_.v(i, j + 1, SOUTH)) * (grid_.v()(i, j) + grid_.v(i, j + 1, SOUTH)) / (4 * grid_.dy());
+    res -= (grid_.v(i, j - 1, NORTH) + grid_.v()(i, j)) * (grid_.v(i, j - 1, NORTH) + grid_.v()(i, j)) / (4 * grid_.dy());
+    res += gamma_ * ( fabs(grid_.v()(i, j) + grid_.v(i, j + 1, SOUTH)) * (grid_.v()(i, j) - grid_.v(i, j + 1, SOUTH)) * 0.25 ) / grid_.dy();
+    res -= gamma_ * ( fabs(grid_.v(i, j - 1, NORTH) + grid_.v()(i, j)) * (grid_.v(i, j - 1, NORTH) - grid_.v()(i, j)) * 0.25 ) / grid_.dy();
 
     return res;
 }
 ////////////////////////////////////////////////////////////////////////////////
 // d(uv)/dy
-real FluidSimulator::dyuv(int i, int j) {
-    ASSERT_MSG( (i >= 0), "wrong input for i: " << i); 
-    ASSERT_MSG( (i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i); 
+real FluidSimulator::dyuv(int i, int j)
+{
+    ASSERT_MSG( (i >= 0), "wrong input for i: " << i);
+    ASSERT_MSG( (i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
     ASSERT_MSG( (j - 1 >= 0), "wrong input for j: " << j);
     ASSERT_MSG( (j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
     real diag = 0.0;
-    if ( grid_.isFluid(i+1,j-1) ) {
-      diag = grid_.v()(i+1,j-1);
-    } else {
-      diag = 0.5*( grid_.v(i+1,j,WEST) + grid_.v(i,j-1,NORTH) );
+    if ( grid_.isFluid(i + 1, j - 1) )
+    {
+        diag = grid_.v()(i + 1, j - 1);
     }
-    real res = ( (grid_.v()(i,j)+grid_.v(i+1,j,WEST))*(grid_.u()(i,j)+grid_.u(i,j+1,SOUTH))*0.25 )/grid_.dy();
-    res -= ( (grid_.v(i,j-1,NORTH)+diag)*(grid_.u(i,j-1,NORTH)+grid_.u()(i,j))*0.25 )/grid_.dy();
-    res += gamma_*( fabs(grid_.v()(i,j)+grid_.v(i+1,j,WEST))*(grid_.u()(i,j)-grid_.u(i,j+1,SOUTH))*0.25 )/grid_.dy();
-    res -= gamma_*( fabs(grid_.v(i,j-1,NORTH)+diag)*(grid_.u(i,j-1,NORTH)-grid_.u()(i,j))*0.25 )/grid_.dy();
+    else
+    {
+        diag = 0.5 * ( grid_.v(i + 1, j, WEST) + grid_.v(i, j - 1, NORTH) );
+    }
+    real res = ( (grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * (grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * 0.25 ) / grid_.dy();
+    res -= ( (grid_.v(i, j - 1, NORTH) + diag) * (grid_.u(i, j - 1, NORTH) + grid_.u()(i, j)) * 0.25 ) / grid_.dy();
+    res += gamma_ * ( fabs(grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * (grid_.u()(i, j) - grid_.u(i, j + 1, SOUTH)) * 0.25 ) / grid_.dy();
+    res -= gamma_ * ( fabs(grid_.v(i, j - 1, NORTH) + diag) * (grid_.u(i, j - 1, NORTH) - grid_.u()(i, j)) * 0.25 ) / grid_.dy();
 
     return res;
 }
 
 // d(uv)/dx
-real FluidSimulator::dxuv(int i, int j) {
-    ASSERT_MSG( (j >= 0), "wrong input for j: " << j); 
-    ASSERT_MSG( (j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j); 
+real FluidSimulator::dxuv(int i, int j)
+{
+    ASSERT_MSG( (j >= 0), "wrong input for j: " << j);
+    ASSERT_MSG( (j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
     ASSERT_MSG( (i - 1 >= 0), "wrong input for i: " << i);
     ASSERT_MSG( (i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
     real diag = 0.0;
-    if ( grid_.isFluid(i-1,j+1) ) {
-      diag = grid_.u()(i-1,j+1);
-    } else {
-      diag = 0.5*( grid_.u(i,j+1,EAST) + grid_.u(i-1,j,SOUTH) );
+    if ( grid_.isFluid(i - 1, j + 1) )
+    {
+        diag = grid_.u()(i - 1, j + 1);
     }
-    real res = ( (grid_.u()(i,j)+grid_.u(i,j+1,SOUTH))*(grid_.v()(i,j)+grid_.v(i+1,j,WEST))*0.25 )/grid_.dx();
-    res -= ( (grid_.u(i-1,j,EAST)+diag)*(grid_.v(i-1,j,EAST)+grid_.v()(i,j))*0.25 )/grid_.dx();
-    res += gamma_*( fabs(grid_.u()(i,j)+grid_.u(i,j+1,SOUTH))*(grid_.v()(i,j)-grid_.v(i+1,j,WEST))*0.25 )/grid_.dx();
-    res -= gamma_*( fabs(grid_.u(i-1,j,EAST)+diag)*(grid_.v(i-1,j,EAST)-grid_.v()(i,j))*0.25 )/grid_.dx();
+    else
+    {
+        diag = 0.5 * ( grid_.u(i, j + 1, EAST) + grid_.u(i - 1, j, SOUTH) );
+    }
+    real res = ( (grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * (grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * 0.25 ) / grid_.dx();
+    res -= ( (grid_.u(i - 1, j, EAST) + diag) * (grid_.v(i - 1, j, EAST) + grid_.v()(i, j)) * 0.25 ) / grid_.dx();
+    res += gamma_ * ( fabs(grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * (grid_.v()(i, j) - grid_.v(i + 1, j, WEST)) * 0.25 ) / grid_.dx();
+    res -= gamma_ * ( fabs(grid_.u(i - 1, j, EAST) + diag) * (grid_.v(i - 1, j, EAST) - grid_.v()(i, j)) * 0.25 ) / grid_.dx();
 
     return res;
 }
 
 // d^2u/dx^2
-real FluidSimulator::ddxu(int i, int j) {
+real FluidSimulator::ddxu(int i, int j)
+{
     ASSERT_MSG( (i - 1 >= 0), "wrong input for i: " << i);
     ASSERT_MSG( (i + 1 < grid_.u().getSize(0)), "wrong input for i: " << i);
-    ASSERT_MSG( (j >= 0), "wrong input for j: " << j); 
-    real res = ( grid_.u(i+1,j,WEST)-2*grid_.u()(i,j)+grid_.u(i-1,j,EAST) )/(grid_.dx()*grid_.dx());
+    ASSERT_MSG( (j >= 0), "wrong input for j: " << j);
+    real res = ( grid_.u(i + 1, j, WEST) - 2 * grid_.u()(i, j) + grid_.u(i - 1, j, EAST) ) / (grid_.dx() * grid_.dx());
 
     return res;
 }
 
 // d^2v/dx^2
-real FluidSimulator::ddxv(int i, int j) {
+real FluidSimulator::ddxv(int i, int j)
+{
     ASSERT_MSG( (i - 1 >= 0), "wrong input for i: " << i);
     ASSERT_MSG( (i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
-    ASSERT_MSG( (j >= 0), "wrong input for j: " << j); 
-    real res = ( grid_.v(i+1,j,WEST)-2*grid_.v()(i,j)+grid_.v(i-1,j,EAST) )/(grid_.dx()*grid_.dx());
+    ASSERT_MSG( (j >= 0), "wrong input for j: " << j);
+    real res = ( grid_.v(i + 1, j, WEST) - 2 * grid_.v()(i, j) + grid_.v(i - 1, j, EAST) ) / (grid_.dx() * grid_.dx());
 
     return res;
 }
 
 // d^2u/dy^2
-real FluidSimulator::ddyu(int i, int j) {
+real FluidSimulator::ddyu(int i, int j)
+{
     ASSERT_MSG( (j - 1 >= 0), "wrong input for j: " << j);
     ASSERT_MSG( (j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
-    ASSERT_MSG( (i >= 0), "wrong input for i: " << i); 
-    real res = ( grid_.u(i,j+1,SOUTH)-2*grid_.u()(i,j)+grid_.u(i,j-1,NORTH) )/(grid_.dy()*grid_.dy());
+    ASSERT_MSG( (i >= 0), "wrong input for i: " << i);
+    real res = ( grid_.u(i, j + 1, SOUTH) - 2 * grid_.u()(i, j) + grid_.u(i, j - 1, NORTH) ) / (grid_.dy() * grid_.dy());
 
     return res;
 }
 
 // d^2v/dy^2
-real FluidSimulator::ddyv(int i, int j) {
+real FluidSimulator::ddyv(int i, int j)
+{
     ASSERT_MSG( (j - 1 >= 0), "wrong input for j: " << j);
     ASSERT_MSG( (j + 1 < grid_.v().getSize(1)), "wrong input for j: " << j);
-    ASSERT_MSG( (i >= 0), "wrong input for i: " << i); 
-    real res = ( grid_.v(i,j+1,SOUTH)-2*grid_.v()(i,j)+grid_.v(i,j-1,NORTH) )/(grid_.dy()*grid_.dy());
+    ASSERT_MSG( (i >= 0), "wrong input for i: " << i);
+    real res = ( grid_.v(i, j + 1, SOUTH) - 2 * grid_.v()(i, j) + grid_.v(i, j - 1, NORTH) ) / (grid_.dy() * grid_.dy());
 
     return res;
 }
@@ -497,42 +599,48 @@ void FluidSimulator::computeFG()
     grid_.g().fill(0);
     PROG("set boundary values for F");
     // boundary values for F
-    for ( int j = 1; j <= jmax; j++ ) {
-        grid_.f()(0,j-1) = grid_.u()(0,j);
-        grid_.f()(imax,j-1) = grid_.u()(imax,j);
+    for ( int j = 1; j <= jmax; j++ )
+    {
+        grid_.f()(0, j - 1) = grid_.u()(0, j);
+        grid_.f()(imax, j - 1) = grid_.u()(imax, j);
     }
 
     PROG("set boundary values for G");
     // boundary values for G
-    for ( int i = 1; i <= imax; i++ ) {
-        grid_.g()(i-1,0) = grid_.v()(i,0);
-        grid_.g()(i-1,jmax) = grid_.v()(i,jmax);
+    for ( int i = 1; i <= imax; i++ )
+    {
+        grid_.g()(i - 1, 0) = grid_.v()(i, 0);
+        grid_.g()(i - 1, jmax) = grid_.v()(i, jmax);
     }
 
-    real dtRe = dt_/Re_;
-    real dtGx = dt_*gx_;
-    real dtGy = dt_*gy_;
+    real dtRe = dt_ / Re_;
+    real dtGx = dt_ * gx_;
+    real dtGy = dt_ * gy_;
 
     PROG("compute F");
     // compute F
-    for ( int i = 1; i < imax; i++ ) {
-        for ( int j = 1; j <= jmax; j++ ) {
-	  
-	  if ( grid_.isFluid(i,j) && grid_.isFluid(i+1,j) ) 
-            grid_.f()(i,j-1) = grid_.u()(i,j) + dtRe*(ddxu(i,j)+ddyu(i,j)) - dt_*(dxuu(i,j) + dyuv(i,j)) + dtGx;
-	  
-	}
+    for ( int i = 1; i < imax; i++ )
+    {
+        for ( int j = 1; j <= jmax; j++ )
+        {
+
+            if ( grid_.isFluid(i, j) && grid_.isFluid(i + 1, j) )
+                grid_.f()(i, j - 1) = grid_.u()(i, j) + dtRe * (ddxu(i, j) + ddyu(i, j)) - dt_ * (dxuu(i, j) + dyuv(i, j)) + dtGx;
+
+        }
     }
 
     PROG("compute G");
     // compute G
-    for ( int i = 1; i <= imax; i++ ) {
-        for ( int j = 1; j < jmax; j++ ) {
-	  
-	  if ( grid_.isFluid(i,j) && grid_.isFluid(i,j+1) ) 
-            grid_.g()(i-1,j) = grid_.v()(i,j) + dtRe*(ddxv(i,j)+ddyv(i,j)) - dt_*(dxuv(i,j) + dyvv(i,j)) + dtGy;
-	  
-	}
+    for ( int i = 1; i <= imax; i++ )
+    {
+        for ( int j = 1; j < jmax; j++ )
+        {
+
+            if ( grid_.isFluid(i, j) && grid_.isFluid(i, j + 1) )
+                grid_.g()(i - 1, j) = grid_.v()(i, j) + dtRe * (ddxv(i, j) + ddyv(i, j)) - dt_ * (dxuv(i, j) + dyvv(i, j)) + dtGy;
+
+        }
     }
 
 }

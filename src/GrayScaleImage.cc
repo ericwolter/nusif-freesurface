@@ -1,8 +1,8 @@
 //======================================================================================================================
 /*!
- *  \file   GrayScaleImage.cpp
- *  \author Martin Bauer <martin.bauer@fau.de>
- */
+*  \file   GrayScaleImage.cpp
+*  \author Martin Bauer <martin.bauer@fau.de>
+*/
 //======================================================================================================================
 
 
@@ -16,92 +16,82 @@
 #include <limits>
 
 
-GrayScaleImage::GrayScaleImage( const std::string & pngFilename )
+GrayScaleImage::GrayScaleImage( const std::string &pngFilename )
 {
-   unsigned int tmpWidth, tmpHeight;
-   unsigned int error = lodepng::decode( image_, tmpWidth, tmpHeight, pngFilename, LCT_GREY, 8 );
-   size_[0] = tmpWidth;
-   size_[1] = tmpHeight;
+    unsigned int tmpWidth, tmpHeight;
+    unsigned int error = lodepng::decode( image_, tmpWidth, tmpHeight, pngFilename, LCT_GREY, 8 );
+    size_[0] = tmpWidth;
+    size_[1] = tmpHeight;
 
-   CHECK_MSG( error == 0 , "Error while loading PNG file: " << lodepng_error_text(error) );
+    CHECK_MSG( error == 0 , "Error while loading PNG file: " << lodepng_error_text(error) );
 }
 // own constructor
-GrayScaleImage::GrayScaleImage( const std::string & pngFilename, unsigned int tmpWidth, unsigned int tmpHeight )
+GrayScaleImage::GrayScaleImage( const std::string &pngFilename, unsigned int tmpWidth, unsigned int tmpHeight )
 {
-  size_[0] = tmpWidth;
-  size_[1] = tmpHeight;
-  image_.resize(tmpWidth * tmpHeight * 4);
-  unsigned int error = lodepng::encode( pngFilename, image_, tmpWidth, tmpHeight, LCT_GREY, 8 );
+    size_[0] = tmpWidth;
+    size_[1] = tmpHeight;
+    image_.resize(tmpWidth * tmpHeight * 4);
+    unsigned int error = lodepng::encode( pngFilename, image_, tmpWidth, tmpHeight, LCT_GREY, 8 );
 
-  CHECK_MSG( error == 0 , "Error while creating PNG file: " << lodepng_error_text(error) );
+    CHECK_MSG( error == 0 , "Error while creating PNG file: " << lodepng_error_text(error) );
 }
 
-void GrayScaleImage::save( const std::string & pngFilename )
+void GrayScaleImage::save( const std::string &pngFilename )
 {
-   unsigned int error = lodepng::encode( pngFilename, image_,
-                                         static_cast<unsigned int>( size_[0] ),
-                                         static_cast<unsigned int>( size_[1] ),
-                                         LCT_GREY, 8 );
+    unsigned int error = lodepng::encode( pngFilename, image_,
+                                          static_cast<unsigned int>( size_[0] ),
+                                          static_cast<unsigned int>( size_[1] ),
+                                          LCT_GREY, 8 );
 
-   CHECK_MSG( error ==0 , "Error while loading PNG file: " << lodepng_error_text(error) );
+    CHECK_MSG( error == 0 , "Error while loading PNG file: " << lodepng_error_text(error) );
 }
 
 
 real GrayScaleImage::operator() ( int x, int y ) const
 {
-   static const real maxVal = real( std::numeric_limits<unsigned char>::max() );
+    static const real maxVal = real( std::numeric_limits<unsigned char>::max() );
 
-   const int yFlip = size_[1] - y - 1;
+    const int yFlip = size_[1] - y - 1;
 
-   return real ( getElement(x, yFlip) ) / maxVal;
+    return real ( getElement(x, yFlip) ) / maxVal;
 }
 
 
 GrayScaleImage GrayScaleImage::getResizedImage( int newWidth, int newHeight ) const
 {
-   if ( newWidth == size_[0]  && newHeight == size_[1] )
-      return *this;
+    if ( newWidth == size_[0]  && newHeight == size_[1] )
+        return *this;
 
 
-   GrayScaleImage resizedImage;
+    GrayScaleImage resizedImage;
 
-   resizedImage.size_[0] = newWidth;
-   resizedImage.size_[1] = newHeight;
+    resizedImage.size_[0] = newWidth;
+    resizedImage.size_[1] = newHeight;
 
-   resizedImage.image_.resize( newWidth * newHeight );
+    resizedImage.image_.resize( newWidth * newHeight );
 
-   real scaleX = real( size_[0] ) / real( newWidth );
-   real scaleY = real( size_[1] ) / real( newHeight);
+    real scaleX = real( size_[0] ) / real( newWidth );
+    real scaleY = real( size_[1] ) / real( newHeight);
 
-   for( int y = 0; y <  newHeight; ++y )
-      for( int x = 0; x <  newWidth; ++x )
-      {
-         real oldX = x * scaleX;
-         real oldY = y * scaleY;
-         int oldXi = static_cast<int>( oldX );
-         int oldYi = static_cast<int>( oldY );
-         real xDiff = oldX - oldXi;
-         real yDiff = oldY - oldYi;
+    for ( int y = 0; y <  newHeight; ++y )
+        for ( int x = 0; x <  newWidth; ++x )
+        {
+            real oldX = x * scaleX;
+            real oldY = y * scaleY;
+            int oldXi = static_cast<int>( oldX );
+            int oldYi = static_cast<int>( oldY );
+            real xDiff = oldX - oldXi;
+            real yDiff = oldY - oldYi;
 
-         // bilinear interpolation
+            // bilinear interpolation
 
-         resizedImage.getElement( x, y ) =
-                  static_cast<unsigned char> (
-                  (1 - xDiff) * (1 - yDiff ) * getElement( oldXi    , oldYi    ) +
-                       xDiff  * (1 - yDiff ) * getElement( oldXi + 1, oldYi    ) +
-                  (1 - xDiff) *      yDiff   * getElement( oldXi    , oldYi + 1) +
-                       xDiff  *      yDiff   * getElement( oldXi + 1, oldYi + 1) );
-      }
+            resizedImage.getElement( x, y ) =
+                static_cast<unsigned char> (
+                    (1 - xDiff) * (1 - yDiff ) * getElement( oldXi    , oldYi    ) +
+                    xDiff  * (1 - yDiff ) * getElement( oldXi + 1, oldYi    ) +
+                    (1 - xDiff) *      yDiff   * getElement( oldXi    , oldYi + 1) +
+                    xDiff  *      yDiff   * getElement( oldXi + 1, oldYi + 1) );
+        }
 
-   return resizedImage;
+    return resizedImage;
 }
-
-
-
-
-
-
-
-
-
-

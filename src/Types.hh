@@ -19,7 +19,7 @@ const flag OBSCENTER = 1 << 0;
 const flag OBSWEST   = 1 << 1;
 const flag OBSEAST   = 1 << 2;
 const flag OBSNORTH  = 1 << 3;
-const flag OBSSOUTH  = 1 << 4; 
+const flag OBSSOUTH  = 1 << 4;
 const flag FREE      = 1 << 5;
 
 #endif //TYPES_HH

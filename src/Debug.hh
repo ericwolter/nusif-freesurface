@@ -10,23 +10,23 @@
 //===================================================================================================================
 
 #define CHECK_MSG(X, MSG) \
-   if( !(X) )  \
-   { std::stringstream ss; \
-     ss << MSG; \
-     internal::checkFct ( (X), #X, ss.str(), __FILE__, __LINE__ );\
-   }
+    if( !(X) )  \
+    { std::stringstream ss; \
+        ss << MSG; \
+        internal::checkFct ( (X), #X, ss.str(), __FILE__, __LINE__ );\
+    }
 
 #define CHECK(X) \
-   if( !(X) ) {  internal::checkFct ( (X), #X, "", __FILE__, __LINE__ ); }
+    if( !(X) ) {  internal::checkFct ( (X), #X, "", __FILE__, __LINE__ ); }
 
 
 
 
 #define WARN(MSG) \
-   { std::stringstream ss; \
-     ss << MSG; \
-     internal::warnFct ( ss.str(), __FILE__, __LINE__ );\
-   }
+    { std::stringstream ss; \
+        ss << MSG; \
+        internal::warnFct ( ss.str(), __FILE__, __LINE__ );\
+    }
 
 
 
@@ -41,20 +41,20 @@
 #ifndef NDEBUG
 
 #define ASSERT_MSG(X, MSG) \
-   if( !(X) )  \
-   { std::stringstream ss; \
-     ss << MSG; \
-     internal::assertFct ( (X), #X, ss.str(), __FILE__, __LINE__ );\
-   }
+    if( !(X) )  \
+    { std::stringstream ss; \
+        ss << MSG; \
+        internal::assertFct ( (X), #X, ss.str(), __FILE__, __LINE__ );\
+    }
 
 #define PROG(MSG) \
-   { std::stringstream ss; \
-     ss << MSG; \
-     internal::progFct ( ss.str(), __FILE__, __LINE__ );\
-   }
+    { std::stringstream ss; \
+        ss << MSG; \
+        internal::progFct ( ss.str(), __FILE__, __LINE__ );\
+    }
 
 #define ASSERT(X) \
-   if( !(X) ) {  internal::assertFct ( (X), #X, "", __FILE__, __LINE__ ); }
+    if( !(X) ) {  internal::assertFct ( (X), #X, "", __FILE__, __LINE__ ); }
 
 
 #else
@@ -73,17 +73,17 @@
 namespace internal
 {
 
-   void checkFct ( bool b, const char * const expression, const std::string & message,
-                   const char * const filename, int line );
-   void assertFct( bool b, const char * const expression, const std::string & message,
-                   const char * const filename, int line );
+void checkFct ( bool b, const char *const expression, const std::string &message,
+                const char *const filename, int line );
+void assertFct( bool b, const char *const expression, const std::string &message,
+                const char *const filename, int line );
 
-   void warnFct( const std::string & message,
-                 const char * const filename, int line );
+void warnFct( const std::string &message,
+              const char *const filename, int line );
 
-   // own "progress" function
-   void progFct( const std::string & message,
-                 const char * const filename, int line );
+// own "progress" function
+void progFct( const std::string &message,
+              const char *const filename, int line );
 
 }
 

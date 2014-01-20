@@ -124,7 +124,9 @@ public:
     void createPng( const std::string &pngFilename );
     void readPng( const std::string &pngFilename );
 
-
+    // Interpolated function ( bilinear interpolation )
+    real u_inter ( real x , real y ) ;
+    real v_inter ( real x , real y ) ;
 protected:
     Array p_;   //< pressure field
     Array rhs_; //< right hand side of the pressure equation

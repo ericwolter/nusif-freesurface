@@ -201,7 +201,7 @@ void FluidSimulator::refreshBoundaries()
             if ( grid_.isFluid(i, jmax) )
             {
                 grid_.v()(i, jmax) = vel_N;
-                grid_.u()(i, jmax + 1) = 0;
+                grid_.u()(i, jmax + 1) = - grid_.u()(i, jmax);
             }
             else
             {
@@ -237,7 +237,7 @@ void FluidSimulator::refreshBoundaries()
             if ( grid_.isFluid(i, 1) )
             {
                 grid_.v()(i, 0) = vel_S;
-                grid_.u()(i, 0) = 0;
+                grid_.u()(i, 0) = - grid_.u()(i, 1);
             }
             else
             {
@@ -273,7 +273,7 @@ void FluidSimulator::refreshBoundaries()
             if ( grid_.isFluid(1, j) )
             {
                 grid_.u()(0, j) = vel_W;
-                grid_.v()(0, j) = 0;
+                grid_.v()(0, j) = - grid_.v()(1, j);
             }
             else
             {
@@ -310,7 +310,7 @@ void FluidSimulator::refreshBoundaries()
             if ( grid_.isFluid(imax, j) )
             {
                 grid_.u()(imax, j) = vel_E;
-                grid_.v()(imax + 1, j) = 0;
+                grid_.v()(imax + 1, j) = - grid_.v()(imax, j);
             }
             else
             {

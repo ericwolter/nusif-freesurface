@@ -18,6 +18,8 @@ class Particle
 
 public:
 
+    Particle(real x, real y);
+
     real &x()
     {
         return x_;

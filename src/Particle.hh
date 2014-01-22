@@ -51,6 +51,10 @@ public:
     {
         return v_;
     }
+    const int &type() const
+    {
+        return type_;
+    }
     //inline real & operator () ( int i ,int j );
     //const  real & operator () ( int i ,int j ) const;
 
@@ -63,6 +67,8 @@ private:
     real y_ ;   // "y" position of particle
     real u_ ;   // "u" velocity of particle
     real v_ ;   // "v" velocity of particle
+
+    int type_;
 
 };
 

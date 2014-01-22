@@ -13,6 +13,8 @@ StaggeredGrid::StaggeredGrid( int xxSize, int yySize, real ddx, real ddy )
     dy_ = ddy;
     xSize_ = xxSize;
     ySize_ = yySize;
+    imax_ = xSize_ / dx_;
+    jmax_ = ySize_ / dy_;
 
     Array pp( (int) (xxSize / ddx) + 2, (int) (yySize / ddy) + 2 );
     Array rhss( (int) (xxSize / ddx), (int) (yySize / ddy) );
@@ -58,6 +60,8 @@ StaggeredGrid::StaggeredGrid( const FileReader &configuration )
     dy_ = yl / jmax;
     xSize_ = xl;
     ySize_ = yl;
+    imax_ = imax;
+    jmax_ = jmax;
     Array pp( imax + 2, jmax + 2 );
     Array rhss( imax, jmax );
     Array uu( imax + 1, jmax + 2 );
@@ -82,25 +86,6 @@ StaggeredGrid::StaggeredGrid( const FileReader &configuration )
     ob.fill(FREE);
     obs_ = ob;
 
-}
-
-void StaggeredGrid::setCellToObstacle(int x, int y)
-{
-    obs_(x, y) = obs_(x, y) | OBSCENTER; // set cell to obstacle
-    if ( x < u_.getSize(0) && y < u_.getSize(1) )
-        u_(x, y) = 0;
-    if ( x < v_.getSize(0) && y < v_.getSize(1) )
-        v_(x, y) = 0;
-
-    // configurate neighbors
-    if ( (x - 1) >= 0 ) // east
-        obs_(x - 1, y) = obs_(x - 1, y) | OBSWEST;
-    if ( (x + 1) < obs_.getSize(0) ) // west
-        obs_(x + 1, y) = obs_(x + 1, y) | OBSEAST;
-    if ( (y - 1) >= 0 ) // south
-        obs_(x, y - 1) = obs_(x, y - 1) | OBSNORTH;
-    if ( (y + 1) < obs_.getSize(1) ) // north
-        obs_(x, y + 1) = obs_(x, y + 1) | OBSSOUTH;
 }
 
 void StaggeredGrid::createRectangle(real x1, real y1, real x2, real y2)
@@ -200,61 +185,106 @@ void StaggeredGrid::readPng( const std::string &pngFilename )
 
 real StaggeredGrid::u_inter ( real x , real y )
 {
-	int i = (int) (x / dx_) + 1 				;
-	int j = (int) (( y + 0.5*dy_ ) / dy_) + 1 	;
+    int i = (int) (x / dx_) + 1                 ;
+    int j = (int) (( y + 0.5 * dy_ ) / dy_) + 1   ;
 
-	real x1 , x2 , y1 , y2 ;
+    real x1 , x2 , y1 , y2 ;
 
-	x1 = (real) (i-1)*dx_ 		;
-	x2 = (real) i*dx_ 			;
-	y1 = (real) ((j-1)-0.5)*dy_ ;
-	y2 = (real) (j-1)*dy_ 		;
+    x1 = (real) (i - 1) * dx_       ;
+    x2 = (real) i * dx_           ;
+    y1 = (real) ((j - 1) - 0.5) * dy_ ;
+    y2 = (real) (j - 1) * dy_       ;
 
-	real u1 = u_( i-1 , j-1 ) ;
-	real u2 = u_( i   , j-1 ) ;
-	real u3 = u_( i-1 , j   ) ;
-	real u4 = u_( i   , j   ) ;
+    real u1 = u_( i - 1 , j - 1 ) ;
+    real u2 = u_( i   , j - 1 ) ;
+    real u3 = u_( i - 1 , j   ) ;
+    real u4 = u_( i   , j   ) ;
 
-	real u_interpolate ;
+    real u_interpolate ;
 
-	real coeeficient = (real) ( 1.0 / (dx_*dy_) ) ;
+    real coeeficient = (real) ( 1.0 / (dx_ * dy_) ) ;
 
-	u_interpolate = coeeficient * (   (real) ( x2 - x  ) * ( y2 - y  )*u1
-								    + (real) ( x  - x1 ) * ( y2 - y  )*u2
-								    + (real) ( x2 - x  ) * ( y  - y1 )*u3
-								    + (real) ( x  - x1 ) * ( y  - y1 )*u4
-								   ) ;
+    u_interpolate = coeeficient * (   (real) ( x2 - x  ) * ( y2 - y  ) * u1
+                                      + (real) ( x  - x1 ) * ( y2 - y  ) * u2
+                                      + (real) ( x2 - x  ) * ( y  - y1 ) * u3
+                                      + (real) ( x  - x1 ) * ( y  - y1 ) * u4
+                                  ) ;
 
-	return u_interpolate ;
+    return u_interpolate ;
 
 }
 
 real StaggeredGrid::v_inter ( real x , real y )
 {
-	int i = (int) (( x + 0.5 * dx_ ) / dx_) + 1	;
-	int j = (int) ( y  / dy_) + 1 				;
+    int i = (int) (( x + 0.5 * dx_ ) / dx_) + 1 ;
+    int j = (int) ( y  / dy_) + 1               ;
 
-	real x1 , x2 , y1 , y2 ;
+    real x1 , x2 , y1 , y2 ;
 
-	x1 = (real) ((i-1)-0.5)*dx_ ;
-	x2 = (real) (i-0.5)    *dx_ ;
-	y1 = (real) (j-1)*dy_ 		;
-	y2 = (real) 	j*dy_ 		;
+    x1 = (real) ((i - 1) - 0.5) * dx_ ;
+    x2 = (real) (i - 0.5)    * dx_ ;
+    y1 = (real) (j - 1) * dy_       ;
+    y2 = (real)     j * dy_       ;
 
-	real v1 = v_( i-1 , j-1 ) ;
-	real v2 = v_( i   , j-1 ) ;
-	real v3 = v_( i-1 , j   ) ;
-	real v4 = v_( i   , j   ) ;
+    real v1 = v_( i - 1 , j - 1 ) ;
+    real v2 = v_( i   , j - 1 ) ;
+    real v3 = v_( i - 1 , j   ) ;
+    real v4 = v_( i   , j   ) ;
 
-	real v_interpolate ;
+    real v_interpolate ;
 
-	real coeeficient = (real) ( 1.0 / (dx_*dy_) ) ;
+    real coeeficient = (real) ( 1.0 / (dx_ * dy_) ) ;
 
-	v_interpolate = coeeficient * (   (real) ( x2 - x  ) * ( y2 - y  )*v1
-								    + (real) ( x  - x1 ) * ( y2 - y  )*v2
-								    + (real) ( x2 - x  ) * ( y  - y1 )*v3
-								    + (real) ( x  - x1 ) * ( y  - y1 )*v4
-								   ) ;
+    v_interpolate = coeeficient * (   (real) ( x2 - x  ) * ( y2 - y  ) * v1
+                                      + (real) ( x  - x1 ) * ( y2 - y  ) * v2
+                                      + (real) ( x2 - x  ) * ( y  - y1 ) * v3
+                                      + (real) ( x  - x1 ) * ( y  - y1 ) * v4
+                                  ) ;
 
-	return v_interpolate ;
+    return v_interpolate;
 }
+
+void StaggeredGrid::setCellToFluid(int x, int y) {}
+void StaggeredGrid::setCellToEmpty(int x, int y) {}
+void StaggeredGrid::setCellToObstacle(int x, int y)
+{
+    obs_(x, y) = obs_(x, y) | OBSCENTER; // set cell to obstacle
+    if ( x < u_.getSize(0) && y < u_.getSize(1) )
+        u_(x, y) = 0;
+    if ( x < v_.getSize(0) && y < v_.getSize(1) )
+        v_(x, y) = 0;
+
+    // configurate neighbors
+    if ( (x - 1) >= 0 ) // east
+        obs_(x - 1, y) = obs_(x - 1, y) | OBSWEST;
+    if ( (x + 1) < obs_.getSize(0) ) // west
+        obs_(x + 1, y) = obs_(x + 1, y) | OBSEAST;
+    if ( (y - 1) >= 0 ) // south
+        obs_(x, y - 1) = obs_(x, y - 1) | OBSNORTH;
+    if ( (y + 1) < obs_.getSize(1) ) // north
+        obs_(x, y + 1) = obs_(x, y + 1) | OBSSOUTH;
+}
+
+void StaggeredGrid::markCells()
+{
+    for (int i = 1; i <= imax_; ++i)
+    {
+        for (int j = 1; j <= jmax_; ++j)
+        {
+            if (!isFluid(i, j)) continue;
+
+            setCellToEmpty(i, j);
+        }
+    }
+
+    for (std::vector<Particle>::iterator it = particles_.begin() ; it != particles_.end(); ++it)
+    {
+        Particle p = *it;
+
+        int i = p.getCellX(dx_);
+        int j = p.getCellY(dy_);
+
+        setCellToFluid(i, j);
+    }
+}
+

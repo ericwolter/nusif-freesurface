@@ -1,11 +1,13 @@
 #ifndef STAGGERED_GRID_HH
 #define STAGGERED_GRID_HH
 
+#include <vector>
 
 #include "Types.hh"
 #include "Array.hh"
 #include "FileReader.hh"
 #include "GrayScaleImage.hh"
+#include "Particle.hh"
 
 
 //*******************************************************************************************************************
@@ -92,6 +94,10 @@ public:
     {
         return obs_;
     }
+    const std::vector<Particle> &particles() const
+    {
+        return particles_;
+    }
 
     real dx() const
     {
@@ -111,6 +117,15 @@ public:
         return ySize_ / dy_;
     }
 
+    int imax() const
+    {
+        return imax_;
+    }
+    int jmax() const
+    {
+        return jmax_;
+    }
+
     inline bool isFluid(const int x, const int y);
     inline int getNumFluid();
 
@@ -118,11 +133,14 @@ public:
     inline real v(const int x, const int y, Direction dir);
     inline real p(const int x, const int y, Direction dir);
 
+    void setCellToFluid(int x, int y);
+    void setCellToEmpty(int x, int y);
     void setCellToObstacle(int x, int y);
     void createRectangle(real x1, real y1, real x2, real y2);
     void createCircle(real x, real y, real r);
     void createPng( const std::string &pngFilename );
     void readPng( const std::string &pngFilename );
+    void markCells();
 
     // Interpolated function ( bilinear interpolation )
     real u_inter ( real x , real y ) ;
@@ -140,6 +158,10 @@ protected:
     real dy_;   //< distance between two grid points in y direction
     real xSize_;
     real ySize_;
+    int imax_;
+    int jmax_;
+
+    std::vector<Particle> particles_;
 };
 
 

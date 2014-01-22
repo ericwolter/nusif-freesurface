@@ -85,11 +85,11 @@ FluidSimulator::FluidSimulator( const FileReader &conf )
     }
 
     safetyfac_ = conf.getRealParameter("safetyfactor");
-    timeStepNr = conf.getIntParameter("timesteps");
+    timeStepNr = (unsigned int)conf.getIntParameter("timesteps");
     CHECK_MSG( (timeStepNr >= 0), "wrong input for timesteps: " << timeStepNr);
-    outPutInt = conf.getIntParameter("outputinterval");
+    outPutInt = (unsigned int)conf.getIntParameter("outputinterval");
     CHECK_MSG( (outPutInt > 0), "wrong input for outputinterval: " << outPutInt);
-    normfreq = conf.getIntParameter("normalizationfrequency");
+    normfreq = (unsigned int)conf.getIntParameter("normalizationfrequency");
     CHECK_MSG( (normfreq > 0), "wrong input for normalizationfrequency: " << normfreq);
     uInit_ = conf.getRealParameter("U_INIT");
     vInit_ = conf.getRealParameter("V_INIT");
@@ -336,7 +336,7 @@ void FluidSimulator::simulate( real duration )
 {
     VTKWriter vtkWriter ( grid_, "lidDrivenCavity", true, true );
     real t = 0;
-    int n = 0;
+    unsigned int n = 0;
 
     PROG("initialize u, v, p, rhs");
     int half = (int) ( rectYY_ / grid_.dy() );

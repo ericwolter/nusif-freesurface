@@ -1,3 +1,6 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
 #pragma once
 
 
@@ -93,3 +96,6 @@ inline int GrayScaleImage::size( int coord ) const
     ASSERT(coord < 2);
     return size_[coord];
 }
+
+
+#pragma GCC diagnostic pop

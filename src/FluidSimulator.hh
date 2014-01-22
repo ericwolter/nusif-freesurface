@@ -62,7 +62,8 @@ private:
     real safetyfac_, gamma_, Re_, gx_, gy_, dt_, vel_N, vel_S, vel_E, vel_W, uInit_, vInit_, pInit_;
     real rectX_, rectXX_, rectY_, rectYY_, circX_, circY_, circR_;
     BCTYPE cond_N, cond_S, cond_E, cond_W;
-    int timeStepNr, normfreq, outPutInt, imax, jmax;
+    unsigned int timeStepNr,normfreq, outPutInt;
+    int imax, jmax;
 
 protected:
     StaggeredGrid grid_;   //< grid

@@ -1,3 +1,6 @@
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wsign-conversion"
+
 //======================================================================================================================
 /*!
 *  \file   GrayScaleImage.cpp
@@ -95,3 +98,5 @@ GrayScaleImage GrayScaleImage::getResizedImage( int newWidth, int newHeight ) co
 
     return resizedImage;
 }
+
+#pragma GCC diagnostic pop

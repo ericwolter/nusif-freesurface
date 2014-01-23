@@ -85,12 +85,62 @@ void ParticleTracer::advanceParticles(real const dt)
 
 real ParticleTracer::interpolateU(real x, real y)
 {
-    return 0.0;
+    // see section 4.2.1
+
+    int i = (int) (x / grid_.dx()) + 1;
+    int j = (int) (( y + 0.5 * grid_.dy() ) / grid_.dy()) + 1;
+
+    real x1, x2, y1, y2;
+    x1 = (i - 1) * grid_.dx();
+    x2 = i * grid_.dx();
+    y1 = ((j - 1) - 0.5) * grid_.dy();
+    y2 = (j - 1) * grid_.dy();
+
+    // TODO: use u accessor function to incooperate obstacles
+    real u1, u2, u3, u4;
+    u1 = grid_.u()( i - 1 , j - 1 );
+    u2 = grid_.u()( i     , j - 1 );
+    u3 = grid_.u()( i - 1 , j     );
+    u4 = grid_.u()( i     , j     );
+
+    real u = (1 / (grid_.dx() * grid_.dy())) * (
+                 ( x2 - x  ) * ( y2 - y  ) * u1 +
+                 ( x  - x1 ) * ( y2 - y  ) * u2 +
+                 ( x2 - x  ) * ( y  - y1 ) * u3 +
+                 ( x  - x1 ) * ( y  - y1 ) * u4
+             );
+
+    return u;
 }
 
 real ParticleTracer::interpolateV(real x, real y)
 {
-    return 0.0;
+    // see section 4.2.1
+
+    int i = (int) (( x + 0.5 * grid_.dx() ) / grid_.dx()) + 1;
+    int j = (int) ( y  / grid_.dy()) + 1;
+
+    real x1, x2, y1, y2;
+    x1 = ((i - 1) - 0.5) * grid_.dx();
+    x2 = (i - 0.5) * grid_.dx();
+    y1 = (j - 1) * grid_.dy();
+    y2 = j * grid_.dy();
+
+    // TODO: use u accessor function to incooperate obstacles
+    real v1, v2, v3, v4;
+    v1 = grid_.v()( i - 1 , j - 1 );
+    v2 = grid_.v()( i     , j - 1 );
+    v3 = grid_.v()( i - 1 , j     );
+    v4 = grid_.v()( i     , j     );
+
+    real v = (1 / (grid_.dx() * grid_.dy())) * (
+                 ( x2 - x  ) * ( y2 - y  ) * v1 +
+                 ( x  - x1 ) * ( y2 - y  ) * v2 +
+                 ( x2 - x  ) * ( y  - y1 ) * v3 +
+                 ( x  - x1 ) * ( y  - y1 ) * v4
+             );
+
+    return v;
 }
 
 

@@ -168,7 +168,7 @@ protected:
 
 inline bool StaggeredGrid::isFluid(const int x, const int y)
 {
-    return ( !(obs_(x, y) & OBSCENTER) );
+    return ( !(obs_(x, y) & OBS) );
 }
 
 
@@ -179,7 +179,7 @@ inline int StaggeredGrid::getNumFluid()
     {
         for ( int j = 0; j < obs_.getSize(1); ++j )
         {
-            if ( !(obs_(i, j) & OBSCENTER) )
+            if ( isFluid(i,j) )
                 ++sum;
         }
     }
@@ -233,7 +233,7 @@ inline real StaggeredGrid::v(const int x, const int y, Direction dir)
 
 inline real StaggeredGrid::p(const int x, const int y, Direction dir)
 {
-    if ( obs_(x, y) & OBSCENTER )
+    if ( !isFluid(x,y) )
     {
         if ( dir == NORTH )
         {

@@ -1,8 +1,8 @@
 #include "Particle.hh"
 
-Particle::Particle(real x, real y) {
-    x_ = x;
-    y_ = y;
+Particle::Particle(real xx, real yy) {
+    x_ = xx;
+    y_ = yy;
 }
 
 int Particle::getCellX(real dx)

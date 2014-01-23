@@ -89,19 +89,7 @@ bool SORSolver::solve( StaggeredGrid &grid )
     {
         WARN("A solution doesn't exist. Instability!");
 
-        real rhssum = 0;
-
-        for ( int i = 0; i < imax; ++i )
-        {
-            for ( int j = 0; j < jmax; ++j )
-            {
-
-                if ( grid.isFluid(i + 1, j + 1) )
-                    rhssum += grid.rhs()(i, j);
-            }
-        }
-
-        real rhsMean = rhssum / grid.getNumFluid();
+        real rhsMean = sum / grid.getNumFluid();
         // substract the mean
         for ( int i = 0; i < imax; ++i )
         {

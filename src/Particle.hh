@@ -77,11 +77,11 @@ private:
 
 };
 
-inline void Particle::setX(real x) {
-    x_ = x;
+inline void Particle::setX(real xx) {
+    x_ = xx;
 }
-inline void Particle::setY(real y) {
-    y_ = y;
+inline void Particle::setY(real yy) {
+    y_ = yy;
 }
 
 

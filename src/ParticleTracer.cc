@@ -65,9 +65,32 @@ void ParticleTracer::fillCell(int x, int y, int numParticles)
 
 void ParticleTracer::print()
 {
-    for (std::vector<Particle>::iterator it = particles_.begin() ; it != particles_.end(); ++it)
+    for (std::vector<Particle>::iterator p = particles_.begin() ; p != particles_.end(); ++p)
     {
-        Particle p = *it;
-        std::cout << "p: [" << p.x() << ", " << p.y() << "]" << std::endl;
+        std::cout << "p: [" << p->x() << ", " << p->y() << "]" << std::endl;
     }
 }
+
+void ParticleTracer::advanceParticles(real const dt)
+{
+    for (std::vector<Particle>::iterator p = particles_.begin() ; p != particles_.end(); ++p)
+    {
+        real u = interpolateU(p->x(), p->y());
+        real v = interpolateV(p->x(), p->y());
+
+        p->setX(p->x() + dt * u);
+        p->setY(p->y() + dt * v);
+    }
+}
+
+real ParticleTracer::interpolateU(real x, real y)
+{
+    return 0.0;
+}
+
+real ParticleTracer::interpolateV(real x, real y)
+{
+    return 0.0;
+}
+
+

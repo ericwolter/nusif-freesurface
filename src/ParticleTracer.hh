@@ -21,9 +21,13 @@ public:
     void addRectangle(int x1, int y1, int x2, int y2);
     void addCircle(int x, int y, int r);
 
+    void advanceParticles(real const dt);
     void print();
 private:
     void fillCell(int i, int j, int numParticles);
+
+    real interpolateU(real x, real y);
+    real interpolateV(real x, real y);
 
     std::vector<Particle> particles_;
     StaggeredGrid grid_;

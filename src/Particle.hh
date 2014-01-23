@@ -63,6 +63,9 @@ public:
     int getCellX(real dx);
     int getCellY(real dy);
 
+    void setX(real x);
+    void setY(real y);
+
 private:
 
     real x_ ;   // "x" position of particle
@@ -73,5 +76,13 @@ private:
     int type_;
 
 };
+
+inline void Particle::setX(real x) {
+    x_ = x;
+}
+inline void Particle::setY(real y) {
+    y_ = y;
+}
+
 
 #endif //PARTICLE_HHH

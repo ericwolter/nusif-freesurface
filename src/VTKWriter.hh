@@ -3,6 +3,7 @@
 
 
 #include "StaggeredGrid.hh"
+#include "ParticleTracer.hh"
 
 
 
@@ -27,21 +28,14 @@ class VTKWriter
 
 public:
 
-    VTKWriter(  const StaggeredGrid &grid, const std::string &basename,
-                bool writePressure = true, bool writeVelocity = true );
+    VTKWriter(  const std::string &basename);
 
-    void write();
+    void write( const StaggeredGrid &grid, const ParticleTracer *tracer );
 
 private:
-    const StaggeredGrid &grid_;
     std::string baseName_;
 
-    bool writeVelocity_;
-    bool writePressure_;
-
     int counter_;
-    std::string header_;
-
 };
 
 #endif

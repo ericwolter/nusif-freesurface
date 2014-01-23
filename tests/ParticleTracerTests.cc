@@ -2,6 +2,7 @@
 #include "../src/ParticleTracer.hh"
 #include "../src/StaggeredGrid.hh"
 #include "../src/Debug.hh"
+#include "../src/VTKWriter.hh"
 
 #include <iostream>
 
@@ -13,7 +14,8 @@ int main( )
 
     tracer.addRectangle(1,1,3,3);
 
-    tracer.print();
+    VTKWriter writer("particletracertest");
+    writer.write(grid, &tracer);
    // std::cout << "Copy Test: ";
    // copyTest();
    // std::cout << "OK" << std::endl;

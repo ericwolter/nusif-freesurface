@@ -21,65 +21,101 @@ const char *RealTypeToString<double>::str = "double";
 
 
 
-VTKWriter::VTKWriter(  const StaggeredGrid &grid, const std::string &basename, bool writePressure, bool writeVelocity )
-    : grid_(grid), baseName_( basename ),
-      writeVelocity_(writeVelocity), writePressure_(writePressure), counter_ (0 )
+VTKWriter::VTKWriter(  const std::string &basename )
+    : baseName_( basename ),
+      counter_ (0 )
 {
-    ASSERT_MSG( writePressure_ || writeVelocity_ , "VTK Writer has to write at least velocity or pressure" );
-
-    std::stringstream sstream;
-    sstream << "# vtk DataFile Version 4.0\n";
-    sstream << "Nusif VTK output\n";
-    sstream << "ASCII\n";
-    sstream << "DATASET STRUCTURED_POINTS\n";
-
-    sstream << "DIMENSIONS " << grid_.xSize() << " " << grid_.ySize() << " 1\n";
-    sstream << "ORIGIN 0 0 0 \n";
-    sstream << "SPACING " << grid_.dx() << " " << grid_.dy() << " 1\n";
-    sstream << "POINT_DATA " << grid_.xSize() * grid_.ySize() << " \n" << std::endl;
-
-    header_ = sstream.str();
 }
 
-void VTKWriter::write()
+void VTKWriter::write( const StaggeredGrid &grid, const ParticleTracer *tracer )
 {
-    std::stringstream fileName;
-    fileName << baseName_ << "_" <<  std::setw(4) << std::setfill( '0') << counter_ << ".vtk";
-    std::ofstream fileStream ( fileName.str().c_str() );
+    std::stringstream fileNameFluid;
+    fileNameFluid << baseName_ << "_" <<  std::setw(4) << std::setfill( '0') << counter_ << "_fluid.vtk";
+    std::ofstream fileStreamFluid ( fileNameFluid.str().c_str() );
 
-    fileStream << header_;
+    fileStreamFluid << "# vtk DataFile Version 4.0\n";
+    fileStreamFluid << "Nusif Fluid VTK output\n";
+    fileStreamFluid << "ASCII\n";
+    fileStreamFluid << "DATASET STRUCTURED_POINTS\n";
 
-    if ( writeVelocity_ )
+    fileStreamFluid << "DIMENSIONS " << grid.xSize() << " " << grid.ySize() << " 1\n";
+    fileStreamFluid << "ORIGIN 0 0 0 \n";
+    fileStreamFluid << "SPACING " << grid.dx() << " " << grid.dy() << " 1\n";
+    fileStreamFluid << "POINT_DATA " << grid.xSize() * grid.ySize() << " \n" << std::endl;
+
+    fileStreamFluid << "VECTORS velocity " << RealTypeToString<real>::str << "\n";
+
+    for ( int j = 0; j < grid.ySize (); ++j )
     {
-        fileStream << "VECTORS velocity " << RealTypeToString<real>::str << "\n";
-
-        for ( int j = 0; j < grid_.ySize (); ++j )
-            for ( int i = 0; i < grid_.xSize (); ++i )
-            {
-                const real u = 0.5 * ( grid_.u() ( i + 1, j + 1 )  + grid_.u() ( i, j + 1 ) );
-                const real v = 0.5 * ( grid_.v() ( i + 1, j + 1 )  + grid_.v() ( i + 1, j ) );
-                fileStream << u << " " << v << " " << " 0\n";
-            }
-
-        fileStream << "\n";
+        for ( int i = 0; i < grid.xSize (); ++i )
+        {
+            const real u = 0.5 * ( grid.u() ( i + 1, j + 1 )  + grid.u() ( i, j + 1 ) );
+            const real v = 0.5 * ( grid.v() ( i + 1, j + 1 )  + grid.v() ( i + 1, j ) );
+            fileStreamFluid << u << " " << v << " " << " 0\n";
+        }
     }
 
-    if ( writePressure_ )
+    fileStreamFluid << "\n";
+
+    fileStreamFluid << "SCALARS pressure " << RealTypeToString<real>::str << " 1\n";
+    fileStreamFluid << "LOOKUP_TABLE default\n";
+
+    for ( int j = 0; j < grid.ySize (); ++j )
     {
-        fileStream << "SCALARS pressure " << RealTypeToString<real>::str << " 1\n";
-        fileStream << "LOOKUP_TABLE default\n";
+        for ( int i = 0; i < grid.xSize (); ++i )
+        {
+            fileStreamFluid << grid.p()( i + 1, j + 1 ) << "\n";
+        }
+    }
 
-        for ( int j = 0; j < grid_.ySize (); ++j )
-            for ( int i = 0; i < grid_.xSize (); ++i )
-                fileStream << grid_.p()( i + 1, j + 1 ) << "\n";
+    fileStreamFluid << "SCALARS rhs " << RealTypeToString<real>::str << " 1\n";
+    fileStreamFluid << "LOOKUP_TABLE default\n";
 
-        fileStream << "SCALARS rhs " << RealTypeToString<real>::str << " 1\n";
-        fileStream << "LOOKUP_TABLE default\n";
+    for ( int j = 0; j < grid.ySize (); ++j )
+    {
+        for ( int i = 0; i < grid.xSize (); ++i )
+        {
+            fileStreamFluid << grid.rhs()( i, j ) << "\n";
+        }
+    }
 
-        for ( int j = 0; j < grid_.ySize (); ++j )
-            for ( int i = 0; i < grid_.xSize (); ++i )
-                fileStream << grid_.rhs()( i, j ) << "\n";
+    if (tracer != NULL)
+    {
+        std::stringstream fileNameParticles;
+        fileNameParticles << baseName_ << "_" <<  std::setw(4) << std::setfill( '0') << counter_ << "_particles.vtk";
+        std::ofstream fileStreamParticles ( fileNameParticles.str().c_str() );
+
+        fileStreamParticles << "# vtk DataFile Version 4.0\n";
+        fileStreamParticles << "Nusif Particles VTK output\n";
+        fileStreamParticles << "ASCII\n";
+        fileStreamParticles << "DATASET UNSTRUCTURED_GRID\n";
+
+        fileStreamParticles << "POINTS " << tracer->particles().size() << " " << RealTypeToString<real>::str << std::endl;
+        for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
+        {
+
+            fileStreamParticles << std::fixed << std::setprecision (5) << p->x() - 1.5*grid.dx() << " " << p->y() - 1.5*grid.dy() << " 0\n";
+        }
+        fileStreamParticles << "CELLS 0 0" << std::endl;
+        fileStreamParticles << "CELL_TYPES 0" << std::endl;
+        fileStreamParticles << "POINT_DATA " << tracer->particles().size() << std::endl;
+        // fileStreamParticles << "SCALARS m " << RealTypeToString<real>::str << std::endl;
+        // fileStreamParticles << "LOOKUP_TABLE default" << std::endl;
+        // for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
+        // {
+        //     fileStreamParticles << std::fixed << std::setprecision (5) << 1 << std::endl;
+        // }
+        fileStreamParticles << "VECTORS velocity " << RealTypeToString<real>::str << std::endl;
+
+        for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
+        {
+            // fileStreamParticles << std::fixed << std::setprecision (5) << p->u() << " " << p->v() << " 0\n";
+            fileStreamParticles << std::fixed << std::setprecision (5) << 5 << " " << 5 << " 0\n";
+        }
+
+        fileStreamParticles << "\n";
     }
 
     ++counter_;
 }
+

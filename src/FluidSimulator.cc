@@ -334,7 +334,7 @@ void FluidSimulator::refreshBoundaries()
 
 void FluidSimulator::simulate( real duration )
 {
-    VTKWriter vtkWriter ( grid_, "lidDrivenCavity", true, true );
+    VTKWriter vtkWriter ( "lidDrivenCavity" );
     real t = 0;
     unsigned int n = 0;
 
@@ -369,7 +369,7 @@ void FluidSimulator::simulate( real duration )
         // without 0th step:
         // if ( n%outPutInt == 0 && n != 0 )
         if ( n % outPutInt == 0 )
-            vtkWriter.write();
+            vtkWriter.write(grid_, NULL);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT( safetyfac_ );
         PROG(n << "'th timestep: refresh boundaries");
@@ -390,7 +390,7 @@ void FluidSimulator::simulate( real duration )
 
 void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
 {
-    VTKWriter vtkWriter ( grid_, "lidDrivenCavity", true, true );
+    VTKWriter vtkWriter ("lidDrivenCavity");
     unsigned int n = 0;
 
     PROG("initialize u, v, p, rhs");
@@ -425,7 +425,7 @@ void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
         // without 0th step:
         // if ( n%outPutInt == 0 && n != 0 )
         if ( n % outPutInt == 0 )
-            vtkWriter.write();
+            vtkWriter.write(grid_, NULL);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT( safetyfac_ );
         PROG(n << "'th timestep: refresh boundaries");

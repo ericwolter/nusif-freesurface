@@ -97,10 +97,10 @@ StaggeredGrid::StaggeredGrid( const FileReader &configuration )
 void StaggeredGrid::createRectangle(real x1, real y1, real x2, real y2)
 {
     // define corners in grid
-    int startX = (int) (x1 / dx_);
-    int startY = (int) (y1 / dy_);
-    int endX = (int) (x2 / dx_);
-    int endY = (int) (y2 / dy_);
+    int startX = std::min( (int) (x1/dx_), (int) (x2/dx_) );
+    int endX = std::max( (int) (x1/dx_), (int) (x2/dx_) );
+    int startY = std::min( (int) (y1/dy_), (int) (y2/dy_) );
+    int endY = std::max( (int) (y1/dy_), (int) (y2/dy_) );
 
     for ( int i = startX; i <= endX; ++i )
     {
@@ -124,7 +124,7 @@ void StaggeredGrid::createCircle(real x, real y, real r)
             // compute vector to the actual point
             point = (x - i * dx_) * (x - i * dx_) + (y - j * dy_) * (y - j * dy_);
 
-            if ( point <= r ) // check if point is in the circle
+            if ( point <= r*r ) // check if point is in the circle
                 setCellToObstacle(i, j); // set cell to obstacle
         }
     }

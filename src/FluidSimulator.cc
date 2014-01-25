@@ -665,3 +665,44 @@ void FluidSimulator::testFG()
     computeFG();
     //grid_.rhs().print();
 }
+
+//*******************************************************************************************************************
+
+void FluidSimulator::set_UVP_surface(const int& dt)
+{
+
+int number_of_empty_neighbour = 0 ;
+    for ( int i = 1; i <= imax; i++ )
+    {
+        for ( int j = 1; j < jmax; j++ )
+        {
+
+            if ( grid_.isFluid(i, j) )
+            	{
+            		// Count the number of neighbour empty cell
+            		if( grid_.isEmpty(i+1 , j ) )
+            			++ number_of_empty_neighbour ;
+            		if ( grid_.isEmpty(i -1 , j )))
+        				++ number_of_empty_neighbour ;
+            		if ( grid_.isEmpty(i, j + 1) )
+            			++ number_of_empty_neighbour ;
+            		if ( grid_.isEmpty(i, j- 1) )
+            			++ number_of_empty_neighbour ;
+
+            	}
+        }
+    }
+
+    switch (number_of_empty_neighbour )
+    {
+    		case(1):
+    			one_empty_neghbour(dt) ;
+    		case(2):
+    			two_empty_neghbour(dt) ;
+    		case(3):
+    			three_empty_neghbour(dt);
+    		case(4):
+    			four_empty_neghbour(dt) ;
+    }
+}
+//*******************************************************************************************************************

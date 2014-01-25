@@ -47,6 +47,12 @@ public:
     void dcavity_test();
     void testFG();
 
+    // Compute surface boundary
+    void set_UVP_surface(const int& dt) ;
+    void one_empty_neghbour(const int& dt ) ;
+    void two_empty_neghbour(const int& dt ) ;
+    void three_empty_neghbour(const int& dt ) ;
+    void four_empty_neghbour(const int& dt ) ;
 private:
     // helper functions (derivatives)
     real dxuu(int i, int j), dyuv(int i, int j), ddxu(int i, int j), ddyu(int i, int j);
@@ -58,6 +64,7 @@ private:
     void determineNextDT( real const &limit );
     void refreshBoundaries();
 
+    void set_UVP_surface(const int& dt);
     // needed values
     real safetyfac_, gamma_, Re_, gx_, gy_, dt_, vel_N, vel_S, vel_E, vel_W, uInit_, vInit_, pInit_;
     real rectX_, rectXX_, rectY_, rectYY_, circX_, circY_, circR_;

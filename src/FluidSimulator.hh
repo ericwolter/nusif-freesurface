@@ -49,10 +49,10 @@ public:
 
     // Compute surface boundary
     void set_UVP_surface(const int& dt) ;
-    void one_empty_neghbour(const int& dt ) ;
-    void two_empty_neghbour(const int& dt ) ;
-    void three_empty_neghbour(const int& dt ) ;
-    void four_empty_neghbour(const int& dt ) ;
+    void one_empty_neighbour   (int i , int j , const int& dt ) ;
+    void two_empty_neighbour   (int i , int j , const int& dt ) ;
+    void three_empty_neighbour (int i , int j , const int& dt ) ;
+    void four_empty_neighbour  (int i , int j , const int& dt ) ;
 private:
     // helper functions (derivatives)
     real dxuu(int i, int j), dyuv(int i, int j), ddxu(int i, int j), ddyu(int i, int j);

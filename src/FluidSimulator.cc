@@ -987,7 +987,27 @@ void FluidSimulator::three_empty_neighbour(int i , int j ,const int& dt)
 }
 //*******************************************************************************************************************
 
-void FluidSimulator::four_empty_neighbour(const int& dt)
+void FluidSimulator::four_empty_neighbour(int i , int j , const int& dt)
 {
+	// According to page 96 of book number 5
+	if (grid_.isEmpty(i+1,j)  && grid_.isEmpty(i-1,j)  && grid_.isEmpty(i,j-1)  && grid_.isEmpty(i,j+1) )
+	{
+		grid_.p()(i,j) = 0.0 ;
+		grid_.u()(i,j) += gx_*dt ;
+		grid_.u()(i-1,j) = grid_.u(i-1,j,WEST) + gx_*dt ;
+		grid_.v()(i,j) += gy_*dt ;
+		grid_.v()(i,j-1) = grid_.u(i,j-1,NORTH) + gy_*dt ;
+
+		grid_.u()(i,j+1)     = grid_.u()(i,j) ;
+		grid_.u()(i,j-1)     = grid_.u()(i,j) ;
+		grid_.u()(i-1,j+1)   = grid_.u(i-1,j,EAST) ;
+		grid_.u()(i-1,j-1)   = grid_.u(i-1,j,EAST) ;
+
+		grid_.v()(i+1,j)     = grid_.v()(i,j) ;
+		grid_.v()(i+1,j-1)   = grid_.v(i,j-1,NORTH) ;
+		grid_.v()(i-1,j)     = grid_.v()(i,j) ;
+		grid_.v()(i-1,j-1)   = grid_.v(i,j-1,NORTH) ;
+	}
+
 
 }

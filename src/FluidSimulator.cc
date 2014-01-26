@@ -782,7 +782,7 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const int& dt)
 	real dy_inverse = (real) 1.0 / grid_.dy() ;
 	real dx_inverse = (real) 1.0 / grid_.dx() ;
 
-	// According to page 93 and 94 ,this case divide to two part :
+	// According to page 93 and 94 ,this case divided to two part :
 	// 1- two empty cell have a corner in share , e.g. Cell(i+1,j) and Cell(i,j-1) are two empty cell
 	// 2- two empty cell are on the opposite (e.g. Cell(i+1,j) and Cell(i-1,j)
 
@@ -899,9 +899,91 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const int& dt)
 }
 //*******************************************************************************************************************
 
-void FluidSimulator::three_empty_neighbour(const int& dt)
+void FluidSimulator::three_empty_neighbour(int i , int j ,const int& dt)
 {
 
+	// According to page 96 of book
+	// Generally we have four option for our three empty neighbour
+
+	// cell(i+1,j) , cell(i,j+1) , cell(i-1,j) are empty
+	if ( grid_.isEmpty(i+1,j)  && grid_.isEmpty(i,j+1)  && grid_.isEmpty(i-1,j))
+	{
+		grid_.p()(i,j) = 0.0 ;
+		grid_.u()(i,j) += gx_*dt ;
+		grid_.u()(i-1,j) = grid_.u(i-1,j,WEST) + gx_*dt ;
+		grid_.v()(i,j) = grid_.v(i,j-1,NORTH) - (grid_.dy() /grid_.dx() )*( grid_.u()(i,j)-grid_.u(i-1,j,EAST) ) ;
+
+		grid_.u()(i-1,j+1) = grid_.u(i-1,j,EAST) ;
+		grid_.u()(i,j+1)   = grid_.u()(i,j) ;
+		grid_.v()(i+1,j)   = grid_.v()(i,j) ;
+		grid_.v()(i-1,j)   = grid_.v()(i,j) ;
+
+		if ( grid_.isEmpty(i+1,j-1) )
+			grid_.v()(i+1,j-1) = grid_v(i,j-1,NORTH) - (grid_.dx() / grid_.dy() )*( grid_.u()(i,j)-grid_.u(i,j-1,NORTH) ) ;
+
+		if ( grid_.isEmpty(i-1,j-1) )
+			grid_.v()(i-1,j-1) = grid_v(i,j-1,NORTH) + (grid_.dx() / grid_.dy() )*( grid_.u(i-1,j,EAST)-grid_.u(i-1,j-1,EAST) ) ;
+	}
+
+	// cell(i+1,j) , cell(i,j-1) , cell(i-1,j) are empty
+	if ( grid_.isEmpty(i+1,j)  && grid_.isEmpty(i,j-1)  && grid_.isEmpty(i-1,j))
+	{
+		grid_.p()(i,j) = 0.0 ;
+		grid_.u()(i,j) += gx_*dt ;
+		grid_.u()(i-1,j) = grid_.u(i-1,j,WEST) + gx_*dt ;
+		grid_.v()(i-1,j) = grid_.v()(i,j) + (grid_.dy() /grid_.dx() )*( grid_.u()(i,j)-grid_.u(i-1,j,EAST) ) ;
+
+		grid_.u()(i-1,j-1)   = grid_.u(i-1,j,EAST) ;
+		grid_.u()(i,j-1)     = grid_.u()(i,j) ;
+		grid_.v()(i+1,j-1)   = grid_.v()(i,j) ;
+		grid_.v()(i-1,j-1)   = grid_.v(i,j-1,NORTH) ;
+
+		if ( grid_.isEmpty(i+1,j+1) )
+			grid_.v()(i+1,j) = grid_.v()(i,j) + (grid_.dx() / grid_.dy() )*( grid_.u(i,j+1,SOUTH)-grid_.u()(i,j) ) ;
+
+		if ( grid_.isEmpty(i-1,j+1) )
+			grid_.v()(i-1,j) = grid_.v()(i,j) - (grid_.dx() / grid_.dy() )*( grid_.u(i-1,j+1,EAST)-grid_.u(i-1,j,EAST) ) ;
+	}
+
+	// cell(i-1,j) , cell(i,j-1) , cell(i,j+1) are empty
+	if ( grid_.isEmpty(i-1,j)  && grid_.isEmpty(i,j-1)  && grid_.isEmpty(i,j+1) )
+	{
+		grid_.p()(i,j) = 0.0 ;
+		grid_.v()(i,j) += gy_*dt ;
+		grid_.v()(i,j-1) = grid_.u(i,j-1,NORTH) + gy_*dt ;
+		grid_.u()(i-1,j) = grid_.u()(i,j) + (grid_.dx() /grid_.dy() )*( grid_.v()(i,j)-grid_.v(i,j-1,NORTH) ) ;
+
+		grid_.u()(i-1,j+1)   = grid_.u(i-1,j,EAST) ;
+		grid_.u()(i-1,j-1)   = grid_.u(i-1,j,EAST) ;
+		grid_.v()(i-1,j)     = grid_.v()(i,j) ;
+		grid_.v()(i-1,j-1)   = grid_.v(i,j-1,NORTH) ;
+
+		if ( grid_.isEmpty(i+1,j+1) )
+			grid_.u()(i,j+1) = grid_.u()(i,j) + (grid_.dy() / grid_.dx() )*( grid_.v(i+1,j,WEST)-grid_.v()(i,j) ) ;
+
+		if ( grid_.isEmpty(i+1,j-1) )
+			grid_.u()(i,j-1) = grid_.u()(i,j) - (grid_.dy() / grid_.dx() )*( grid_.v(i+1,j-1,NORTH)-grid_.v(i,j-1,NORTH) ) ;
+	}
+
+	// cell(i+1,j) , cell(i,j-1) , cell(i,j+1) are empty
+	if ( grid_.isEmpty(i+1,j)  && grid_.isEmpty(i,j-1)  && grid_.isEmpty(i,j+1) )
+	{
+		grid_.p()(i,j) = 0.0 ;
+		grid_.v()(i,j) += gy_*dt ;
+		grid_.v()(i,j-1) = grid_.v(i,j-1,NORTH) + gy_*dt ;
+		grid_.u()(i,j) = grid_.u(i-1,j,EAST) + (grid_.dx() /grid_.dy() )*( grid_.v()(i,j)-grid_.v(i,j-1,NORTH) ) ;
+
+		grid_.u()(i,j+1)     = grid_.u()(i,j) ;
+		grid_.u()(i,j-1)     = grid_.u()(i,j) ;
+		grid_.v()(i+1,j)     = grid_.v()(i,j) ;
+		grid_.v()(i+1,j-1)   = grid_.v(i,j-1,NORTH) ;
+
+		if ( grid_.isEmpty(i-1,j+1) )
+			grid_.u()(i-1,j+1) = grid_.u()(i,j) + (grid_.dy() / grid_.dx() )*( grid_.v()(i,j)-grid_.v(i-1,j,EAST) ) ;
+
+		if ( grid_.isEmpty(i-1,j-1) )
+			grid_.u()(i-1,j-1) = grid_.u(i-1,j,EAST) - (grid_.dy() / grid_.dx() )*( grid_.v(i,j-1,NORTH)-grid_.v(i-1,j-1,NORTH) ) ;
+	}
 }
 //*******************************************************************************************************************
 

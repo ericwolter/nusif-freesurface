@@ -4,14 +4,32 @@
 #include "ParticleTracer.hh"
 
 
-ParticleTracer::ParticleTracer ( StaggeredGrid &grid )
-    : grid_(grid)
+ParticleTracer::ParticleTracer ( const FileReader &conf  )
+    : grid_(conf)
 {
 }
 
 void ParticleTracer::markCells()
 {
+    for (int i = 1; i <= grid_.imax(); ++i)
+    {
+        for (int j = 1; j <= grid_.jmax(); ++j)
+        {
+            if (!grid_.isFluid(i, j)) continue;
 
+            grid_.setCellToEmpty(i, j);
+        }
+    }
+
+    for (std::vector<Particle>::iterator it = particles_.begin() ; it != particles_.end(); ++it)
+    {
+        Particle prtcl = *it;
+
+        int i = prtcl.getCellX(grid_.dx());
+        int j = prtcl.getCellY(grid_.dy());
+
+        grid_.setCellToFluid(i, j);
+    }
 }
 
 void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2)

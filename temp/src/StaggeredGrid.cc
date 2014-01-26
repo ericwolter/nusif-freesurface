@@ -34,12 +34,8 @@ StaggeredGrid::StaggeredGrid( int xxSize, int yySize, real ddx, real ddy )
     //    Flag array:
     //    obstacle cell (center): ob(i,j) =  1
     //    fluid cell (center):    ob(i,j) =  2
-
     //    empty cell (center):    ob(i,j) =  4
-    //    empty cell (north):     ob(i,j) =  8
-    //    empty cell (south):     ob(i,j) = 16
-    //    empty cell (west):      ob(i,j) = 32
-    //    empty cell (east):      ob(i,j) = 64
+
     ob.fill(FLUID);
     obs_ = ob;
 
@@ -83,12 +79,8 @@ StaggeredGrid::StaggeredGrid( const FileReader &configuration )
     //    Flag array:
     //    obstacle cell (center): ob(i,j) =  1
     //    fluid cell (center):    ob(i,j) =  2
-
     //    empty cell (center):    ob(i,j) =  4
-    //    empty cell (north):     ob(i,j) =  8
-    //    empty cell (south):     ob(i,j) = 16
-    //    empty cell (west):      ob(i,j) = 32
-    //    empty cell (east):      ob(i,j) = 64
+
     ob.fill(FLUID);
     obs_ = ob;
 

@@ -671,45 +671,49 @@ void FluidSimulator::testFG()
 void FluidSimulator::set_UVP_surface(const int& dt)
 {
 
-int number_of_empty_neighbour = 0 ;
     for ( int i = 1; i <= imax; i++ )
     {
         for ( int j = 1; j < jmax; j++ )
         {
-
-            if ( grid_.isFluid(i, j) )
-            	{
-            		// Count the number of empty neighbour cell
-            		if( grid_.isEmpty(i+1 , j ) )
-            			++ number_of_empty_neighbour ;
-            		if ( grid_.isEmpty(i -1 , j )))
-        				++ number_of_empty_neighbour ;
-            		if ( grid_.isEmpty(i, j + 1) )
-            			++ number_of_empty_neighbour ;
-            		if ( grid_.isEmpty(i, j- 1) )
-            			++ number_of_empty_neighbour ;
-
-            	}
-            switch (number_of_empty_neighbour )
-            {
-            		case(1):
-            			one_empty_neighbour  ( i , j , dt ) ;
-            		case(2):
-            			two_empty_neighbour  ( i , j , dt ) ;
-            		case(3):
-            			three_empty_neighbour( i , j , dt ) ;
-            		case(4):
-            			four_empty_neighbour ( i , j , dt ) ;
-            }
-        }
+        	set_UVP_surface(i,j,dt) ;
         }
     }
 
 
-
 //*******************************************************************************************************************
 
-void FluidSimulator::one_empty_neghbour(int i , int j , const int& dt)
+void FluidSimulator::set_UVP_surface(int i, int j , const int& dt)
+ {
+
+	int number_of_empty_neighbour = 0 ;
+
+    if ( grid_.isFluid(i, j) )
+    	{
+    		// Count the number of empty neighbour cell
+    		if( grid_.isEmpty(i+1 , j ) )
+    			++ number_of_empty_neighbour ;
+    		if ( grid_.isEmpty(i -1 , j ) )
+				++ number_of_empty_neighbour ;
+    		if ( grid_.isEmpty(i, j + 1) )
+    			++ number_of_empty_neighbour ;
+    		if ( grid_.isEmpty(i, j- 1) )
+    			++ number_of_empty_neighbour ;
+    	}
+    switch (number_of_empty_neighbour )
+    {
+    		case(1):
+    			one_empty_neighbour  ( i , j , dt ) ;
+    		case(2):
+    			two_empty_neighbour  ( i , j , dt ) ;
+    		case(3):
+    			three_empty_neighbour( i , j , dt ) ;
+    		case(4):
+    			four_empty_neighbour ( i , j , dt ) ;
+    }
+}
+//*******************************************************************************************************************
+
+void FluidSimulator::one_empty_neighbour(int i , int j , const int& dt)
 {
 	// According to page 92 ,case 1 of the book
 	// If cell (i,j) is Fluid, one of the other neighbour(North,East,West,South) is empty cell.
@@ -771,19 +775,137 @@ void FluidSimulator::one_empty_neghbour(int i , int j , const int& dt)
 }
 //*******************************************************************************************************************
 
-void FluidSimulator::two_empty_neghbour(const int& dt)
+void FluidSimulator::two_empty_neighbour(int i , int j , const int& dt)
+{
+
+	real Re_inverse = (real) 1.0 / Re_ ;
+	real dy_inverse = (real) 1.0 / grid_.dy() ;
+	real dx_inverse = (real) 1.0 / grid_.dx() ;
+
+	// According to page 93 and 94 ,this case divide to two part :
+	// 1- two empty cell have a corner in share , e.g. Cell(i+1,j) and Cell(i,j-1) are two empty cell
+	// 2- two empty cell are on the opposite (e.g. Cell(i+1,j) and Cell(i-1,j)
+
+	// Case 1 : in this case we have four options for our two empty neighbour
+
+	// Cell(i+1,j) and Cell(i,j-1) are empty cell (Like one in book page 94 )
+
+	if (grid_.isEmpty(i+1,j)  && grid_.isEmpty(i,j-1) )
+	{
+		grid_.u()(i,j)   = grid_.u( i-1 , j   , EAST  ) ;
+		grid_.v()(i,j-1)   = grid_.v()( i   , j ) ;
+		grid_.p()(i,j)	 = -0.5*Re_inverse*(
+											 ( grid_.u(i,j+1,SOUTH) + grid_.u(i-1,j+1,SOUTH) - grid_.u()(i,j) - grid_.u(i-1,j,EAST) ) * dy_inverse
+											+
+											 ( grid_.v()(i,j) + grid_.v(i,j-1,NORTH) - grid_.v(i-1,j,EAST) - grid_.v(i-1,j-1,EAST)  ) * dx_inverse
+											);
+		if (grid_.isEmpty(i-1,j-1) )
+			grid_.u()( i-1 , j-1 ) = grid_.u( i-1 , j , EAST) + (grid_.dy()/grid_.dx() ) * ( grid_.v( i , j-1 , NORTH) - grid_.v( i-1 , j-1 , NORTH ) )  ;
+		if (grid_.isEmpty(i+1,j+1) )
+		{
+			//set_UVP_surface (i , j+1 , dt) ;
+			grid_.v()(i+1,j) = grid_.v()(i,j ) - (grid_.dx() / grid_.dy())*( grid_.u(i,j+1,SOUTH) - grid_.u()(i,j) ) ;
+		}
+		grid_u()(i,j-1)   = grid_.u()(i,j)     ;
+		grid_v()(i+1,j-1) = grid_.v(i,j-1,NORTH) ;
+	}
+
+	// Cell(i-1,j) and Cell(i,j+1) are empty cell
+	else if (grid_.isEmpty(i-1,j)  && grid_.isEmpty(i,j+1) )
+	{
+		grid_.u()(i-1,j)   = grid_.u()( i , j ) ;
+		grid_.v()(i,j)     = grid_.v( i  , j-1 , NORTH ) ;
+		grid_.p()(i,j)	 = -0.5*Re_inverse*(
+											 ( grid_.u()(i,j) + grid_.u(i-1,j,EAST) - grid_.u(i,j-1,NORTH) - grid_.u(i-1,j-1,NORTH) ) * dy_inverse
+											+
+											 ( grid_.v()(i,j) + grid_.v(i,j-1,NORTH) - grid_.v(i+1,j,WEST) - grid_.v(i+1,j-1,WEST)  ) * dx_inverse
+											) ;
+		if (grid_.isEmpty(i-1,j-1) )
+			grid_.v()( i-1 , j-1 ) = grid_.v( i , j-1 , NORTH) + ( grid_.dx()/grid_.dy() ) * ( grid_.u( i-1 , j , EAST ) - grid_.u( i-1 , j-1 , EAST ) )  ;
+		if (grid_.isEmpty(i+1,j+1) )
+		{
+			//set_UVP_surface (i+1 , j , dt) ;
+			grid_.u()(i,j+1) = grid_.u()(i,j ) - (grid_.dy() / grid_.dx())*( grid_.v(i+1,j,WEST) - grid_.v()(i,j) ) ;
+		}
+		grid_u()(i-1,j+1)   = grid_.u(i-1,j,WEST ) ;
+		grid_v()(i-1,j)     = grid_.v()(i,j) ;
+	}
+
+	// Cell(i,j+1) and Cell(i+1,j) are empty cell
+	else if (grid_.isEmpty(i+1,j)  && grid_.isEmpty(i,j+1) )
+	{
+		grid_.u()(i,j)  = grid_.u( i-1 , j , EAST) ;
+		grid_.v()(i,j)  = grid_.v( i  , j-1 , NORTH ) ;
+		grid_.p()(i,j)	 =  0.5*Re_inverse*(
+											 ( grid_.u()(i,j) + grid_.u(i,j-1,NORTH) - grid_.u(i-1,j-1,EAST) - grid_.u(i-1,j,EAST) ) * dy_inverse
+											+
+											 ( grid_.v()(i,j) + grid_.v(i,j-1,NORTH) - grid_.v(i-1,j,EAST) - grid_.v(i-1,j-1,EAST)  ) * dx_inverse
+											) ;
+		if (grid_.isEmpty(i+1,j-1) )
+			grid_.v()( i+1 , j-1 ) = grid_.v( i , j-1 , NORTH) - ( grid_.dx()/grid_.dy() ) * ( grid_.u()( i , j ) - grid_.u( i , j-1 , NORTH ) )  ;
+		if (grid_.isEmpty(i-1,j+1) )
+		{
+			grid_.u()(i-1,j+1) = grid_.u(i-1,j,EAST ) - (grid_.dy() / grid_.dx())*( grid_.v()(i,j) - grid_.v(i-1,j,EAST) ) ;
+		}
+		grid_u()(i,j+1)   = grid_.u()(i,j ) ;
+		grid_v()(i+1,j)   = grid_.v()(i,j) ;
+	}
+
+	// Cell(i,j-1) and Cell(i-1,j) are empty cell
+	else if (grid_.isEmpty(i-1,j)  && grid_.isEmpty(i,j-1) )
+	{
+		grid_.u()(i-1,j)  = grid_.u()( i , j ) ;
+		grid_.v()(i,j-1)  = grid_.v()( i , j ) ;
+		grid_.p()(i,j)	 =  0.5*Re_inverse*(
+											 ( grid_.u(i-1,j,EAST) + grid_.u()(i,j) - grid_.u(i-1,j+1,SOUTH) - grid_.u(i,j+1,SOUTH) ) * dy_inverse
+											+
+											 ( grid_.v()(i,j) + grid_.v(i,j-1,NORTH) - grid_.v(i+1,j,WEST) - grid_.v(i+1,j-1,WEST)  ) * dx_inverse
+											) ;
+		if (grid_.isEmpty(i+1,j-1) )
+			grid_.u()( i , j-1 ) = grid_.u()( i , j) + ( grid_.dy()/grid_.dx() ) * ( grid_.v( i+1 , j , WEST) - grid_.v( i , j-1 , NORTH ) )  ;
+		if (grid_.isEmpty(i-1,j+1) )
+		{
+			grid_.v()(i-1,j) = grid_.v()(i,j ) + (grid_.dx() / grid_.dy())*( grid_.u()(i-1,j+1,EAST) - grid_.u(i-1,j,EAST) ) ;
+		}
+		grid_u()(i-1,j-1)   = grid_.u( i-1 , j   , EAST  ) ;
+		grid_v()(i-1,j-1)   = grid_.v( i   , j-1 , NORTH ) ;
+	}
+
+	// Case 2 : in this case we have two options for our two empty opposite neighbour
+
+	// Cell(i+1,j) and Cell(i-1,j) are empty cell
+	else if (grid_.isEmpty(i+1,j)  && grid_.isEmpty(i-1,j))
+	{
+		grid_.u()(i,j) += gx_*dt ;
+		grid_.u()(i-1,j) = grid_.u(i-1,j,WEST) + gx_*dt ;
+		if (grid_.isEmpty(i-1,j-1) )
+			grid_.v()( i-1 , j-1 ) = grid_.v(i , j-1 , NORTH) + (grid_.dx() / grid_.dy())*( grid_.u(i-1,j,EAST) - grid_.u(i-1,j-1,EAST) ) ;
+		if (grid_.isEmpty(i+1,j-1) )
+			grid_.v()( i+1 , j-1 ) = grid_.v(i , j-1 , NORTH) - (grid_.dx() / grid_.dy())*( grid_.u()(i,j) - grid_.u(i,j-1,NORTH) ) ;
+		grid_.p(i,j) = 0.0 ;
+	}
+	// Cell(i,j+1) and Cell(i,j-1) are empty cell
+	else if (grid_.isEmpty(i,j+1)  && grid_.isEmpty(i,j-1))
+	{
+		grid_.v()(i,j) += gy_*dt ;
+		grid_.v()(i,j-1) = grid_.y(i,j-1, NORTH) + gy_*dt ;
+		if (grid_.isEmpty(i-1,j-1) )
+			grid_.u()( i-1 , j-1 ) = grid_.u(i-1 , j , EAST) + (grid_.dy() / grid_.dx())*( grid_.v(i,j-1,SOUTH) - grid_.v(i-1,j-1,SOUTH) ) ;
+		if (grid_.isEmpty(i-1,j+1) )
+			grid_.u()( i-1 , j+1 ) = grid_.u(i-1 , j , EAST) - (grid_.dy() / grid_.dx())*( grid_.v()(i,j) - grid_.v(i-1,j,EAST) ) ;
+		grid_.p(i,j) = 0.0 ;
+	}
+
+}
+//*******************************************************************************************************************
+
+void FluidSimulator::three_empty_neighbour(const int& dt)
 {
 
 }
 //*******************************************************************************************************************
 
-void FluidSimulator::three_empty_neghbour(const int& dt)
-{
-
-}
-//*******************************************************************************************************************
-
-void FluidSimulator::four_empty_neghbour(const int& dt)
+void FluidSimulator::four_empty_neighbour(const int& dt)
 {
 
 }

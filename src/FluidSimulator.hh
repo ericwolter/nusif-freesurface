@@ -49,6 +49,8 @@ public:
 
     // Compute surface boundary
     void set_UVP_surface(const int& dt) ;
+    void set_UVP_surface(int i, int j , const int& dt)
+
     void one_empty_neighbour   (int i , int j , const int& dt ) ;
     void two_empty_neighbour   (int i , int j , const int& dt ) ;
     void three_empty_neighbour (int i , int j , const int& dt ) ;

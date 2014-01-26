@@ -250,11 +250,23 @@ real StaggeredGrid::v_inter ( real x , real y )
     return v_interpolate;
 }
 
-void StaggeredGrid::setCellToFluid(int x, int y) {}
-void StaggeredGrid::setCellToEmpty(int x, int y) {}
+void StaggeredGrid::setCellToFluid(int x, int y)
+{
+    obs_(x,y) = FLUID; // set cell to fluid
+}
+
+void StaggeredGrid::setCellToEmpty(int x, int y)
+{
+    obs_(x, y) = EMPTY; // set cell to empty
+    if ( x < u_.getSize(0) && y < u_.getSize(1) )
+        u_(x, y) = 0;
+    if ( x < v_.getSize(0) && y < v_.getSize(1) )
+        v_(x, y) = 0;
+}
+
 void StaggeredGrid::setCellToObstacle(int x, int y)
 {
-    obs_(x, y) = obs_(x, y) | OBS; // set cell to obstacle
+    obs_(x, y) = OBS; // set cell to obstacle
     if ( x < u_.getSize(0) && y < u_.getSize(1) )
         u_(x, y) = 0;
     if ( x < v_.getSize(0) && y < v_.getSize(1) )

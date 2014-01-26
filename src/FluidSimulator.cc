@@ -6,7 +6,7 @@
 
 // constructor for FluidSimulator
 FluidSimulator::FluidSimulator( const FileReader &conf )
-    : grid_(conf), solver_(conf)
+    : grid_(conf), solver_(conf),particle_tracer_(grid_)
 {
     PROG("construct FluidSimulator with a file");
     gamma_ = conf.getRealParameter("gamma");
@@ -117,6 +117,15 @@ FluidSimulator::FluidSimulator( const FileReader &conf )
     circR_ = conf.getRealParameter("CircleR");
     CHECK_MSG( (circR_ >= 0), "wrong input for CircleR: " << circR_);
 
+    // Particle
+    rectX1_particle_ = conf.getRealParameter("RectangleParticleX1");
+    CHECK_MSG( (rectX_ >= 0), "wrong input for RectangleX1: " << rectX_);
+    rectX2_particle_ = conf.getRealParameter("RectangleParticleX2");
+    CHECK_MSG( (rectXX_ >= 0), "wrong input for RectangleX2: " << rectXX_);
+    rectY1_particle_= conf.getRealParameter("RectangleParticleY1");
+    CHECK_MSG( (rectY_ >= 0), "wrong input for RectangleY1: " << rectY_);
+    rectY2_particle_ = conf.getRealParameter("RectangleParticleY2");
+    CHECK_MSG( (rectYY_ >= 0), "wrong input for RectangleY2: " << rectYY_);
 }
 
 void FluidSimulator::composeRHS()
@@ -334,33 +343,18 @@ void FluidSimulator::refreshBoundaries()
 
 void FluidSimulator::simulate( real duration )
 {
-    VTKWriter vtkWriter ( "lidDrivenCavity" );
+    VTKWriter vtkWriter ( "BreakingDum" );
     real t = 0;
     unsigned int n = 0;
 
     PROG("initialize u, v, p, rhs");
-    int half = (int) ( rectYY_ / grid_.dy() );
-    for ( int i = 0; i < grid_.u().getSize(0); ++i )
-    {
-        for ( int j = 0; j < grid_.u().getSize(1); ++j )
-        {
-            if ( j > half )
-            {
-                grid_.u()(i, j) = 1;
-            }
-            else
-            {
-                grid_.u()(i, j) = 0;
-            }
-        }
-    }
 
+    grid_.u().fill(uInit_);
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
     grid_.rhs().fill(0);
-    PROG("set inner obstacles");
-    grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
-    grid_.createCircle(circX_, circY_, circR_);
+    PROG("set initial partcile");
+    particle_tracer_.addRectangle(rectX1_particle_,rectX2_particle_,rectY1_particle_,rectY2_particle_) ;
 
     refreshBoundaries();
 
@@ -372,6 +366,9 @@ void FluidSimulator::simulate( real duration )
             vtkWriter.write(grid_, NULL);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT( safetyfac_ );
+        particle_tracer_.markCells() ;
+        //particle_tracer_.advanceParticles(dt_) ;
+        // intepolation function for u,v of particle needed
         PROG(n << "'th timestep: refresh boundaries");
         refreshBoundaries();
         computeFG();
@@ -381,6 +378,8 @@ void FluidSimulator::simulate( real duration )
         solv().solve( grid_ );
         PROG(n << "'th timestep: update u and v; " );
         updateVelocities();
+        particle_tracer_.advanceParticles(dt_) ;
+
         if ( n % normfreq == 0 )
             normalization();
         t += dt_;

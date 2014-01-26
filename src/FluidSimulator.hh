@@ -5,6 +5,7 @@
 #include "FileReader.hh"
 #include "StaggeredGrid.hh"
 #include "SORSolver.hh"
+#include "ParticleTracer.hh"
 
 #include "VTKWriter.hh"
 
@@ -66,18 +67,19 @@ private:
     void determineNextDT( real const &limit );
     void refreshBoundaries();
 
-    void set_UVP_surface(const int& dt);
+    //void set_UVP_surface(const int& dt);
     // needed values
     real safetyfac_, gamma_, Re_, gx_, gy_, dt_, vel_N, vel_S, vel_E, vel_W, uInit_, vInit_, pInit_;
     real rectX_, rectXX_, rectY_, rectYY_, circX_, circY_, circR_;
     BCTYPE cond_N, cond_S, cond_E, cond_W;
     unsigned int timeStepNr,normfreq, outPutInt;
     int imax, jmax;
+    real rectX1_particle_ , rectX2_particle_ ,rectY1_particle_ ,rectY2_particle_ ;
 
 protected:
     StaggeredGrid grid_;   //< grid
     SORSolver solver_;     //< solver
-
+    ParticleTracer particle_tracer_ ;
 };
 
 

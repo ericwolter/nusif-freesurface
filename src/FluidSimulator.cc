@@ -118,13 +118,13 @@ FluidSimulator::FluidSimulator( const FileReader &conf )
     CHECK_MSG( (circR_ >= 0), "wrong input for CircleR: " << circR_);
 
     // Particle
-    rectX1_particle_ = conf.getRealParameter("RectangleParticleX1") / _grid.dx();
+    rectX1_particle_ = conf.getRealParameter("RectangleParticleX1") / grid_.dx();
     CHECK_MSG( (rectX_ >= 0), "wrong input for RectangleX1: " << rectX_);
-    rectX2_particle_ = conf.getRealParameter("RectangleParticleX2") / _grid.dx();
+    rectX2_particle_ = conf.getRealParameter("RectangleParticleX2") / grid_.dx();
     CHECK_MSG( (rectXX_ >= 0), "wrong input for RectangleX2: " << rectXX_);
-    rectY1_particle_= conf.getRealParameter("RectangleParticleY1") / _grid.dy();
+    rectY1_particle_= conf.getRealParameter("RectangleParticleY1") / grid_.dy();
     CHECK_MSG( (rectY_ >= 0), "wrong input for RectangleY1: " << rectY_);
-    rectY2_particle_ = conf.getRealParameter("RectangleParticleY2") / _grid.dy();
+    rectY2_particle_ = conf.getRealParameter("RectangleParticleY2") / grid_.dy();
     CHECK_MSG( (rectYY_ >= 0), "wrong input for RectangleY2: " << rectYY_);
 }
 

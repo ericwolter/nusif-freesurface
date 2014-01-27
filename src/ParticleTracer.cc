@@ -21,12 +21,10 @@ void ParticleTracer::markCells()
         }
     }
 
-    for (std::vector<Particle>::iterator it = particles_.begin() ; it != particles_.end(); ++it)
+    for (std::vector<Particle>::iterator p = particles_.begin() ; p != particles_.end(); ++p)
     {
-        Particle prtcl = *it;
-
-        int i = prtcl.getCellX(dx_);
-        int j = prtcl.getCellY(dy_);
+        int i = p->getCellX(dx_);
+        int j = p->getCellY(dy_);
 
         grid_.setCellToFluid(i, j);
     }
@@ -52,7 +50,7 @@ void ParticleTracer::addCircle(int x, int y, int r)
 {
     for (int i = -r; i < r; ++i)
     {
-        int h = (int)sqrt(r * r - x * x);
+        int h = (int)sqrt(r * r - i * i);
 
         for (int j = -h; j < h; ++j)
         {

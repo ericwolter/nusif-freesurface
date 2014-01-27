@@ -16,7 +16,7 @@ int main( int argc, char **argv )
     }
 
     FileReader confi;
-    //////////////////////////////////////////////////////// backstep /////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////// Breaking dum /////////////////////////////////////////////////////////////
     confi.registerStringParameter("name");
 
     //////////////////////////////////////////////////////// Initialization ///////////////////////////////////////////////////////
@@ -50,10 +50,9 @@ int main( int argc, char **argv )
     confi.registerRealParameter("RectangleParticleY1");
     confi.registerRealParameter("RectangleParticleY2");
 
-    confi.registerRealParameter("CircleParticleX1");
-    confi.registerRealParameter("CircleParticleX2");
-    confi.registerRealParameter("CircleParticleY1");
-    confi.registerRealParameter("CircleParticleY2");
+    confi.registerRealParameter("CircleParticleX");
+    confi.registerRealParameter("CircleParticleY");
+    confi.registerRealParameter("CircleParticleR");
 
     confi.registerRealParameter("RectangleX1");
     confi.registerRealParameter("RectangleY1");

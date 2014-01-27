@@ -34,12 +34,8 @@ StaggeredGrid::StaggeredGrid( int xxSize, int yySize, real ddx, real ddy )
     //    Flag array:
     //    obstacle cell (center): ob(i,j) =  1
     //    fluid cell (center):    ob(i,j) =  2
-
     //    empty cell (center):    ob(i,j) =  4
-    //    empty cell (north):     ob(i,j) =  8
-    //    empty cell (south):     ob(i,j) = 16
-    //    empty cell (west):      ob(i,j) = 32
-    //    empty cell (east):      ob(i,j) = 64
+
     ob.fill(FLUID);
     obs_ = ob;
 
@@ -83,12 +79,8 @@ StaggeredGrid::StaggeredGrid( const FileReader &configuration )
     //    Flag array:
     //    obstacle cell (center): ob(i,j) =  1
     //    fluid cell (center):    ob(i,j) =  2
-
     //    empty cell (center):    ob(i,j) =  4
-    //    empty cell (north):     ob(i,j) =  8
-    //    empty cell (south):     ob(i,j) = 16
-    //    empty cell (west):      ob(i,j) = 32
-    //    empty cell (east):      ob(i,j) = 64
+
     ob.fill(FLUID);
     obs_ = ob;
 
@@ -136,7 +128,7 @@ void StaggeredGrid::createPng( const std::string &pngFilename )
     // create png file
     int n = obs_.getSize(0);
     int m = obs_.getSize(1);
-    GrayScaleImage image(pngFilename, (unsigned int)n, (unsigned int)m);
+    GrayScaleImage image(pngFilename, n, m);
 
     // set size
     image = image.getResizedImage( n, m );
@@ -250,12 +242,12 @@ real StaggeredGrid::v_inter ( real x , real y )
     return v_interpolate;
 }
 
-void StaggeredGrid::setCellToFluid(int x, int y)
+void StaggeredGrid::setCellToFluid(int x, int y) 
 {
     obs_(x,y) = FLUID; // set cell to fluid
 }
 
-void StaggeredGrid::setCellToEmpty(int x, int y)
+void StaggeredGrid::setCellToEmpty(int x, int y) 
 {
     obs_(x, y) = EMPTY; // set cell to empty
     if ( x < u_.getSize(0) && y < u_.getSize(1) )

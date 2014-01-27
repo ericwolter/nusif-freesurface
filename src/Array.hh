@@ -171,7 +171,7 @@ inline ArrayTemplate<T> &ArrayTemplate<T>::operator = (const ArrayTemplate<T> &s
     arr = new T[s.getSize()];
     ASSERT_MSG(arr != NULL, "malloc failed"); // check if malloc was successful
 
-    memcpy( arr, s.arr, (unsigned long)s.getSize()*sizeof(T) ); // copy the array
+    memcpy( arr, s.arr, s.getSize()*sizeof(T) ); // copy the array
 
     return *this;
 }

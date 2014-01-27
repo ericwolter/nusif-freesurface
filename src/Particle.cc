@@ -1,6 +1,7 @@
 #include "Particle.hh"
 
-Particle::Particle(real xx, real yy) {
+Particle::Particle(real xx, real yy)
+{
     x_ = xx;
     y_ = yy;
 }

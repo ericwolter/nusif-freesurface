@@ -128,6 +128,7 @@ public:
 
     inline bool isFluid(const int x, const int y);
     inline bool isEmpty(const int x, const int y);
+    inline bool isObstacle(const int x, const int y);
     inline int getNumFluid();
 
     inline real u(const int x, const int y, Direction dir);
@@ -169,12 +170,17 @@ protected:
 
 inline bool StaggeredGrid::isFluid(const int x, const int y)
 {
-    return ( !(obs_(x, y) & OBS) );
+    return ( obs_(x, y) & FLUID );
 }
 
 inline bool StaggeredGrid::isEmpty(const int x, const int y)
 {
-    return ( !(obs_(x, y) & EMPTY) );   
+    return ( obs_(x, y) & EMPTY );
+}
+
+inline bool StaggeredGrid::isObstacle(const int x, const int y)
+{
+    return ( obs_(x, y) & OBS );
 }
 
 

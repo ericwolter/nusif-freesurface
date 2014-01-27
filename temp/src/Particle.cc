@@ -1,15 +1,16 @@
 #include "Particle.hh"
 
-Particle::Particle(real xx, real yy) {
+Particle::Particle(real xx, real yy)
+{
     x_ = xx;
     y_ = yy;
 }
 
 int Particle::getCellX(real dx)
 {
-    return 0;
+    return (int)(x / dx);
 }
 int Particle::getCellY(real dy)
 {
-    return 0;
+    return (int)(y / dy);
 }

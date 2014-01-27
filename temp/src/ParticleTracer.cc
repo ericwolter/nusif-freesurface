@@ -21,12 +21,10 @@ void ParticleTracer::markCells()
         }
     }
 
-    for (std::vector<Particle>::iterator it = particles_.begin() ; it != particles_.end(); ++it)
+    for (std::vector<Particle>::iterator p = particles_.begin() ; p != particles_.end(); ++p)
     {
-        Particle prtcl = *it;
-
-        int i = prtcl.getCellX(grid_.dx());
-        int j = prtcl.getCellY(grid_.dy());
+        int i = p->getCellX(grid_.dx());
+        int j = p->getCellY(grid_.dy());
 
         grid_.setCellToFluid(i, j);
     }

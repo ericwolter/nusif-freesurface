@@ -9,6 +9,11 @@ ParticleTracer::ParticleTracer ( const FileReader &conf  )
 {
 }
 
+ParticleTracer::ParticleTracer ( const StaggeredGrid &grid )
+    : grid_(grid)
+{
+}
+
 void ParticleTracer::markCells()
 {
     for (int i = 1; i <= grid_.imax(); ++i)

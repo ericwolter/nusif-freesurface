@@ -11,6 +11,7 @@ class ParticleTracer
 public:
 
     ParticleTracer ( const FileReader &conf  );
+    ParticleTracer ( const StaggeredGrid &grid );
 
     const std::vector<Particle> &particles() const
     {

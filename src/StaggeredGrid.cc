@@ -136,7 +136,7 @@ void StaggeredGrid::createPng( const std::string &pngFilename )
     // create png file
     int n = obs_.getSize(0);
     int m = obs_.getSize(1);
-    GrayScaleImage image(pngFilename, n, m);
+    GrayScaleImage image(pngFilename, (unsigned int)n, (unsigned int)m);
 
     // set size
     image = image.getResizedImage( n, m );

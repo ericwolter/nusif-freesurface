@@ -11,11 +11,11 @@ ParticleTracer::ParticleTracer ( StaggeredGrid &grid )
 
 void ParticleTracer::markCells()
 {
-    for (int i = 1; i <= imax_; ++i)
+    for (int i = 1; i <= grid_.imax(); ++i)
     {
-        for (int j = 1; j <= jmax_; ++j)
+        for (int j = 1; j <= grid_.jmax(); ++j)
         {
-            if (!isFluid(i, j)) continue;
+            if (!grid_.isFluid(i, j)) continue;
 
             grid_.setCellToEmpty(i, j);
         }
@@ -23,8 +23,8 @@ void ParticleTracer::markCells()
 
     for (std::vector<Particle>::iterator p = particles_.begin() ; p != particles_.end(); ++p)
     {
-        int i = p->getCellX(dx_);
-        int j = p->getCellY(dy_);
+        int i = p->getCellX(grid_.dx());
+        int j = p->getCellY(grid_.dy());
 
         grid_.setCellToFluid(i, j);
     }

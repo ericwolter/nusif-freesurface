@@ -8,9 +8,9 @@ Particle::Particle(real xx, real yy)
 
 int Particle::getCellX(real dx)
 {
-    return (int)(x / dx);
+    return (int)(x_ / dx);
 }
 int Particle::getCellY(real dy)
 {
-    return (int)(y / dy);
+    return (int)(y_ / dy);
 }

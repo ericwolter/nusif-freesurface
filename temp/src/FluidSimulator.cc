@@ -457,7 +457,7 @@ void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
         // without 0th step:
         // if ( n%outPutInt == 0 && n != 0 )
         if ( n % outPutInt == 0 )
-            vtkWriter.write(grid_, NULL);
+            vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT( safetyfac_ );
         particle_tracer_.markCells();

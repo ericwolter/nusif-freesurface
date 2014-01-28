@@ -68,6 +68,8 @@ private:
     // compute surface boundary
     void set_UVP_surface(const int& dt);
     void set_UVP_surface(int i, int j , const int& dt);
+//     real set_U_surface(int i, int j , const int &dt);
+//     real set_V_surface(int i, int j , const int &dt);
     // needed values
     real safetyfac_, gamma_, Re_, gx_, gy_, dt_, vel_N, vel_S, vel_E, vel_W, uInit_, vInit_, pInit_;
     real rectX_, rectXX_, rectY_, rectYY_, circX_, circY_, circR_;

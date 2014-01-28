@@ -77,15 +77,15 @@ void ParticleTracer::fillCell(int x, int y, int numParticles)
     int particlesPerSide = (int)(sqrt(numParticles));
     // std::cout << "TRACER particlesPerSide: " << particlesPerSide << std::endl;
 
-    real deltaX = grid_.dx() / (particlesPerSide + 1);
-    real deltaY = grid_.dy() / (particlesPerSide + 1);
+    real deltaX = grid_.dx() / (particlesPerSide);
+    real deltaY = grid_.dy() / (particlesPerSide);
     // std::cout << "TRACER deltaX,Y: " << deltaX << ", " << deltaY << std::endl;
 
     for (int i = 1; i <= particlesPerSide; ++i)
     {
         for (int j = 1; j <= particlesPerSide; ++j)
-        {
-            Particle p(cellX + i * deltaX, cellY + j * deltaY);
+        {   
+            Particle p(cellX + deltaX / 2 + (i-1) * deltaX, cellY + deltaY / 2 + (j-1) * deltaY);
             // std::cout << "TRACER pX,Y: " << (cellX + i * deltaX) << ", " << (cellY + j * deltaY) << std::endl;
             particles_.push_back(p);
         }
@@ -102,6 +102,7 @@ void ParticleTracer::print()
 
 void ParticleTracer::advanceParticles(real const dt)
 {
+    std::vector<int> toDelete;
     for (std::vector<Particle>::iterator p = particles_.begin() ; p != particles_.end(); ++p)
     {
         real u = interpolateU(p->x(), p->y());
@@ -109,6 +110,15 @@ void ParticleTracer::advanceParticles(real const dt)
 
         p->setX(p->x() + dt * u);
         p->setY(p->y() + dt * v);
+
+        int newCellX = p->getCellX(grid_.dx());
+        int newCellY = p->getCellY(grid_.dy());        
+
+        // if the particle moved into an obstacle cell or outside the domain just delete it
+        bool isOutsideDomain = newCellX < 1 || newCellX > grid_.imax() || newCellY < 1 || newCellY > grid_.jmax();
+        bool isObstacle = grid_.isObstacle(newCellX, newCellY);
+        if(isOutsideDomain || isObstacle) {
+        }
     }
 }
 

@@ -4,25 +4,96 @@
 #include "../src/Debug.hh"
 #include "../src/VTKWriter.hh"
 
+#include "math.h"
 #include <iostream>
+
+void testTotalNumber()
+{
+    StaggeredGrid grid(2, 2, 1, 1);
+    ParticleTracer tracer(&grid);
+    tracer.addRectangle(0, 0, 2, 2);
+
+    CHECK( tracer.particles().size() == 4 * 9 );
+}
+
+void testFirstPositionCorrect()
+{
+    StaggeredGrid grid(2, 2, 1, 1);
+    ParticleTracer tracer(&grid);
+    tracer.addRectangle(0, 0, 2, 2);
+
+    Particle p = tracer.particles()[0];
+    CHECK( fabs( p.x() - 0.16667 ) < 1e-5 );
+    CHECK( fabs( p.y() - 0.16667 ) < 1e-5 );
+}
+
+void testCenterPositionCorrect()
+{
+    StaggeredGrid grid(3, 3, 1, 1);
+    ParticleTracer tracer(&grid);
+    tracer.addRectangle(0, 0, 3, 3);
+
+    unsigned int centerOffset = 9 * 4 /* jump over cells */ + 4 /* the index of the center particle in a cell */;
+    Particle p = tracer.particles()[centerOffset];
+    CHECK( fabs( p.x() - 1.5 ) < 1e-5 );
+    CHECK( fabs( p.y() - 1.5 ) < 1e-5 );
+}
+
+void testCenterZeroInterpolate()
+{
+    StaggeredGrid grid(3, 3, 1, 1);
+    grid.u().fill(0.0);
+    grid.v().fill(0.0);
+
+    ParticleTracer tracer(&grid);
+    tracer.addRectangle(0, 0, 3, 3);
+
+    unsigned int centerOffset = 9 * 4 /* jump over cells */ + 4 /* the index of the center particle in a cell */;
+    Particle p = tracer.particles()[centerOffset];
+    real u = tracer.interpolateU(p.x(), p.y());
+    real v = tracer.interpolateV(p.x(), p.y());
+
+    CHECK( fabs( u - 0.0 ) < 1e-5 );
+    CHECK( fabs( v - 0.0 ) < 1e-5 );
+}
+
+void testCenterSingleInterpolate()
+{
+    StaggeredGrid grid(3, 3, 1, 1);
+    grid.u().fill(0.0);
+    grid.v().fill(0.0);
+
+    ParticleTracer tracer(&grid);
+    tracer.addRectangle(0, 0, 3, 3);
+
+    grid.u()(2, 2) = 1.0;
+    grid.v()(2, 2) = 1.0;
+
+    unsigned int centerOffset = 9 * 4 /* jump over cells */ + 4 /* the index of the center particle in a cell */;
+    Particle p = tracer.particles()[centerOffset];
+    real u = tracer.interpolateU(p.x(), p.y());
+    real v = tracer.interpolateV(p.x(), p.y());
+
+    CHECK( fabs( u - 0.5 ) < 1e-5 );
+    CHECK( fabs( v - 0.5 ) < 1e-5 );
+}
+
 
 int main( )
 {
-    StaggeredGrid grid(3,3,1,1);
-    grid.p().print();
-    ParticleTracer tracer(grid);
+    testTotalNumber();
+    std::cout << "[TEST] Total Number Test: OK" << std::endl;
 
-    tracer.addRectangle(1,1,3,3);
+    testFirstPositionCorrect();
+    std::cout << "[TEST] Correct First Position Test: OK" << std::endl;
 
-    VTKWriter writer("particletracertest");
-    writer.write(grid, &tracer);
-   // std::cout << "Copy Test: ";
-   // copyTest();
-   // std::cout << "OK" << std::endl;
+    testCenterPositionCorrect();
+    std::cout << "[TEST] Correct Center Position Test: OK" << std::endl;
 
-   // std::cout << "Contiguous Memory Test: ";
-   // contiguousMemoryTest();
-   // std::cout << "OK" << std::endl;
+    testCenterZeroInterpolate();
+    std::cout << "[TEST] Center Zero Interpolation Test: OK" << std::endl;
 
-   return 0;
+    testCenterSingleInterpolate();
+    std::cout << "[TEST] Center Single Interpolation: OK" << std::endl;
+    return 0;
 }

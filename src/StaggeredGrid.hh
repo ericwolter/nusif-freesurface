@@ -154,9 +154,9 @@ public:
     void readPng( const std::string &pngFilename );
     void markCells();
 
-    // Interpolated function ( bilinear interpolation )
-    real u_inter ( real x , real y ) ;
-    real v_inter ( real x , real y ) ;
+//    // Interpolated function ( bilinear interpolation )
+//    real u_inter ( real x , real y ) ;
+//    real v_inter ( real x , real y ) ;
 protected:
     Array p_;   //< pressure field
     Array rhs_; //< right hand side of the pressure equation

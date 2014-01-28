@@ -740,12 +740,16 @@ void FluidSimulator::set_UVP_surface(int i, int j , const int &dt)
     {
     case (1):
         one_empty_neighbour  ( i , j , dt ) ;
+    	break;
     case (2):
         two_empty_neighbour  ( i , j , dt ) ;
+    	break;
     case (3):
         three_empty_neighbour( i , j , dt ) ;
+    	break;
     case (4):
         four_empty_neighbour ( i , j , dt ) ;
+    	break;
     }
 }
 

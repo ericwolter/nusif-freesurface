@@ -6,8 +6,10 @@
 
 // constructor for FluidSimulator
 FluidSimulator::FluidSimulator( const FileReader &conf )
-    : grid_(conf), solver_(conf), particle_tracer_(conf)
+    : grid_(conf), solver_(conf)
 {
+    particle_tracer_ = ParticleTracer(&grid_);
+    
     PROG("construct FluidSimulator with a file");
     gamma_ = conf.getRealParameter("gamma");
     CHECK_MSG( (gamma_ >= 0 && gamma_ <= 1), "wrong input for gamma: " << gamma_);

@@ -10,8 +10,8 @@ class ParticleTracer
 {
 public:
 
-    ParticleTracer ( const FileReader &conf  );
-    ParticleTracer ( const StaggeredGrid &grid );
+    ParticleTracer ( );
+    ParticleTracer ( StaggeredGrid *grid );
 
     const std::vector<Particle> &particles() const
     {
@@ -24,14 +24,17 @@ public:
 
     void advanceParticles(real const dt);
     void print();
+
 private:
     void fillCell(int i, int j, int numParticles);
 
+    std::vector<Particle> particles_;
+    StaggeredGrid *grid_;
+
+    // Caution!!! These are only public for test purposes!!!
+public:
     real interpolateU(real x, real y);
     real interpolateV(real x, real y);
-
-    std::vector<Particle> particles_;
-    StaggeredGrid grid_;
 };
 
 #endif //PARTICLE_TRACER_HH

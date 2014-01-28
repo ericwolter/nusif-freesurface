@@ -117,6 +117,16 @@ public:
         return ySize_ / dy_;
     }
 
+    real xDomain() const
+    {
+        return xSize_;
+    }
+
+    real yDomain() const
+    {
+        return ySize_;
+    }
+
     int imax() const
     {
         return imax_;

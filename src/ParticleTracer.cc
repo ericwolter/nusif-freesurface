@@ -14,6 +14,8 @@ ParticleTracer::ParticleTracer ( StaggeredGrid *grid )
 
 void ParticleTracer::markCells()
 {
+    std::cout << "- marking cells" << std::endl;
+
     for (int i = 1; i <= grid_->imax(); ++i)
     {
         for (int j = 1; j <= grid_->jmax(); ++j)
@@ -84,7 +86,7 @@ void ParticleTracer::fillCell(int x, int y, int numParticles)
         for (int j = 1; j <= particlesPerSide; ++j)
         {
             Particle p(cellX + deltaX / 2 + (i - 1) * deltaX, cellY + deltaY / 2 + (j - 1) * deltaY);
-            // std::cout << "TRACER pX,Y: " << (cellX + i * deltaX) << ", " << (cellY + j * deltaY) << std::endl;
+            // std::cout << "TRACER pX,Y: " << cellX + deltaX / 2 + (i - 1) * deltaX << ", " << cellY + deltaY / 2 + (j - 1) * deltaY << std::endl;
             particles_.push_back(p);
         }
     }
@@ -100,21 +102,28 @@ void ParticleTracer::print()
 
 void ParticleTracer::advanceParticles(real const dt)
 {
+    std::cout << "- advancing particles" << std::endl;
+
     for (unsigned int i = 0; i < particles_.size(); ++i)
     {
         Particle *p = &particles_[i];
         real u = interpolateU(p->x(), p->y());
         real v = interpolateV(p->x(), p->y());
 
+        // std::cout << "TRACER oldPosX,Y: " << p->x() << ", " << p->y() << std::endl;
         p->setX(p->x() + dt * u);
         p->setY(p->y() + dt * v);
+        // std::cout << "TRACER newPosX,Y: " << p->x() << ", " << p->y() << std::endl;
 
         int newCellX = p->getCellX(grid_->dx());
         int newCellY = p->getCellY(grid_->dy());
+        // std::cout << "TRACER cellX,Y: " << newCellX << ", " << newCellY << std::endl;
 
         // if the particle moved into an obstacle cell or outside the domain just delete it
         bool isOutsideDomain = newCellX < 1 || newCellX > grid_->imax() || newCellY < 1 || newCellY > grid_->jmax();
         bool isObstacle = grid_->isObstacle(newCellX, newCellY);
+        // std::cout << "TRACER outside: " << isOutsideDomain << ", " << isObstacle << std::endl;
+
         if (isOutsideDomain || isObstacle)
         {
             particles_.erase(particles_.begin() + i);
@@ -142,10 +151,10 @@ real ParticleTracer::interpolateU(real x, real y)
 
     // TODO: use u accessor function to incooperate obstacles
     real u1, u2, u3, u4;
-    u1 = grid_->u()( i - 1 , j - 1 );
-    u2 = grid_->u()( i     , j - 1 );
-    u3 = grid_->u()( i - 1 , j     );
-    u4 = grid_->u()( i     , j     );
+    u1 = grid_->u( i - 1 , j - 1 , EAST);
+    u2 = grid_->u( i     , j - 1 , WEST);
+    u3 = grid_->u( i - 1 , j     , EAST);
+    u4 = grid_->u( i     , j     , WEST);
     // std::cout << "interpolateU u1,u2: " << u1 << ", " << u2 << std::endl;
     // std::cout << "interpolateU u3,u4: " << u3 << ", " << u4 << std::endl;
 
@@ -178,10 +187,10 @@ real ParticleTracer::interpolateV(real x, real y)
 
     // TODO: use u accessor function to incooperate obstacles
     real v1, v2, v3, v4;
-    v1 = grid_->v()( i - 1 , j - 1 );
-    v2 = grid_->v()( i     , j - 1 );
-    v3 = grid_->v()( i - 1 , j     );
-    v4 = grid_->v()( i     , j     );
+    v1 = grid_->v( i - 1 , j - 1 , NORTH);
+    v2 = grid_->v( i     , j - 1 , NORTH);
+    v3 = grid_->v( i - 1 , j     , SOUTH);
+    v4 = grid_->v( i     , j     , SOUTH);
 
     real v = (1 / (grid_->dx() * grid_->dy())) * (
                  ( x2 - x  ) * ( y2 - y  ) * v1 +

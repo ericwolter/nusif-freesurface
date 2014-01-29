@@ -721,7 +721,7 @@ void FluidSimulator::testFG()
 
 //*******************************************************************************************************************
 
-void FluidSimulator::set_UVP_surface(const int &dt, bool compP)
+void FluidSimulator::set_UVP_surface(const real &dt, bool compP)
 {
 
     for (int i = 1; i <= imax; i++)
@@ -735,7 +735,7 @@ void FluidSimulator::set_UVP_surface(const int &dt, bool compP)
 }
 
 
-void FluidSimulator::set_UVP_surface(int i, int j , const int &dt, bool compP)
+void FluidSimulator::set_UVP_surface(int i, int j , const real &dt, bool compP)
 {
 
     int number_of_empty_neighbour = 0 ;
@@ -770,7 +770,7 @@ void FluidSimulator::set_UVP_surface(int i, int j , const int &dt, bool compP)
     }
 }
 
-// real FluidSimulator::set_U_surface(int i, int j , const int &dt) // not finished yet!!!
+// real FluidSimulator::set_U_surface(int i, int j , const real &dt) // not finished yet!!!
 // {
 //     int number_of_empty_neighbour = 0 ;
 //
@@ -823,7 +823,7 @@ void FluidSimulator::set_UVP_surface(int i, int j , const int &dt, bool compP)
 //     }
 // }
 //
-// real FluidSimulator::set_V_surface(int i, int j , const int &dt) already finished!
+// real FluidSimulator::set_V_surface(int i, int j , const real &dt) already finished!
 // {
 //     int number_of_empty_neighbour = 0 ;
 //
@@ -879,7 +879,7 @@ void FluidSimulator::set_UVP_surface(int i, int j , const int &dt, bool compP)
 
 //*******************************************************************************************************************
 
-void FluidSimulator::one_empty_neighbour(int i , int j , const int &dt, bool compP)
+void FluidSimulator::one_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
     // According to page 92 ,case 1 of the book
     // If cell (i,j) is Fluid, one of the other neighbour(North,East,West,South) is empty cell.
@@ -945,7 +945,7 @@ void FluidSimulator::one_empty_neighbour(int i , int j , const int &dt, bool com
 }
 //*******************************************************************************************************************
 
-void FluidSimulator::two_empty_neighbour(int i , int j , const int &dt, bool compP)
+void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
 
     real Re_inverse = (real) 1.0 / Re_ ;
@@ -1065,7 +1065,7 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const int &dt, bool com
 }
 //*******************************************************************************************************************
 
-void FluidSimulator::three_empty_neighbour(int i , int j , const int &dt, bool compP)
+void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
 
     // According to page 96 of book
@@ -1157,7 +1157,7 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const int &dt, bool c
 }
 //*******************************************************************************************************************
 
-void FluidSimulator::four_empty_neighbour(int i , int j , const int &dt, bool compP)
+void FluidSimulator::four_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
     // According to page 96 of book number 5
     if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1))
@@ -1179,6 +1179,4 @@ void FluidSimulator::four_empty_neighbour(int i , int j , const int &dt, bool co
         grid_.v()(i - 1, j)     = grid_.v()(i, j) ;
         grid_.v()(i - 1, j - 1)   = grid_.v()(i, j - 1) ;
     }
-
-
 }

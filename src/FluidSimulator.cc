@@ -384,8 +384,8 @@ void FluidSimulator::simulate(real duration)
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectX2_particle_ / grid_.dy()), (int)(rectY1_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()));
-    particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_));
+    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectX2_particle_ / grid_.dy()), (int)(rectY1_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
+    particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
 
     refreshBoundaries();
 
@@ -448,8 +448,8 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx())  , (int)(rectY2_particle_ / grid_.dy()));
-    particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_));
+    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx())  , (int)(rectY2_particle_ / grid_.dy()), 0);
+    particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
     grid_.createPng("test.png");
 
     refreshBoundaries();

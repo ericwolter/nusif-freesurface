@@ -35,7 +35,7 @@ void ParticleTracer::markCells()
     }
 }
 
-void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2)
+void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2, int type)
 {
     PROG("adding particle rectangle: " << "(" << x1 << "|" << y1 << ")" << ", " << "(" << x2 << "|" << y2 << ")");
     int minX = std::min(x1, x2);
@@ -48,12 +48,12 @@ void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2)
         for (int j = minY; j < maxY; ++j)
         {
             // std::cout << "TRACER fillCell: " << i + 1 << ", " << j + 1 << std::endl;
-            this->fillCell(i + 1, j + 1, 9);
+            this->fillCell(i + 1, j + 1, 9, type);
         }
     }
 }
 
-void ParticleTracer::addCircle(int x, int y, int r)
+void ParticleTracer::addCircle(int x, int y, int r, int type)
 {
     PROG("adding particle circle: " << "(" << x << "|" << y << "|" << r << ")");
 
@@ -63,12 +63,12 @@ void ParticleTracer::addCircle(int x, int y, int r)
 
         for (int j = -h; j < h; ++j)
         {
-            this->fillCell(x + i, y + j, 9);
+            this->fillCell(x + i, y + j, 9, type);
         }
     }
 }
 
-void ParticleTracer::fillCell(int x, int y, int numParticles)
+void ParticleTracer::fillCell(int x, int y, int numParticles, int type)
 {
     real cellX = (x - 1) * grid_->dx();
     real cellY = (y - 1) * grid_->dy();
@@ -85,7 +85,7 @@ void ParticleTracer::fillCell(int x, int y, int numParticles)
     {
         for (int j = 1; j <= particlesPerSide; ++j)
         {
-            Particle p(cellX + deltaX / 2 + (i - 1) * deltaX, cellY + deltaY / 2 + (j - 1) * deltaY);
+            Particle p(cellX + deltaX / 2 + (i - 1) * deltaX, cellY + deltaY / 2 + (j - 1) * deltaY, type);
             // std::cout << "TRACER pX,Y: " << cellX + deltaX / 2 + (i - 1) * deltaX << ", " << cellY + deltaY / 2 + (j - 1) * deltaY << std::endl;
             particles_.push_back(p);
         }

@@ -99,18 +99,11 @@ void VTKWriter::write(const StaggeredGrid &grid, const ParticleTracer *tracer)
         fileStreamParticles << "CELLS 0 0" << std::endl;
         fileStreamParticles << "CELL_TYPES 0" << std::endl;
         fileStreamParticles << "POINT_DATA " << tracer->particles().size() << std::endl;
-        // fileStreamParticles << "SCALARS m " << RealTypeToString<real>::str << std::endl;
-        // fileStreamParticles << "LOOKUP_TABLE default" << std::endl;
-        // for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
-        // {
-        //     fileStreamParticles << std::fixed << std::setprecision (5) << 1 << std::endl;
-        // }
-        fileStreamParticles << "VECTORS velocity " << RealTypeToString<real>::str << std::endl;
-
+        fileStreamParticles << "SCALARS type int" << RealTypeToString<real>::str << std::endl;
+        fileStreamParticles << "LOOKUP_TABLE default" << std::endl;
         for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
         {
-            // fileStreamParticles << std::fixed << std::setprecision (5) << p->u() << " " << p->v() << " 0\n";
-            fileStreamParticles << std::fixed << std::setprecision(5) << 5 << " " << 5 << " 0\n";
+            fileStreamParticles << p->type() << std::endl;
         }
 
         fileStreamParticles << "\n";

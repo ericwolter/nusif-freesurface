@@ -356,7 +356,7 @@ void FluidSimulator::refreshBoundaries()
 
 void FluidSimulator::simulate(real duration)
 {
-    VTKWriter vtkWriter ( name_ );
+    VTKWriter vtkWriter (name_);
 
     real t = 0;
     unsigned int n = 0;
@@ -405,17 +405,19 @@ void FluidSimulator::simulate(real duration)
         PROG(n << "'th timestep: determine next dt");
         determineNextDT(safetyfac_);
         particle_tracer_.markCells();
-        //particle_tracer_.advanceParticles(dt_) ;
-        // intepolation function for u,v of particle needed
-        PROG(n << "'th timestep: refresh boundaries");
-        refreshBoundaries();
+        PROG(n << "'th timestep: set u, v, p at the free boundary");
+        set_UVP_surface(dt_,true);
         computeFG();
         PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
         composeRHS();
         PROG(n << "'th timestep: solve pressure equation");
         solv().solve(grid_);
-        PROG(n << "'th timestep: update u and v; ");
+        PROG(n << "'th timestep: update u and v in fluid domain");
         updateVelocities();
+        PROG(n << "'th timestep: refresh boundaries");
+        refreshBoundaries();
+        PROG(n << "'th timestep: set u, v at the free boundary");
+        set_UVP_surface(dt_,false);
         particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
@@ -459,7 +461,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx())  , (int)(rectY2_particle_ / grid_.dy()), 0);
+    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
     particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
     grid_.createPng("test.png");
 
@@ -474,17 +476,19 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         PROG(n << "'th timestep: determine next dt");
         determineNextDT(safetyfac_);
         particle_tracer_.markCells();
-        //particle_tracer_.advanceParticles(dt_) ;
-        // intepolation function for u,v of particle needed
-        PROG(n << "'th timestep: refresh boundaries");
-        refreshBoundaries();
+        PROG(n << "'th timestep: set u, v, p at the free boundary");
+        set_UVP_surface(dt_,true);
         computeFG();
         PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
         composeRHS();
         PROG(n << "'th timestep: solve pressure equation");
         solv().solve(grid_);
-        PROG(n << "'th timestep: update u and v");
+        PROG(n << "'th timestep: update u and v in fluid domain");
         updateVelocities();
+        PROG(n << "'th timestep: refresh boundaries");
+        refreshBoundaries();
+        PROG(n << "'th timestep: set u, v at the free boundary");
+        set_UVP_surface(dt_,false);
         particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();

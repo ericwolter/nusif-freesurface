@@ -14,7 +14,7 @@ ParticleTracer::ParticleTracer(StaggeredGrid *grid)
 
 void ParticleTracer::markCells()
 {
-    std::cout << "- marking cells" << std::endl;
+    PROG("marking cells");
 
     for (int i = 1; i <= grid_->imax(); ++i)
     {
@@ -37,7 +37,7 @@ void ParticleTracer::markCells()
 
 void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2)
 {
-    std::cout << "Adding particle rectangle: " << "(" << x1 << "|" << y1 << ")" << ", " << "(" << x2 << "|" << y2 << ")" << std::endl;
+    PROG("adding particle rectangle: " << "(" << x1 << "|" << y1 << ")" << ", " << "(" << x2 << "|" << y2 << ")");
     int minX = std::min(x1, x2);
     int maxX = std::max(x1, x2);
     int minY = std::min(y1, y2);
@@ -55,7 +55,7 @@ void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2)
 
 void ParticleTracer::addCircle(int x, int y, int r)
 {
-    std::cout << "Adding particle circle: " << "(" << x << "|" << y << "|" << r << ")" << std::endl;
+    PROG("adding particle circle: " << "(" << x << "|" << y << "|" << r << ")");
 
     for (int i = -r; i < r; ++i)
     {
@@ -102,7 +102,7 @@ void ParticleTracer::print()
 
 void ParticleTracer::advanceParticles(real const dt)
 {
-    std::cout << "- advancing particles" << std::endl;
+    PROG("advancing particles");
 
     for (unsigned int i = 0; i < particles_.size(); ++i)
     {

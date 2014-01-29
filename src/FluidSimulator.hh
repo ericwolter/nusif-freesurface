@@ -15,11 +15,11 @@
 class FluidSimulator
 {
 public:
-    FluidSimulator( const FileReader &conf );
+    FluidSimulator(const FileReader &conf);
 
     /// Simulates a given time-length
-    void simulate             ( real duration              );
-    void simulateTimeStepCount( unsigned int nrOfTimeSteps );
+    void simulate(real duration);
+    void simulateTimeStepCount(unsigned int nrOfTimeSteps);
 
 
     // Getter functions for the internally stored StaggeredGrid
@@ -56,25 +56,25 @@ private:
     void computeFG();
     void composeRHS();
     void updateVelocities();
-    void determineNextDT( real const &limit );
+    void determineNextDT(real const &limit);
     void refreshBoundaries();
 
     // compute surface boundary
-    void set_UVP_surface(const int& dt, bool compP);
-    void set_UVP_surface(int i, int j , const int& dt, bool compP);
-    void one_empty_neighbour   (int i , int j , const int& dt, bool compP ) ;
-    void two_empty_neighbour   (int i , int j , const int& dt, bool compP ) ;
-    void three_empty_neighbour (int i , int j , const int& dt, bool compP ) ;
-    void four_empty_neighbour  (int i , int j , const int& dt, bool compP ) ;
-//     real set_U_surface(int i, int j , const int &dt);
-//     real set_V_surface(int i, int j , const int &dt);
+    void set_UVP_surface(const int &dt, bool compP);
+    void set_UVP_surface(int i, int j , const int &dt, bool compP);
+    void one_empty_neighbour(int i , int j , const int &dt, bool compP) ;
+    void two_empty_neighbour(int i , int j , const int &dt, bool compP) ;
+    void three_empty_neighbour(int i , int j , const int &dt, bool compP) ;
+    void four_empty_neighbour(int i , int j , const int &dt, bool compP) ;
+    //     real set_U_surface(int i, int j , const int &dt);
+    //     real set_V_surface(int i, int j , const int &dt);
     // needed values
     real safetyfac_, gamma_, Re_, gx_, gy_, dt_, vel_N, vel_S, vel_E, vel_W, uInit_, vInit_, pInit_;
     real rectX_, rectXX_, rectY_, rectYY_, circX_, circY_, circR_;
     BCTYPE cond_N, cond_S, cond_E, cond_W;
-    unsigned int timeStepNr,normfreq, outPutInt;
+    unsigned int timeStepNr, normfreq, outPutInt;
     int imax, jmax;
-    real rectX1_particle_ , rectX2_particle_ ,rectY1_particle_ ,rectY2_particle_, circX_particle_, circY_particle_, circR_particle_;
+    real rectX1_particle_ , rectX2_particle_ , rectY1_particle_ , rectY2_particle_, circX_particle_, circY_particle_, circR_particle_;
 
 protected:
     StaggeredGrid grid_;   //< grid

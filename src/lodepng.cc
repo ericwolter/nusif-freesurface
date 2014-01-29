@@ -345,7 +345,7 @@ static void lodepng_set32bitInt(unsigned char *buffer, unsigned value)
     buffer[0] = (unsigned char)((value >> 24) & 0xff);
     buffer[1] = (unsigned char)((value >> 16) & 0xff);
     buffer[2] = (unsigned char)((value >>  8) & 0xff);
-    buffer[3] = (unsigned char)((value      ) & 0xff);
+    buffer[3] = (unsigned char)((value) & 0xff);
 }
 #endif /*defined(LODEPNG_COMPILE_PNG) || defined(LODEPNG_COMPILE_ENCODER)*/
 
@@ -383,7 +383,7 @@ unsigned lodepng_load_file(unsigned char **out, size_t *outsize, const char *fil
     /*read contents of the file into the vector*/
     *outsize = 0;
     *out = (unsigned char *)lodepng_malloc((size_t)size);
-    if (size && (*out)) (*outsize) = fread(*out, 1, (size_t)size, file);
+    if (size && (*out))(*outsize) = fread(*out, 1, (size_t)size, file);
 
     fclose(file);
     if (!(*out) && size) return 83; /*the above malloc failed*/
@@ -394,7 +394,7 @@ unsigned lodepng_load_file(unsigned char **out, size_t *outsize, const char *fil
 unsigned lodepng_save_file(const unsigned char *buffer, size_t buffersize, const char *filename)
 {
     FILE *file;
-    file = fopen(filename, "wb" );
+    file = fopen(filename, "wb");
     if (!file) return 79;
     fwrite((char *)buffer , 1 , buffersize, file);
     fclose(file);
@@ -1226,7 +1226,7 @@ static unsigned inflateNoCompression(ucvector *out, const unsigned char *in, siz
     /*go to first boundary of byte*/
     size_t p;
     unsigned LEN, NLEN, n, error = 0;
-    while (((*bp) & 0x7) != 0) (*bp)++;
+    while (((*bp) & 0x7) != 0)(*bp)++;
     p = (*bp) / 8; /*byte position*/
 
     /*read LEN (2 bytes) and NLEN (2 bytes)*/
@@ -2359,8 +2359,8 @@ static void setBitOfReversedStream0(size_t *bitpointer, unsigned char *bitstream
 static void setBitOfReversedStream(size_t *bitpointer, unsigned char *bitstream, unsigned char bit)
 {
     /*the current bit in bitstream may be 0 or 1 for this to work*/
-    if (bit == 0) bitstream[(*bitpointer) >> 3] &=  (unsigned char)(~(1 << (7 - ((*bitpointer) & 0x7))));
-    else         bitstream[(*bitpointer) >> 3] |=  (1 << (7 - ((*bitpointer) & 0x7)));
+    if (bit == 0) bitstream[(*bitpointer) >> 3] &= (unsigned char)(~(1 << (7 - ((*bitpointer) & 0x7))));
+    else         bitstream[(*bitpointer) >> 3] |= (1 << (7 - ((*bitpointer) & 0x7)));
     (*bitpointer)++;
 }
 
@@ -2500,10 +2500,10 @@ static unsigned checkColorValidity(LodePNGColorType colortype, unsigned bd) /*bd
     switch (colortype)
     {
     case 0: if (!(bd == 1 || bd == 2 || bd == 4 || bd == 8 || bd == 16)) return 37; break; /*grey*/
-    case 2: if (!(                                 bd == 8 || bd == 16)) return 37; break; /*RGB*/
-    case 3: if (!(bd == 1 || bd == 2 || bd == 4 || bd == 8            )) return 37; break; /*palette*/
-    case 4: if (!(                                 bd == 8 || bd == 16)) return 37; break; /*grey + alpha*/
-    case 6: if (!(                                 bd == 8 || bd == 16)) return 37; break; /*RGBA*/
+    case 2: if (!(bd == 8 || bd == 16)) return 37; break;                                  /*RGB*/
+    case 3: if (!(bd == 1 || bd == 2 || bd == 4 || bd == 8)) return 37; break;             /*palette*/
+    case 4: if (!(bd == 8 || bd == 16)) return 37; break;                                  /*grey + alpha*/
+    case 6: if (!(bd == 8 || bd == 16)) return 37; break;                                  /*RGBA*/
     default: return 31;
     }
     return 0; /*allowed color type / bits combination*/

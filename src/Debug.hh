@@ -73,17 +73,17 @@
 namespace internal
 {
 
-void checkFct ( bool b, const char *const expression, const std::string &message,
-                const char *const filename, int line );
-void assertFct( bool b, const char *const expression, const std::string &message,
-                const char *const filename, int line );
+void checkFct(bool b, const char *const expression, const std::string &message,
+              const char *const filename, int line);
+void assertFct(bool b, const char *const expression, const std::string &message,
+               const char *const filename, int line);
 
-void warnFct( const std::string &message,
-              const char *const filename, int line );
+void warnFct(const std::string &message,
+             const char *const filename, int line);
 
 // own "progress" function
-void progFct( const std::string &message,
-              const char *const filename, int line );
+void progFct(const std::string &message,
+             const char *const filename, int line);
 
 }
 

@@ -3,11 +3,11 @@
 
 #include "ParticleTracer.hh"
 
-ParticleTracer::ParticleTracer ( )
+ParticleTracer::ParticleTracer()
 {
 }
 
-ParticleTracer::ParticleTracer ( StaggeredGrid *grid )
+ParticleTracer::ParticleTracer(StaggeredGrid *grid)
     : grid_(grid)
 {
 }
@@ -137,8 +137,8 @@ real ParticleTracer::interpolateU(real x, real y)
 {
     // see section 4.2.1
     // std::cout << "interpolateU x,y: " << x << ", " << y << std::endl;
-    int i = (int) (x / grid_->dx()) + 1;
-    int j = (int) (( y + 0.5 * grid_->dy() ) / grid_->dy()) + 1;
+    int i = (int)(x / grid_->dx()) + 1;
+    int j = (int)((y + 0.5 * grid_->dy()) / grid_->dy()) + 1;
     // std::cout << "interpolateU i,j: " << i << ", " << j << std::endl;
 
     real x1, x2, y1, y2;
@@ -151,18 +151,18 @@ real ParticleTracer::interpolateU(real x, real y)
 
     // TODO: use u accessor function to incooperate obstacles
     real u1, u2, u3, u4;
-    u1 = grid_->u( i - 1 , j - 1 , EAST);
-    u2 = grid_->u( i     , j - 1 , WEST);
-    u3 = grid_->u( i - 1 , j     , EAST);
-    u4 = grid_->u( i     , j     , WEST);
+    u1 = grid_->u(i - 1 , j - 1 , EAST);
+    u2 = grid_->u(i     , j - 1 , WEST);
+    u3 = grid_->u(i - 1 , j     , EAST);
+    u4 = grid_->u(i     , j     , WEST);
     // std::cout << "interpolateU u1,u2: " << u1 << ", " << u2 << std::endl;
     // std::cout << "interpolateU u3,u4: " << u3 << ", " << u4 << std::endl;
 
     real u = (1 / (grid_->dx() * grid_->dy())) * (
-                 ( x2 - x  ) * ( y2 - y  ) * u1 +
-                 ( x  - x1 ) * ( y2 - y  ) * u2 +
-                 ( x2 - x  ) * ( y  - y1 ) * u3 +
-                 ( x  - x1 ) * ( y  - y1 ) * u4
+                 (x2 - x) * (y2 - y) * u1 +
+                 (x  - x1) * (y2 - y) * u2 +
+                 (x2 - x) * (y  - y1) * u3 +
+                 (x  - x1) * (y  - y1) * u4
              );
 
     return u;
@@ -173,8 +173,8 @@ real ParticleTracer::interpolateV(real x, real y)
     // see section 4.2.1
 
     // std::cout << "interpolateV x,y: " << x << ", " << y << std::endl;
-    int i = (int) (( x + 0.5 * grid_->dx() ) / grid_->dx()) + 1;
-    int j = (int) ( y  / grid_->dy()) + 1;
+    int i = (int)((x + 0.5 * grid_->dx()) / grid_->dx()) + 1;
+    int j = (int)(y  / grid_->dy()) + 1;
     // std::cout << "interpolateV i,j: " << i << ", " << j << std::endl;
 
     real x1, x2, y1, y2;
@@ -187,16 +187,16 @@ real ParticleTracer::interpolateV(real x, real y)
 
     // TODO: use u accessor function to incooperate obstacles
     real v1, v2, v3, v4;
-    v1 = grid_->v( i - 1 , j - 1 , NORTH);
-    v2 = grid_->v( i     , j - 1 , NORTH);
-    v3 = grid_->v( i - 1 , j     , SOUTH);
-    v4 = grid_->v( i     , j     , SOUTH);
+    v1 = grid_->v(i - 1 , j - 1 , NORTH);
+    v2 = grid_->v(i     , j - 1 , NORTH);
+    v3 = grid_->v(i - 1 , j     , SOUTH);
+    v4 = grid_->v(i     , j     , SOUTH);
 
     real v = (1 / (grid_->dx() * grid_->dy())) * (
-                 ( x2 - x  ) * ( y2 - y  ) * v1 +
-                 ( x  - x1 ) * ( y2 - y  ) * v2 +
-                 ( x2 - x  ) * ( y  - y1 ) * v3 +
-                 ( x  - x1 ) * ( y  - y1 ) * v4
+                 (x2 - x) * (y2 - y) * v1 +
+                 (x  - x1) * (y2 - y) * v2 +
+                 (x2 - x) * (y  - y1) * v3 +
+                 (x  - x1) * (y  - y1) * v4
              );
 
     return v;

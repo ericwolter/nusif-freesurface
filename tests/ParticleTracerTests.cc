@@ -13,16 +13,16 @@ void testTotalNumber()
     ParticleTracer tracer(&grid);
     tracer.addRectangle(0, 0, 2, 2);
 
-    CHECK( tracer.particles().size() == 4 * 9 );
+    CHECK(tracer.particles().size() == 4 * 9);
 }
 
 void testTotalNumberLarge()
 {
-    StaggeredGrid grid(1.0, 1.0, 1.0/30, 1.0/30);
+    StaggeredGrid grid(1.0, 1.0, 1.0 / 30, 1.0 / 30);
     ParticleTracer tracer(&grid);
     tracer.addRectangle(0, 0, 30, 30);
 
-    CHECK( tracer.particles().size() == 30 * 30 * 9 );
+    CHECK(tracer.particles().size() == 30 * 30 * 9);
 }
 
 void testCellCorrect()
@@ -33,8 +33,8 @@ void testCellCorrect()
 
     Particle p = tracer.particles()[0];
 
-    CHECK( p.getCellX(grid.dx()) == 1);
-    CHECK( p.getCellY(grid.dy()) == 1);
+    CHECK(p.getCellX(grid.dx()) == 1);
+    CHECK(p.getCellY(grid.dy()) == 1);
 }
 
 void testFirstPositionCorrect()
@@ -44,8 +44,8 @@ void testFirstPositionCorrect()
     tracer.addRectangle(0, 0, 2, 2);
 
     Particle p = tracer.particles()[0];
-    CHECK( fabs( p.x() - 0.16667 ) < 1e-5 );
-    CHECK( fabs( p.y() - 0.16667 ) < 1e-5 );
+    CHECK(fabs(p.x() - 0.16667) < 1e-5);
+    CHECK(fabs(p.y() - 0.16667) < 1e-5);
 }
 
 void testCenterPositionCorrect()
@@ -56,8 +56,8 @@ void testCenterPositionCorrect()
 
     unsigned int centerOffset = 9 * 4 /* jump over cells */ + 4 /* the index of the center particle in a cell */;
     Particle p = tracer.particles()[centerOffset];
-    CHECK( fabs( p.x() - 1.5 ) < 1e-5 );
-    CHECK( fabs( p.y() - 1.5 ) < 1e-5 );
+    CHECK(fabs(p.x() - 1.5) < 1e-5);
+    CHECK(fabs(p.y() - 1.5) < 1e-5);
 }
 
 void testCenterZeroInterpolate()
@@ -74,8 +74,8 @@ void testCenterZeroInterpolate()
     real u = tracer.interpolateU(p.x(), p.y());
     real v = tracer.interpolateV(p.x(), p.y());
 
-    CHECK( fabs( u - 0.0 ) < 1e-5 );
-    CHECK( fabs( v - 0.0 ) < 1e-5 );
+    CHECK(fabs(u - 0.0) < 1e-5);
+    CHECK(fabs(v - 0.0) < 1e-5);
 }
 
 void testCenterSingleInterpolate()
@@ -95,8 +95,8 @@ void testCenterSingleInterpolate()
     real u = tracer.interpolateU(p.x(), p.y());
     real v = tracer.interpolateV(p.x(), p.y());
 
-    CHECK( fabs( u - 0.5 ) < 1e-5 );
-    CHECK( fabs( v - 0.5 ) < 1e-5 );
+    CHECK(fabs(u - 0.5) < 1e-5);
+    CHECK(fabs(v - 0.5) < 1e-5);
 }
 
 void testInterpolatedCellsCorrect()
@@ -116,10 +116,10 @@ void testInterpolatedCellsCorrect()
     Particle p = tracer.particles()[centerOffset];
     real u = tracer.interpolateU(p.x(), p.y());
 
-    CHECK( fabs( u - 0.5 ) < 1e-5 );
+    CHECK(fabs(u - 0.5) < 1e-5);
 }
 
-int main( )
+int main()
 {
     testTotalNumber();
     std::cout << "[TEST] Total Number Test: OK" << std::endl;

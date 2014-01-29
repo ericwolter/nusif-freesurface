@@ -37,33 +37,33 @@ class FileReader
 public:
 
     //register a new parameter with name key and initial int value
-    void registerIntParameter( const std::string &key, int init = 0 );
+    void registerIntParameter(const std::string &key, int init = 0);
     //register a new parameter with name key and initial double value
-    void registerRealParameter( const std::string &key, real init = 0 );
+    void registerRealParameter(const std::string &key, real init = 0);
 
     //register a new parameter with name key and initial string value
-    void registerStringParameter( const std::string &key, const std::string &init = "" );
+    void registerStringParameter(const std::string &key, const std::string &init = "");
 
     //set a value for the key string with value in
-    void setParameter( const std::string &key, const std::string &in );
+    void setParameter(const std::string &key, const std::string &in);
 
     //set a value for the key string with value in
-    void setParameter( const std::string &key, real in );
+    void setParameter(const std::string &key, real in);
 
     //set a value for the key string with value in
-    void setParameter( const std::string &key, int in );
+    void setParameter(const std::string &key, int in);
 
     // get the int value of key
-    inline int getIntParameter( const std::string &key ) const;
+    inline int getIntParameter(const std::string &key) const;
 
     // get the double value of key
-    inline real getRealParameter( const std::string &key ) const;
+    inline real getRealParameter(const std::string &key) const;
 
     // get the string value of key
-    inline std::string getStringParameter( const std::string &key ) const;
+    inline std::string getStringParameter(const std::string &key) const;
 
     //try to read all registered parameters from file name
-    bool readFile( const std::string &name );
+    bool readFile(const std::string &name);
 
     //print out all parameters to std:out
     void printParameters() const;
@@ -85,7 +85,7 @@ private:
 inline int FileReader::getIntParameter(const std::string &key) const
 {
     // check if key exists
-    ASSERT_MSG( ints.count(key) == 1, "Such key doesn't exist.(" + key + ")"  );
+    ASSERT_MSG(ints.count(key) == 1, "Such key doesn't exist.(" + key + ")");
 
     return ints.find(key)->second;
 }
@@ -93,7 +93,7 @@ inline int FileReader::getIntParameter(const std::string &key) const
 inline real FileReader::getRealParameter(const std::string &key) const
 {
     // check if key exists
-    ASSERT_MSG( reals.count(key) == 1, "Such key doesn't exist. (" + key + ")" );
+    ASSERT_MSG(reals.count(key) == 1, "Such key doesn't exist. (" + key + ")");
 
     return reals.find(key)->second;
 }
@@ -101,7 +101,7 @@ inline real FileReader::getRealParameter(const std::string &key) const
 inline std::string FileReader::getStringParameter(const std::string &key) const
 {
     // check if key exists
-    ASSERT_MSG( strings.count(key) == 1, "Such key doesn't exist. (" + key + ")" );
+    ASSERT_MSG(strings.count(key) == 1, "Such key doesn't exist. (" + key + ")");
 
     return strings.find(key)->second;
 }

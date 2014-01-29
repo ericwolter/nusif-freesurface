@@ -10,8 +10,8 @@ class ParticleTracer
 {
 public:
 
-    ParticleTracer ( );
-    ParticleTracer ( StaggeredGrid *grid );
+    ParticleTracer();
+    ParticleTracer(StaggeredGrid *grid);
 
     const std::vector<Particle> &particles() const
     {

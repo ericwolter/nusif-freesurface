@@ -5,20 +5,20 @@
 
 
 // constructor for FluidSimulator
-FluidSimulator::FluidSimulator( const FileReader &conf )
+FluidSimulator::FluidSimulator(const FileReader &conf)
     : grid_(conf), solver_(conf)
 {
     particle_tracer_ = ParticleTracer(&grid_);
-    
+
     PROG("construct FluidSimulator with a file");
     gamma_ = conf.getRealParameter("gamma");
-    CHECK_MSG( (gamma_ >= 0 && gamma_ <= 1), "wrong input for gamma: " << gamma_);
+    CHECK_MSG((gamma_ >= 0 && gamma_ <= 1), "wrong input for gamma: " << gamma_);
     Re_ = conf.getRealParameter("Re");
-    CHECK_MSG( (Re_ > 0), "wrong input for Re: " << Re_);
+    CHECK_MSG((Re_ > 0), "wrong input for Re: " << Re_);
     gx_ = conf.getRealParameter("GX");
     gy_ = conf.getRealParameter("GY");
     dt_ = conf.getRealParameter("dt");
-    CHECK_MSG( (dt_ > 0), "wrong input for dt: " << dt_);
+    CHECK_MSG((dt_ > 0), "wrong input for dt: " << dt_);
 
     vel_N = conf.getRealParameter("boundary_velocity_N");
     vel_S = conf.getRealParameter("boundary_velocity_S");
@@ -30,11 +30,11 @@ FluidSimulator::FluidSimulator( const FileReader &conf )
     std::string we = conf.getStringParameter("boundary_condition_W");
     std::string es = conf.getStringParameter("boundary_condition_E");
 
-    if ( no == "inflow" )
+    if (no == "inflow")
     {
         cond_N = INFLOW;
     }
-    else if ( no == "outflow" )
+    else if (no == "outflow")
     {
         ASSERT_MSG(vel_N == 0.0, "there should be no velocity values for an outflow boundary!");
         cond_N = OUTFLOW;
@@ -44,11 +44,11 @@ FluidSimulator::FluidSimulator( const FileReader &conf )
         cond_N = NOSLIP;
     }
 
-    if ( so == "inflow" )
+    if (so == "inflow")
     {
         cond_S = INFLOW;
     }
-    else if ( so == "outflow" )
+    else if (so == "outflow")
     {
         ASSERT_MSG(vel_S == 0.0, "there should be no velocity values for an outflow boundary!");
         cond_S = OUTFLOW;
@@ -58,11 +58,11 @@ FluidSimulator::FluidSimulator( const FileReader &conf )
         cond_S = NOSLIP;
     }
 
-    if ( we == "inflow" )
+    if (we == "inflow")
     {
         cond_W = INFLOW;
     }
-    else if ( we == "outflow" )
+    else if (we == "outflow")
     {
         ASSERT_MSG(vel_W == 0.0, "there should be no velocity values for an outflow boundary!");
         cond_W = OUTFLOW;
@@ -72,11 +72,11 @@ FluidSimulator::FluidSimulator( const FileReader &conf )
         cond_W = NOSLIP;
     }
 
-    if ( es == "inflow" )
+    if (es == "inflow")
     {
         cond_E = INFLOW;
     }
-    else if ( es == "outflow" )
+    else if (es == "outflow")
     {
         ASSERT_MSG(vel_E == 0.0, "there should be no velocity values for an outflow boundary!");
         cond_E = OUTFLOW;
@@ -88,64 +88,64 @@ FluidSimulator::FluidSimulator( const FileReader &conf )
 
     safetyfac_ = conf.getRealParameter("safetyfactor");
     timeStepNr = (unsigned int)conf.getIntParameter("timesteps");
-    CHECK_MSG( (timeStepNr >= 0), "wrong input for timesteps: " << timeStepNr);
+    CHECK_MSG((timeStepNr >= 0), "wrong input for timesteps: " << timeStepNr);
     outPutInt = (unsigned int)conf.getIntParameter("outputinterval");
-    CHECK_MSG( (outPutInt > 0), "wrong input for outputinterval: " << outPutInt);
+    CHECK_MSG((outPutInt > 0), "wrong input for outputinterval: " << outPutInt);
     normfreq = (unsigned int)conf.getIntParameter("normalizationfrequency");
-    CHECK_MSG( (normfreq > 0), "wrong input for normalizationfrequency: " << normfreq);
+    CHECK_MSG((normfreq > 0), "wrong input for normalizationfrequency: " << normfreq);
     uInit_ = conf.getRealParameter("U_INIT");
     vInit_ = conf.getRealParameter("V_INIT");
     pInit_ = conf.getRealParameter("P_INIT");
     imax = conf.getIntParameter("imax");
-    CHECK_MSG( (imax > 0), "wrong input for imax: " << imax);
+    CHECK_MSG((imax > 0), "wrong input for imax: " << imax);
     jmax = conf.getIntParameter("jmax");
-    CHECK_MSG( (jmax > 0), "wrong input for jmax: " << jmax);
+    CHECK_MSG((jmax > 0), "wrong input for jmax: " << jmax);
 
     // obstacles:
     // rectangle
     rectX_ = conf.getRealParameter("RectangleX1");
-    CHECK_MSG( (rectX_ >= 0), "wrong input for RectangleX1: " << rectX_);
+    CHECK_MSG((rectX_ >= 0), "wrong input for RectangleX1: " << rectX_);
     rectXX_ = conf.getRealParameter("RectangleX2");
-    CHECK_MSG( (rectXX_ >= 0), "wrong input for RectangleX2: " << rectXX_);
+    CHECK_MSG((rectXX_ >= 0), "wrong input for RectangleX2: " << rectXX_);
     rectY_ = conf.getRealParameter("RectangleY1");
-    CHECK_MSG( (rectY_ >= 0), "wrong input for RectangleY1: " << rectY_);
+    CHECK_MSG((rectY_ >= 0), "wrong input for RectangleY1: " << rectY_);
     rectYY_ = conf.getRealParameter("RectangleY2");
-    CHECK_MSG( (rectYY_ >= 0), "wrong input for RectangleY2: " << rectYY_);
+    CHECK_MSG((rectYY_ >= 0), "wrong input for RectangleY2: " << rectYY_);
     // circle
     circX_ = conf.getRealParameter("CircleX");
-    CHECK_MSG( (circX_ >= 0), "wrong input for CircleX: " << circX_);
+    CHECK_MSG((circX_ >= 0), "wrong input for CircleX: " << circX_);
     circY_ = conf.getRealParameter("CircleY");
-    CHECK_MSG( (circY_ >= 0), "wrong input for CircleY: " << circY_);
+    CHECK_MSG((circY_ >= 0), "wrong input for CircleY: " << circY_);
     circR_ = conf.getRealParameter("CircleR");
-    CHECK_MSG( (circR_ >= 0), "wrong input for CircleR: " << circR_);
+    CHECK_MSG((circR_ >= 0), "wrong input for CircleR: " << circR_);
 
     // particle
     // rectangle
     rectX1_particle_ = conf.getRealParameter("RectangleParticleX1");
-    CHECK_MSG( (rectX_ >= 0), "wrong input for RectangleX1: " << rectX_);
+    CHECK_MSG((rectX_ >= 0), "wrong input for RectangleX1: " << rectX_);
     rectX2_particle_ = conf.getRealParameter("RectangleParticleX2");
-    CHECK_MSG( (rectXX_ >= 0), "wrong input for RectangleX2: " << rectXX_);
+    CHECK_MSG((rectXX_ >= 0), "wrong input for RectangleX2: " << rectXX_);
     rectY1_particle_ = conf.getRealParameter("RectangleParticleY1");
-    CHECK_MSG( (rectY_ >= 0), "wrong input for RectangleY1: " << rectY_);
+    CHECK_MSG((rectY_ >= 0), "wrong input for RectangleY1: " << rectY_);
     rectY2_particle_ = conf.getRealParameter("RectangleParticleY2");
-    CHECK_MSG( (rectYY_ >= 0), "wrong input for RectangleY2: " << rectYY_);
+    CHECK_MSG((rectYY_ >= 0), "wrong input for RectangleY2: " << rectYY_);
     // circle
     circX_particle_ = conf.getRealParameter("CircleParticleX");
-    CHECK_MSG( (circX_particle_ >= 0), "wrong input for CircleParticleX: " << circX_particle_);
+    CHECK_MSG((circX_particle_ >= 0), "wrong input for CircleParticleX: " << circX_particle_);
     circY_particle_ = conf.getRealParameter("CircleParticleY");
-    CHECK_MSG( (circY_particle_ >= 0), "wrong input for CircleParticleY: " << circY_particle_);
+    CHECK_MSG((circY_particle_ >= 0), "wrong input for CircleParticleY: " << circY_particle_);
     circR_particle_ = conf.getRealParameter("CircleParticleR");
-    CHECK_MSG( (circR_particle_ >= 0), "wrong input for CircleParticleR: " << circR_particle_);
+    CHECK_MSG((circR_particle_ >= 0), "wrong input for CircleParticleR: " << circR_particle_);
 
 }
 
 void FluidSimulator::composeRHS()
 {
     // formula 3.38
-    for ( int i = 1; i <= imax; i++ )
+    for (int i = 1; i <= imax; i++)
     {
-        for ( int j = 1; j <= jmax; j++ )
-            grid_.rhs()(i - 1, j - 1) = ( (grid_.f()(i, j - 1) - grid_.f()(i - 1, j - 1)) / grid_.dx() + (grid_.g()(i - 1, j) - grid_.g()(i - 1, j - 1)) / grid_.dy() ) / dt_;
+        for (int j = 1; j <= jmax; j++)
+            grid_.rhs()(i - 1, j - 1) = ((grid_.f()(i, j - 1) - grid_.f()(i - 1, j - 1)) / grid_.dx() + (grid_.g()(i - 1, j) - grid_.g()(i - 1, j - 1)) / grid_.dy()) / dt_;
     }
 }
 
@@ -154,29 +154,29 @@ void FluidSimulator::updateVelocities()
     real dtdx = dt_ / grid_.dx();
     real dtdy = dt_ / grid_.dy();
 
-    for ( int i = 1; i <= imax; i++ )
+    for (int i = 1; i <= imax; i++)
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
 
-            if ( grid_.isFluid(i, j) )  // update obly for fluid cells
+            if (grid_.isFluid(i, j))    // update obly for fluid cells
             {
 
-                if ( i != imax && grid_.isFluid(i + 1, j) ) // formula 3.34
-                    grid_.u()(i, j) = grid_.f()(i, j - 1) - ( grid_.p(i + 1, j, WEST) - grid_.p()(i, j) ) * dtdx;
+                if (i != imax && grid_.isFluid(i + 1, j))   // formula 3.34
+                    grid_.u()(i, j) = grid_.f()(i, j - 1) - (grid_.p(i + 1, j, WEST) - grid_.p()(i, j)) * dtdx;
 
-                if ( j != jmax && grid_.isFluid(i, j + 1) ) // formula 3.35
-                    grid_.v()(i, j) = grid_.g()(i - 1, j) - ( grid_.p(i, j + 1, SOUTH) - grid_.p()(i, j) ) * dtdy;
+                if (j != jmax && grid_.isFluid(i, j + 1))   // formula 3.35
+                    grid_.v()(i, j) = grid_.g()(i - 1, j) - (grid_.p(i, j + 1, SOUTH) - grid_.p()(i, j)) * dtdy;
 
             }
         }
     }
 }
 
-void FluidSimulator::determineNextDT( real const &limit )
+void FluidSimulator::determineNextDT(real const &limit)
 {
     // first stability condition
-    real one = Re_ / ( 2 / pow(grid_.dx(), 2) + 2 / pow(grid_.dy(), 2) );
+    real one = Re_ / (2 / pow(grid_.dx(), 2) + 2 / pow(grid_.dy(), 2));
     bool first = dt_ < one;
     // CFL / 3.49
     real two = grid_.dx() / grid_.u().maxE();
@@ -184,12 +184,12 @@ void FluidSimulator::determineNextDT( real const &limit )
     real three = grid_.dy() / grid_.v().maxE();
     bool third = dt_ < three;
     // control step size
-    if ( !(first && second && third) )   // 3.50
+    if (!(first && second && third))     // 3.50
     {
         real minimum = std::min(one, two);
         minimum = std::min(minimum, three);
 
-        if ( limit > 0 && limit <= 1 )   // check safety factor
+        if (limit > 0 && limit <= 1)     // check safety factor
         {
             dt_ = limit * minimum;
         }
@@ -205,20 +205,20 @@ void FluidSimulator::determineNextDT( real const &limit )
 void FluidSimulator::refreshBoundaries()
 {
     // conditions for north border
-    if ( cond_N == NOSLIP )   // no-slip
+    if (cond_N == NOSLIP)     // no-slip
     {
-        for ( int i = 1; i <= imax; i++ )
+        for (int i = 1; i <= imax; i++)
         {
             grid_.v()(i, jmax) = 0;
             grid_.u()(i, jmax + 1) = 2 * vel_N - grid_.u()(i, jmax);
         }
 
     }
-    else if ( cond_N == INFLOW )     // inflow
+    else if (cond_N == INFLOW)       // inflow
     {
-        for ( int i = 1; i <= imax; i++ )
+        for (int i = 1; i <= imax; i++)
         {
-            if ( grid_.isFluid(i, jmax) )
+            if (grid_.isFluid(i, jmax))
             {
                 grid_.v()(i, jmax) = vel_N;
                 grid_.u()(i, jmax + 1) = - grid_.u()(i, jmax);
@@ -233,7 +233,7 @@ void FluidSimulator::refreshBoundaries()
     }
     else     // outflow
     {
-        for ( int i = 1; i <= imax; i++ )
+        for (int i = 1; i <= imax; i++)
         {
             grid_.v()(i, jmax) = grid_.v()(i, jmax - 1);
             grid_.u()(i, jmax + 1) = grid_.u()(i, jmax);
@@ -241,20 +241,20 @@ void FluidSimulator::refreshBoundaries()
     }
 
     // conditions for south border
-    if ( cond_S == NOSLIP )   // no-slip
+    if (cond_S == NOSLIP)     // no-slip
     {
-        for ( int i = 1; i <= imax; i++ )
+        for (int i = 1; i <= imax; i++)
         {
             grid_.v()(i, 0) = 0;
             grid_.u()(i, 0) = 2 * vel_S - grid_.u()(i, 1);
         }
 
     }
-    else if ( cond_S == INFLOW )     // inflow
+    else if (cond_S == INFLOW)       // inflow
     {
-        for ( int i = 1; i <= imax; i++ )
+        for (int i = 1; i <= imax; i++)
         {
-            if ( grid_.isFluid(i, 1) )
+            if (grid_.isFluid(i, 1))
             {
                 grid_.v()(i, 0) = vel_S;
                 grid_.u()(i, 0) = - grid_.u()(i, 1);
@@ -269,7 +269,7 @@ void FluidSimulator::refreshBoundaries()
     }
     else     // outflow
     {
-        for ( int i = 1; i <= imax; i++ )
+        for (int i = 1; i <= imax; i++)
         {
             grid_.v()(i, 0) = grid_.v()(i, 1);
             grid_.u()(i, 0) = grid_.u()(i, 1);
@@ -277,20 +277,20 @@ void FluidSimulator::refreshBoundaries()
     }
 
     // conditions for west border
-    if ( cond_W == NOSLIP )   // no-slip
+    if (cond_W == NOSLIP)     // no-slip
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
             grid_.u()(0, j) = 0;
             grid_.v()(0, j) = 2 * vel_W - grid_.v()(1, j);
         }
 
     }
-    else if ( cond_W == INFLOW )     // inflow
+    else if (cond_W == INFLOW)       // inflow
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
-            if ( grid_.isFluid(1, j) )
+            if (grid_.isFluid(1, j))
             {
                 grid_.u()(0, j) = vel_W;
                 grid_.v()(0, j) = - grid_.v()(1, j);
@@ -306,7 +306,7 @@ void FluidSimulator::refreshBoundaries()
     }
     else     // outflow
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
             grid_.u()(0, j) = grid_.u()(1, j);
             grid_.v()(0, j) = grid_.v()(1, j);
@@ -314,20 +314,20 @@ void FluidSimulator::refreshBoundaries()
     }
 
     // conditions for east border
-    if ( cond_E == NOSLIP )   // no-slip
+    if (cond_E == NOSLIP)     // no-slip
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
             grid_.u()(imax, j) = 0;
             grid_.v()(imax + 1, j) = 2 * vel_E - grid_.v()(imax, j);
         }
 
     }
-    else if ( cond_E == INFLOW )     // inflow
+    else if (cond_E == INFLOW)       // inflow
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
-            if ( grid_.isFluid(imax, j) )
+            if (grid_.isFluid(imax, j))
             {
                 grid_.u()(imax, j) = vel_E;
                 grid_.v()(imax + 1, j) = - grid_.v()(imax, j);
@@ -343,7 +343,7 @@ void FluidSimulator::refreshBoundaries()
     }
     else     // outflow
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
             grid_.u()(imax, j) = grid_.u()(imax - 1, j);
             grid_.v()(imax + 1, j) = grid_.v()(imax, j);
@@ -352,29 +352,29 @@ void FluidSimulator::refreshBoundaries()
 
 }
 
-void FluidSimulator::simulate( real duration )
+void FluidSimulator::simulate(real duration)
 {
     //VTKWriter vtkWriter ( "lidDrivenCavity" );
-    VTKWriter vtkWriter ( "BreakingDum" );
+    VTKWriter vtkWriter("BreakingDum");
     real t = 0;
     unsigned int n = 0;
 
     PROG("initialize u, v, p, rhs");
-//     int half = (int) ( rectYY_ / grid_.dy() );
-//     for ( int i = 0; i < grid_.u().getSize(0); ++i )
-//     {
-//         for ( int j = 0; j < grid_.u().getSize(1); ++j )
-//         {
-//             if ( j > half )
-//             {
-//                 grid_.u()(i, j) = 1;
-//             }
-//             else
-//             {
-//                 grid_.u()(i, j) = 0;
-//             }
-//         }
-//     }
+    //     int half = (int) ( rectYY_ / grid_.dy() );
+    //     for ( int i = 0; i < grid_.u().getSize(0); ++i )
+    //     {
+    //         for ( int j = 0; j < grid_.u().getSize(1); ++j )
+    //         {
+    //             if ( j > half )
+    //             {
+    //                 grid_.u()(i, j) = 1;
+    //             }
+    //             else
+    //             {
+    //                 grid_.u()(i, j) = 0;
+    //             }
+    //         }
+    //     }
 
     grid_.u().fill(uInit_);
     grid_.v().fill(vInit_);
@@ -384,19 +384,19 @@ void FluidSimulator::simulate( real duration )
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    particle_tracer_.addRectangle( (int) (rectX1_particle_ / grid_.dx()), (int) (rectX2_particle_ / grid_.dy()), (int) (rectY1_particle_ / grid_.dx()), (int) (rectY2_particle_ / grid_.dy()) );
-    particle_tracer_.addCircle( (int) (circX_particle_ / grid_.dx()), (int) (circY_particle_ / grid_.dy()), (int) (circR_particle_) );
+    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectX2_particle_ / grid_.dy()), (int)(rectY1_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()));
+    particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_));
 
     refreshBoundaries();
 
-    while (t <= duration )
+    while (t <= duration)
     {
         // without 0th step:
         // if ( n%outPutInt == 0 && n != 0 )
-        if ( n % outPutInt == 0 )
+        if (n % outPutInt == 0)
             vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
-        determineNextDT( safetyfac_ );
+        determineNextDT(safetyfac_);
         particle_tracer_.markCells();
         //particle_tracer_.advanceParticles(dt_) ;
         // intepolation function for u,v of particle needed
@@ -406,30 +406,30 @@ void FluidSimulator::simulate( real duration )
         PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
         composeRHS();
         PROG(n << "'th timestep: solve pressure equation");
-        solv().solve( grid_ );
-        PROG(n << "'th timestep: update u and v; " );
+        solv().solve(grid_);
+        PROG(n << "'th timestep: update u and v; ");
         updateVelocities();
         particle_tracer_.advanceParticles(dt_);
-        if ( n % normfreq == 0 )
+        if (n % normfreq == 0)
             normalization();
         t += dt_;
         n++;
     }
 }
 
-void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
+void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
 {
-    VTKWriter vtkWriter ("lidDrivenCavity");
+    VTKWriter vtkWriter("lidDrivenCavity");
     // VTKWriter vtkWriter ( "BreakingDum" );
     unsigned int n = 0;
 
     PROG("initialize u, v, p, rhs");
-    int half = (int) ( rectYY_ / grid_.dy() );
-    for ( int i = 0; i < grid_.u().getSize(0); ++i )
+    int half = (int)(rectYY_ / grid_.dy());
+    for (int i = 0; i < grid_.u().getSize(0); ++i)
     {
-        for ( int j = 0; j < grid_.u().getSize(1); ++j )
+        for (int j = 0; j < grid_.u().getSize(1); ++j)
         {
-            if ( j > half )
+            if (j > half)
             {
                 grid_.u()(i, j) = 1;
             }
@@ -448,20 +448,20 @@ void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    particle_tracer_.addRectangle( (int) (rectX1_particle_ / grid_.dx()), (int) (rectY1_particle_ / grid_.dy()), (int) (rectX2_particle_ / grid_.dx())  , (int) (rectY2_particle_ / grid_.dy()));
-    particle_tracer_.addCircle( (int) (circX_particle_ / grid_.dx()), (int) (circY_particle_ / grid_.dy()), (int) (circR_particle_) );
+    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx())  , (int)(rectY2_particle_ / grid_.dy()));
+    particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_));
     grid_.createPng("test.png");
 
     refreshBoundaries();
 
-    while (n <= nrOfTimeSteps )
+    while (n <= nrOfTimeSteps)
     {
         // without 0th step:
         // if ( n%outPutInt == 0 && n != 0 )
-        if ( n % outPutInt == 0 )
+        if (n % outPutInt == 0)
             vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
-        determineNextDT( safetyfac_ );
+        determineNextDT(safetyfac_);
         particle_tracer_.markCells();
         //particle_tracer_.advanceParticles(dt_) ;
         // intepolation function for u,v of particle needed
@@ -471,11 +471,11 @@ void FluidSimulator::simulateTimeStepCount( unsigned int nrOfTimeSteps )
         PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
         composeRHS();
         PROG(n << "'th timestep: solve pressure equation");
-        solv().solve( grid_ );
+        solv().solve(grid_);
         PROG(n << "'th timestep: update u and v");
         updateVelocities();
         particle_tracer_.advanceParticles(dt_);
-        if ( n % normfreq == 0 )
+        if (n % normfreq == 0)
             normalization();
         n++;
     }
@@ -486,24 +486,24 @@ void FluidSimulator::normalization()
 {
     real psum = 0;
 
-    for ( int i = 1; i <= imax; i++ )
+    for (int i = 1; i <= imax; i++)
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
 
-            if ( grid_.isFluid(i, j) )
+            if (grid_.isFluid(i, j))
                 psum += grid_.p()(i, j);
         }
     }
 
     real pMean = psum / grid_.getNumFluid();
     // substract the mean
-    for ( int i = 1; i <= imax; i++ )
+    for (int i = 1; i <= imax; i++)
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
 
-            if ( grid_.isFluid(i, j) )
+            if (grid_.isFluid(i, j))
                 grid_.p()(i, j) -= pMean;
         }
     }
@@ -514,13 +514,13 @@ void FluidSimulator::normalization()
 // d(u^2)/dx
 real FluidSimulator::dxuu(int i, int j)
 {
-    ASSERT_MSG( (i - 1 >= 0), "wrong input for i: " << i);
-    ASSERT_MSG( (i + 1 < grid_.u().getSize(0)), "wrong input for i: " << i);
-    ASSERT_MSG( (j >= 0), "wrong input for j: " << j);
+    ASSERT_MSG((i - 1 >= 0), "wrong input for i: " << i);
+    ASSERT_MSG((i + 1 < grid_.u().getSize(0)), "wrong input for i: " << i);
+    ASSERT_MSG((j >= 0), "wrong input for j: " << j);
     real res = (grid_.u()(i, j) + grid_.u(i + 1, j, WEST)) * (grid_.u()(i, j) + grid_.u(i + 1, j, WEST)) / (4 * grid_.dx());
     res -= (grid_.u(i - 1, j, EAST) + grid_.u()(i, j)) * (grid_.u(i - 1, j, EAST) + grid_.u()(i, j)) / (4 * grid_.dx());
-    res += gamma_ * ( fabs(grid_.u()(i, j) + grid_.u(i + 1, j, WEST)) * (grid_.u()(i, j) - grid_.u(i + 1, j, WEST)) * 0.25 ) / grid_.dx();
-    res -= gamma_ * ( fabs(grid_.u(i - 1, j, EAST) + grid_.u()(i, j)) * (grid_.u(i - 1, j, EAST) - grid_.u()(i, j)) * 0.25 ) / grid_.dx();
+    res += gamma_ * (fabs(grid_.u()(i, j) + grid_.u(i + 1, j, WEST)) * (grid_.u()(i, j) - grid_.u(i + 1, j, WEST)) * 0.25) / grid_.dx();
+    res -= gamma_ * (fabs(grid_.u(i - 1, j, EAST) + grid_.u()(i, j)) * (grid_.u(i - 1, j, EAST) - grid_.u()(i, j)) * 0.25) / grid_.dx();
 
     return res;
 }
@@ -528,13 +528,13 @@ real FluidSimulator::dxuu(int i, int j)
 // d(v^2)/dy
 real FluidSimulator::dyvv(int i, int j)
 {
-    ASSERT_MSG( (i >= 0), "wrong input for i: " << i);
-    ASSERT_MSG( (j - 1 >= 0), "wrong input for j: " << j);
-    ASSERT_MSG( (j + 1 < grid_.v().getSize(1)), "wrong input for j: " << j);
+    ASSERT_MSG((i >= 0), "wrong input for i: " << i);
+    ASSERT_MSG((j - 1 >= 0), "wrong input for j: " << j);
+    ASSERT_MSG((j + 1 < grid_.v().getSize(1)), "wrong input for j: " << j);
     real res = (grid_.v()(i, j) + grid_.v(i, j + 1, SOUTH)) * (grid_.v()(i, j) + grid_.v(i, j + 1, SOUTH)) / (4 * grid_.dy());
     res -= (grid_.v(i, j - 1, NORTH) + grid_.v()(i, j)) * (grid_.v(i, j - 1, NORTH) + grid_.v()(i, j)) / (4 * grid_.dy());
-    res += gamma_ * ( fabs(grid_.v()(i, j) + grid_.v(i, j + 1, SOUTH)) * (grid_.v()(i, j) - grid_.v(i, j + 1, SOUTH)) * 0.25 ) / grid_.dy();
-    res -= gamma_ * ( fabs(grid_.v(i, j - 1, NORTH) + grid_.v()(i, j)) * (grid_.v(i, j - 1, NORTH) - grid_.v()(i, j)) * 0.25 ) / grid_.dy();
+    res += gamma_ * (fabs(grid_.v()(i, j) + grid_.v(i, j + 1, SOUTH)) * (grid_.v()(i, j) - grid_.v(i, j + 1, SOUTH)) * 0.25) / grid_.dy();
+    res -= gamma_ * (fabs(grid_.v(i, j - 1, NORTH) + grid_.v()(i, j)) * (grid_.v(i, j - 1, NORTH) - grid_.v()(i, j)) * 0.25) / grid_.dy();
 
     return res;
 }
@@ -542,23 +542,23 @@ real FluidSimulator::dyvv(int i, int j)
 // d(uv)/dy
 real FluidSimulator::dyuv(int i, int j)
 {
-    ASSERT_MSG( (i >= 0), "wrong input for i: " << i);
-    ASSERT_MSG( (i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
-    ASSERT_MSG( (j - 1 >= 0), "wrong input for j: " << j);
-    ASSERT_MSG( (j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
+    ASSERT_MSG((i >= 0), "wrong input for i: " << i);
+    ASSERT_MSG((i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
+    ASSERT_MSG((j - 1 >= 0), "wrong input for j: " << j);
+    ASSERT_MSG((j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
     real diag = 0.0;
-    if ( grid_.isFluid(i + 1, j - 1) )
+    if (grid_.isFluid(i + 1, j - 1))
     {
         diag = grid_.v()(i + 1, j - 1);
     }
     else
     {
-        diag = 0.5 * ( grid_.v(i + 1, j, WEST) + grid_.v(i, j - 1, NORTH) );
+        diag = 0.5 * (grid_.v(i + 1, j, WEST) + grid_.v(i, j - 1, NORTH));
     }
-    real res = ( (grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * (grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * 0.25 ) / grid_.dy();
-    res -= ( (grid_.v(i, j - 1, NORTH) + diag) * (grid_.u(i, j - 1, NORTH) + grid_.u()(i, j)) * 0.25 ) / grid_.dy();
-    res += gamma_ * ( fabs(grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * (grid_.u()(i, j) - grid_.u(i, j + 1, SOUTH)) * 0.25 ) / grid_.dy();
-    res -= gamma_ * ( fabs(grid_.v(i, j - 1, NORTH) + diag) * (grid_.u(i, j - 1, NORTH) - grid_.u()(i, j)) * 0.25 ) / grid_.dy();
+    real res = ((grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * (grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * 0.25) / grid_.dy();
+    res -= ((grid_.v(i, j - 1, NORTH) + diag) * (grid_.u(i, j - 1, NORTH) + grid_.u()(i, j)) * 0.25) / grid_.dy();
+    res += gamma_ * (fabs(grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * (grid_.u()(i, j) - grid_.u(i, j + 1, SOUTH)) * 0.25) / grid_.dy();
+    res -= gamma_ * (fabs(grid_.v(i, j - 1, NORTH) + diag) * (grid_.u(i, j - 1, NORTH) - grid_.u()(i, j)) * 0.25) / grid_.dy();
 
     return res;
 }
@@ -566,23 +566,23 @@ real FluidSimulator::dyuv(int i, int j)
 // d(uv)/dx
 real FluidSimulator::dxuv(int i, int j)
 {
-    ASSERT_MSG( (j >= 0), "wrong input for j: " << j);
-    ASSERT_MSG( (j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
-    ASSERT_MSG( (i - 1 >= 0), "wrong input for i: " << i);
-    ASSERT_MSG( (i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
+    ASSERT_MSG((j >= 0), "wrong input for j: " << j);
+    ASSERT_MSG((j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
+    ASSERT_MSG((i - 1 >= 0), "wrong input for i: " << i);
+    ASSERT_MSG((i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
     real diag = 0.0;
-    if ( grid_.isFluid(i - 1, j + 1) )
+    if (grid_.isFluid(i - 1, j + 1))
     {
         diag = grid_.u()(i - 1, j + 1);
     }
     else
     {
-        diag = 0.5 * ( grid_.u(i, j + 1, EAST) + grid_.u(i - 1, j, SOUTH) );
+        diag = 0.5 * (grid_.u(i, j + 1, EAST) + grid_.u(i - 1, j, SOUTH));
     }
-    real res = ( (grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * (grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * 0.25 ) / grid_.dx();
-    res -= ( (grid_.u(i - 1, j, EAST) + diag) * (grid_.v(i - 1, j, EAST) + grid_.v()(i, j)) * 0.25 ) / grid_.dx();
-    res += gamma_ * ( fabs(grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * (grid_.v()(i, j) - grid_.v(i + 1, j, WEST)) * 0.25 ) / grid_.dx();
-    res -= gamma_ * ( fabs(grid_.u(i - 1, j, EAST) + diag) * (grid_.v(i - 1, j, EAST) - grid_.v()(i, j)) * 0.25 ) / grid_.dx();
+    real res = ((grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * (grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * 0.25) / grid_.dx();
+    res -= ((grid_.u(i - 1, j, EAST) + diag) * (grid_.v(i - 1, j, EAST) + grid_.v()(i, j)) * 0.25) / grid_.dx();
+    res += gamma_ * (fabs(grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * (grid_.v()(i, j) - grid_.v(i + 1, j, WEST)) * 0.25) / grid_.dx();
+    res -= gamma_ * (fabs(grid_.u(i - 1, j, EAST) + diag) * (grid_.v(i - 1, j, EAST) - grid_.v()(i, j)) * 0.25) / grid_.dx();
 
     return res;
 }
@@ -590,10 +590,10 @@ real FluidSimulator::dxuv(int i, int j)
 // d^2u/dx^2
 real FluidSimulator::ddxu(int i, int j)
 {
-    ASSERT_MSG( (i - 1 >= 0), "wrong input for i: " << i);
-    ASSERT_MSG( (i + 1 < grid_.u().getSize(0)), "wrong input for i: " << i);
-    ASSERT_MSG( (j >= 0), "wrong input for j: " << j);
-    real res = ( grid_.u(i + 1, j, WEST) - 2 * grid_.u()(i, j) + grid_.u(i - 1, j, EAST) ) / (grid_.dx() * grid_.dx());
+    ASSERT_MSG((i - 1 >= 0), "wrong input for i: " << i);
+    ASSERT_MSG((i + 1 < grid_.u().getSize(0)), "wrong input for i: " << i);
+    ASSERT_MSG((j >= 0), "wrong input for j: " << j);
+    real res = (grid_.u(i + 1, j, WEST) - 2 * grid_.u()(i, j) + grid_.u(i - 1, j, EAST)) / (grid_.dx() * grid_.dx());
 
     return res;
 }
@@ -601,10 +601,10 @@ real FluidSimulator::ddxu(int i, int j)
 // d^2v/dx^2
 real FluidSimulator::ddxv(int i, int j)
 {
-    ASSERT_MSG( (i - 1 >= 0), "wrong input for i: " << i);
-    ASSERT_MSG( (i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
-    ASSERT_MSG( (j >= 0), "wrong input for j: " << j);
-    real res = ( grid_.v(i + 1, j, WEST) - 2 * grid_.v()(i, j) + grid_.v(i - 1, j, EAST) ) / (grid_.dx() * grid_.dx());
+    ASSERT_MSG((i - 1 >= 0), "wrong input for i: " << i);
+    ASSERT_MSG((i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
+    ASSERT_MSG((j >= 0), "wrong input for j: " << j);
+    real res = (grid_.v(i + 1, j, WEST) - 2 * grid_.v()(i, j) + grid_.v(i - 1, j, EAST)) / (grid_.dx() * grid_.dx());
 
     return res;
 }
@@ -612,10 +612,10 @@ real FluidSimulator::ddxv(int i, int j)
 // d^2u/dy^2
 real FluidSimulator::ddyu(int i, int j)
 {
-    ASSERT_MSG( (j - 1 >= 0), "wrong input for j: " << j);
-    ASSERT_MSG( (j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
-    ASSERT_MSG( (i >= 0), "wrong input for i: " << i);
-    real res = ( grid_.u(i, j + 1, SOUTH) - 2 * grid_.u()(i, j) + grid_.u(i, j - 1, NORTH) ) / (grid_.dy() * grid_.dy());
+    ASSERT_MSG((j - 1 >= 0), "wrong input for j: " << j);
+    ASSERT_MSG((j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
+    ASSERT_MSG((i >= 0), "wrong input for i: " << i);
+    real res = (grid_.u(i, j + 1, SOUTH) - 2 * grid_.u()(i, j) + grid_.u(i, j - 1, NORTH)) / (grid_.dy() * grid_.dy());
 
     return res;
 }
@@ -623,10 +623,10 @@ real FluidSimulator::ddyu(int i, int j)
 // d^2v/dy^2
 real FluidSimulator::ddyv(int i, int j)
 {
-    ASSERT_MSG( (j - 1 >= 0), "wrong input for j: " << j);
-    ASSERT_MSG( (j + 1 < grid_.v().getSize(1)), "wrong input for j: " << j);
-    ASSERT_MSG( (i >= 0), "wrong input for i: " << i);
-    real res = ( grid_.v(i, j + 1, SOUTH) - 2 * grid_.v()(i, j) + grid_.v(i, j - 1, NORTH) ) / (grid_.dy() * grid_.dy());
+    ASSERT_MSG((j - 1 >= 0), "wrong input for j: " << j);
+    ASSERT_MSG((j + 1 < grid_.v().getSize(1)), "wrong input for j: " << j);
+    ASSERT_MSG((i >= 0), "wrong input for i: " << i);
+    real res = (grid_.v(i, j + 1, SOUTH) - 2 * grid_.v()(i, j) + grid_.v(i, j - 1, NORTH)) / (grid_.dy() * grid_.dy());
 
     return res;
 }
@@ -637,7 +637,7 @@ void FluidSimulator::computeFG()
     grid_.g().fill(0);
     PROG("set boundary values for F");
     // boundary values for F
-    for ( int j = 1; j <= jmax; j++ )
+    for (int j = 1; j <= jmax; j++)
     {
         grid_.f()(0, j - 1) = grid_.u()(0, j);
         grid_.f()(imax, j - 1) = grid_.u()(imax, j);
@@ -645,7 +645,7 @@ void FluidSimulator::computeFG()
 
     PROG("set boundary values for G");
     // boundary values for G
-    for ( int i = 1; i <= imax; i++ )
+    for (int i = 1; i <= imax; i++)
     {
         grid_.g()(i - 1, 0) = grid_.v()(i, 0);
         grid_.g()(i - 1, jmax) = grid_.v()(i, jmax);
@@ -657,12 +657,12 @@ void FluidSimulator::computeFG()
 
     PROG("compute F");
     // compute F
-    for ( int i = 1; i < imax; i++ )
+    for (int i = 1; i < imax; i++)
     {
-        for ( int j = 1; j <= jmax; j++ )
+        for (int j = 1; j <= jmax; j++)
         {
 
-            if ( grid_.isFluid(i, j) && grid_.isFluid(i + 1, j) )
+            if (grid_.isFluid(i, j) && grid_.isFluid(i + 1, j))
                 grid_.f()(i, j - 1) = grid_.u()(i, j) + dtRe * (ddxu(i, j) + ddyu(i, j)) - dt_ * (dxuu(i, j) + dyuv(i, j)) + dtGx;
 
         }
@@ -670,12 +670,12 @@ void FluidSimulator::computeFG()
 
     PROG("compute G");
     // compute G
-    for ( int i = 1; i <= imax; i++ )
+    for (int i = 1; i <= imax; i++)
     {
-        for ( int j = 1; j < jmax; j++ )
+        for (int j = 1; j < jmax; j++)
         {
 
-            if ( grid_.isFluid(i, j) && grid_.isFluid(i, j + 1) )
+            if (grid_.isFluid(i, j) && grid_.isFluid(i, j + 1))
                 grid_.g()(i - 1, j) = grid_.v()(i, j) + dtRe * (ddxv(i, j) + ddyv(i, j)) - dt_ * (dxuv(i, j) + dyvv(i, j)) + dtGy;
 
         }
@@ -709,9 +709,9 @@ void FluidSimulator::testFG()
 void FluidSimulator::set_UVP_surface(const int &dt, bool compP)
 {
 
-    for ( int i = 1; i <= imax; i++ )
+    for (int i = 1; i <= imax; i++)
     {
-        for ( int j = 1; j < jmax; j++ ) // !?!
+        for (int j = 1; j < jmax; j++)   // !?!
         {
 
             set_UVP_surface(i, j, dt, compP);
@@ -725,40 +725,40 @@ void FluidSimulator::set_UVP_surface(int i, int j , const int &dt, bool compP)
 
     int number_of_empty_neighbour = 0 ;
 
-    if ( grid_.isFluid(i, j) )
+    if (grid_.isFluid(i, j))
     {
         // Count the number of empty neighbour cell
-        if ( grid_.isEmpty(i + 1, j) )
+        if (grid_.isEmpty(i + 1, j))
             ++ number_of_empty_neighbour ;
-        if ( grid_.isEmpty(i - 1, j) )
+        if (grid_.isEmpty(i - 1, j))
             ++ number_of_empty_neighbour ;
-        if ( grid_.isEmpty(i, j + 1) )
+        if (grid_.isEmpty(i, j + 1))
             ++ number_of_empty_neighbour ;
-        if ( grid_.isEmpty(i, j - 1) )
+        if (grid_.isEmpty(i, j - 1))
             ++ number_of_empty_neighbour ;
 
     }
-    switch (number_of_empty_neighbour )
+    switch (number_of_empty_neighbour)
     {
     case (1):
-        one_empty_neighbour  ( i , j , dt, compP ) ;
-    	break;
+        one_empty_neighbour(i , j , dt, compP) ;
+        break;
     case (2):
-        two_empty_neighbour  ( i , j , dt, compP ) ;
-    	break;
+        two_empty_neighbour(i , j , dt, compP) ;
+        break;
     case (3):
-        three_empty_neighbour( i , j , dt, compP ) ;
-    	break;
+        three_empty_neighbour(i , j , dt, compP) ;
+        break;
     case (4):
-        four_empty_neighbour ( i , j , dt, compP ) ;
-    	break;
+        four_empty_neighbour(i , j , dt, compP) ;
+        break;
     }
 }
 
 // real FluidSimulator::set_U_surface(int i, int j , const int &dt) // not finished yet!!!
 // {
 //     int number_of_empty_neighbour = 0 ;
-// 
+//
 //     if ( grid_.isFluid(i, j) )
 //     {
 //         // Count the number of empty neighbour cell
@@ -770,28 +770,28 @@ void FluidSimulator::set_UVP_surface(int i, int j , const int &dt, bool compP)
 //             ++ number_of_empty_neighbour ;
 //         if ( grid_.isEmpty(i, j - 1) )
 //             ++ number_of_empty_neighbour ;
-// 
+//
 //     }
-//     
+//
 //     switch (number_of_empty_neighbour )
 //     {
-//       
+//
 //     case (1): // one empty neighbour in the
 //       if ( grid_.isEmpty(i+1, j) ) // east
-// 	return  grid_.u()(i - 1 , j) - ( grid_.dx() / grid_.dy()) * ( grid_.v()( i , j ) - grid_.v()( i , j - 1 ) ) ;
+//  return  grid_.u()(i - 1 , j) - ( grid_.dx() / grid_.dy()) * ( grid_.v()( i , j ) - grid_.v()( i , j - 1 ) ) ;
 //       else // south/north/west
-// 	return grid_.u()(i,j) ;
-//       
+//  return grid_.u()(i,j) ;
+//
 //     case (2): // two empty neighbours in the
-//     	 if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j - 1) ) // east and south
+//       if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j - 1) ) // east and south
 //         return grid_.u()( i - 1 , j ) ;
 //       else if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j + 1) ) // east and north
 //         return grid_.u()(i - 1 , j) ;
 //       else if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i - 1, j)) // east and west
 //         return grid_.u()(i, j) + gx_ * dt ;
 //       else // north and south
-// 	return grid_.u()(i,j) ;
-//     
+//  return grid_.u()(i,j) ;
+//
 //     case (3): // three empty neighbours in the
 //       if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j + 1) && grid_.isEmpty(i - 1, j)) // east, north and west
 //         return grid_.u()(i, j) + gx_ * dt ;
@@ -800,18 +800,18 @@ void FluidSimulator::set_UVP_surface(int i, int j , const int &dt, bool compP)
 //       else if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j - 1) && grid_.isEmpty(i, j + 1) ) // east, south and north
 //         return grid_.u()(i - 1, j) - (grid_.dx() / grid_.dy() ) * ( grid_.v()(i, j) - grid_.v()(i, j - 1) ) ;
 //       else // north, south and west
-// 	return grid_.u()(i,j) ;
-//       
+//  return grid_.u()(i,j) ;
+//
 //     case (4): // four empty neighbours
 //       return grid_.u()(i, j) + gx_ * dt ;
-//       
-//     }  
+//
+//     }
 // }
-// 
+//
 // real FluidSimulator::set_V_surface(int i, int j , const int &dt) already finished!
 // {
 //     int number_of_empty_neighbour = 0 ;
-// 
+//
 //     if ( grid_.isFluid(i, j) )
 //     {
 //         // Count the number of empty neighbour cell
@@ -823,42 +823,42 @@ void FluidSimulator::set_UVP_surface(int i, int j , const int &dt, bool compP)
 //             ++ number_of_empty_neighbour ;
 //         if ( grid_.isEmpty(i, j - 1) )
 //             ++ number_of_empty_neighbour ;
-// 
+//
 //     }
-//     
+//
 //     switch (number_of_empty_neighbour )
 //     {
-//       
+//
 //     case (1): // one empty neighbour in the
 //       if ( grid_.isEmpty(i, j + 1) ) // north
-// 	return  grid_.v()(i , j - 1) - ( grid_.dy() / grid_.dx()) * ( grid_.u()( i , j ) - grid_.u()( i - 1 , j ) ) ;
+//  return  grid_.v()(i , j - 1) - ( grid_.dy() / grid_.dx()) * ( grid_.u()( i , j ) - grid_.u()( i - 1 , j ) ) ;
 //       else // south/east/west
-// 	return grid_.v()(i,j) ;
-//       
+//  return grid_.v()(i,j) ;
+//
 //     case (2): // two empty neighbours in the
 //       if (grid_.isEmpty(i - 1, j) && grid_.isEmpty(i, j + 1) ) // west and north
-// 	return grid_.v()( i  , j - 1 ) ;
+//  return grid_.v()( i  , j - 1 ) ;
 //       else if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j + 1) ) // east and north
-//         return grid_.v()( i  , j - 1 ) ; 
+//         return grid_.v()( i  , j - 1 ) ;
 //       else if (grid_.isEmpty(i, j + 1) && grid_.isEmpty(i, j - 1)) // south and north
 //         return grid_.v()(i, j) + gy_ * dt ;
 //       else // east and west
-// 	return grid_.v()(i,j) ;
-//     
+//  return grid_.v()(i,j) ;
+//
 //     case (3): // three empty neighbours in the
 //       if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j + 1)  && grid_.isEmpty(i - 1, j)) // east, north and west
 //         return grid_.v()(i, j) = grid_.v()(i, j - 1) - (grid_.dy() / grid_.dx() ) * ( grid_.u()(i, j) - grid_.u()(i - 1, j) ) ;
 //       else if ( grid_.isEmpty(i - 1, j) && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1) ) // west, south and east
 //         return grid_.v()(i, j) + gy_ * dt ;
 //       else if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1) ) // east, south and north
-// 	return grid_.v()(i, j) + gy_ * dt ;
+//  return grid_.v()(i, j) + gy_ * dt ;
 //       else // east, south and west
-// 	return grid_.v()(i,j) ;
-//       
+//  return grid_.v()(i,j) ;
+//
 //     case (4): // four empty neighbours
 //       return grid_.v()(i, j) + gy_ * dt ;
-//       
-//     }  
+//
+//     }
 // }
 
 
@@ -873,59 +873,59 @@ void FluidSimulator::one_empty_neighbour(int i , int j , const int &dt, bool com
 
     // EAST : only the cell (i+1,j) is empty (exactly like one which has been mentioned in the book)
 
-    if ( grid_.isEmpty(i + 1, j) )
+    if (grid_.isEmpty(i + 1, j))
     {
         if (compP)
-	  grid_.p()(i, j) =  ( 2 / (Re_ * grid_.dx()) ) * ( grid_.u()(i , j) - grid_.u()( i - 1 , j ) ) ;
-        grid_.u()(i, j) =  grid_.u()(i - 1 , j) - ( grid_.dx() / grid_.dy()) * ( grid_.v()( i , j ) - grid_.v()( i , j - 1 ) ) ;
+            grid_.p()(i, j) = (2 / (Re_ * grid_.dx())) * (grid_.u()(i , j) - grid_.u()(i - 1 , j)) ;
+        grid_.u()(i, j) =  grid_.u()(i - 1 , j) - (grid_.dx() / grid_.dy()) * (grid_.v()(i , j) - grid_.v()(i , j - 1)) ;
 
         if (grid_.isEmpty(i + 1, j - 1))
-            grid_.v()(i + 1, j - 1) = grid_.v()(i , j - 1) - ( grid_.dx() / grid_.dy()) * ( grid_.u()( i , j ) - grid_.u()( i , j - 1 ) ) ;
-//         else ///////////////////////////////////////////// conti ////////////////////////////////////////////////////////////////////////
-//             grid_.v()(i + 1, j - 1) = grid_.v()(i + 1 , j - 2) - ( grid_.dy() / grid_.dx()) * ( grid_.u()( i + 1 , j - 1) - grid_.u()( i , j - 1 ) ) ;
+            grid_.v()(i + 1, j - 1) = grid_.v()(i , j - 1) - (grid_.dx() / grid_.dy()) * (grid_.u()(i , j) - grid_.u()(i , j - 1)) ;
+        //         else ///////////////////////////////////////////// conti ////////////////////////////////////////////////////////////////////////
+        //             grid_.v()(i + 1, j - 1) = grid_.v()(i + 1 , j - 2) - ( grid_.dy() / grid_.dx()) * ( grid_.u()( i + 1 , j - 1) - grid_.u()( i , j - 1 ) ) ;
 
     }
 
     // WEST : only the cell (i-1,j) is empty (West of cell(i,j) )
 
-    else if ( grid_.isEmpty(i - 1, j) )
+    else if (grid_.isEmpty(i - 1, j))
     {
         if (compP)
-	  grid_.p()(i, j)   =  ( 2 / (Re_ * grid_.dx()) ) * ( grid_.u()( i , j) - grid_.u()( i - 1 , j ) ) ;
-        grid_.u()(i - 1, j) =  grid_.u()( i , j ) + ( grid_.dx() / grid_.dy()) * ( grid_.v()( i , j ) - grid_.v()( i , j - 1 ) ) ;
+            grid_.p()(i, j)   = (2 / (Re_ * grid_.dx())) * (grid_.u()(i , j) - grid_.u()(i - 1 , j)) ;
+        grid_.u()(i - 1, j) =  grid_.u()(i , j) + (grid_.dx() / grid_.dy()) * (grid_.v()(i , j) - grid_.v()(i , j - 1)) ;
 
-        if (grid_.isEmpty(i - 1, j - 1) )
-            grid_.v()(i - 1, j - 1) = grid_.v()(i , j - 1) + ( grid_.dx() / grid_.dy()) * ( grid_.u()( i , j ) - grid_.u()( i , j - 1 ) ) ;
-//         else ///////////////////////////////////////////// conti ////////////////////////////////////////////////////////////////////////
-//             grid_.v()(i - 1, j - 1) = grid_.v()(i - 1 , j - 2) - ( grid_.dy() / grid_.dx()) * ( grid_.u()( i - 1 , j - 1 ) - grid_.u()( i - 2 , j - 1 ) ) ;
+        if (grid_.isEmpty(i - 1, j - 1))
+            grid_.v()(i - 1, j - 1) = grid_.v()(i , j - 1) + (grid_.dx() / grid_.dy()) * (grid_.u()(i , j) - grid_.u()(i , j - 1)) ;
+        //         else ///////////////////////////////////////////// conti ////////////////////////////////////////////////////////////////////////
+        //             grid_.v()(i - 1, j - 1) = grid_.v()(i - 1 , j - 2) - ( grid_.dy() / grid_.dx()) * ( grid_.u()( i - 1 , j - 1 ) - grid_.u()( i - 2 , j - 1 ) ) ;
     }
 
     // NORTH : only the cell (i,j+1) is empty (North of cell(i,j) )
 
-    else if ( grid_.isEmpty(i, j + 1) )
+    else if (grid_.isEmpty(i, j + 1))
     {
         if (compP)
-	  grid_.p()(i, j) =  ( 2 / (Re_ * grid_.dy()) ) * ( grid_.v()( i , j) - grid_.v()( i , j - 1 ) ) ;
-        grid_.v()(i, j) =  grid_.v()(i , j - 1) - ( grid_.dy() / grid_.dx()) * ( grid_.u()( i , j ) - grid_.u()( i - 1 , j ) ) ;
+            grid_.p()(i, j) = (2 / (Re_ * grid_.dy())) * (grid_.v()(i , j) - grid_.v()(i , j - 1)) ;
+        grid_.v()(i, j) =  grid_.v()(i , j - 1) - (grid_.dy() / grid_.dx()) * (grid_.u()(i , j) - grid_.u()(i - 1 , j)) ;
 
-        if (grid_.isEmpty(i - 1, j + 1) )
-            grid_.u()(i - 1, j + 1) =  grid_.u()(i - 1 , j) - ( grid_.dy() / grid_.dx()) * ( grid_.v()( i , j ) - grid_.v()( i - 1 , j ) ) ;
-//         else ///////////////////////////////////////////// conti + no values(?) ////////////////////////////////////////////////////////////
-//             grid_.u()(i - 1, j + 1) =  grid_.u()(i - 2 , j + 1) - ( grid_.dx() / grid_.dy()) * ( grid_.v()( i - 1 , j + 1 ) - grid_.v()( i - 1 , j ) ) ;
+        if (grid_.isEmpty(i - 1, j + 1))
+            grid_.u()(i - 1, j + 1) =  grid_.u()(i - 1 , j) - (grid_.dy() / grid_.dx()) * (grid_.v()(i , j) - grid_.v()(i - 1 , j)) ;
+        //         else ///////////////////////////////////////////// conti + no values(?) ////////////////////////////////////////////////////////////
+        //             grid_.u()(i - 1, j + 1) =  grid_.u()(i - 2 , j + 1) - ( grid_.dx() / grid_.dy()) * ( grid_.v()( i - 1 , j + 1 ) - grid_.v()( i - 1 , j ) ) ;
     }
 
     // SOUTH : only the cell (i,j-1) is empty (South of cell(i,j) )
 
-    else if ( grid_.isEmpty(i, j - 1) )
+    else if (grid_.isEmpty(i, j - 1))
     {
         if (compP)
-	  grid_.p()(i, j) =  ( 2 / (Re_ * grid_.dy()) ) * ( grid_.v()( i , j) - grid_.v()( i , j - 1 ) ) ;
-        grid_.v()(i, j - 1) =  grid_.v()( i , j ) + ( grid_.dy() / grid_.dx()) * ( grid_.u()( i , j ) - grid_.u()( i - 1 , j ) ) ;
+            grid_.p()(i, j) = (2 / (Re_ * grid_.dy())) * (grid_.v()(i , j) - grid_.v()(i , j - 1)) ;
+        grid_.v()(i, j - 1) =  grid_.v()(i , j) + (grid_.dy() / grid_.dx()) * (grid_.u()(i , j) - grid_.u()(i - 1 , j)) ;
 
-        if (grid_.isEmpty(i - 1, j - 1) )
-            grid_.u()(i - 1, j - 1) =  grid_.u()(i - 1 , j) + ( grid_.dy() / grid_.dx()) * ( grid_.v()( i , j ) - grid_.v()( i - 1 , j ) ) ;
-//         else ///////////////////////////////////////////// conti + no values(?) //////////////////////////////////////////////////////////////
-//             grid_.u()(i - 1, j - 1) =  grid_.u()(i - 2 , j + 1 ) - ( grid_.dx() / grid_.dy()) * ( grid_.v()( i - 1 , j - 1 ) - grid_.v()( i - 1 , j - 2 ) ) ;
+        if (grid_.isEmpty(i - 1, j - 1))
+            grid_.u()(i - 1, j - 1) =  grid_.u()(i - 1 , j) + (grid_.dy() / grid_.dx()) * (grid_.v()(i , j) - grid_.v()(i - 1 , j)) ;
+        //         else ///////////////////////////////////////////// conti + no values(?) //////////////////////////////////////////////////////////////
+        //             grid_.u()(i - 1, j - 1) =  grid_.u()(i - 2 , j + 1 ) - ( grid_.dx() / grid_.dy()) * ( grid_.v()( i - 1 , j - 1 ) - grid_.v()( i - 1 , j - 2 ) ) ;
     }
 }
 //*******************************************************************************************************************
@@ -945,79 +945,79 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const int &dt, bool com
 
     // Cell(i+1,j) and Cell(i,j-1) are empty cell (Like one in book page 94 ) SE
 
-    if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1) )
+    if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1))
     {
-        grid_.u()(i, j)   = grid_.u()( i - 1 , j ) ;
-        grid_.v()(i, j - 1)   = grid_.v()( i   , j ); 
+        grid_.u()(i, j)   = grid_.u()(i - 1 , j) ;
+        grid_.v()(i, j - 1)   = grid_.v()(i   , j);
         if (compP)
-	  grid_.p()(i, j)   = -0.5 * Re_inverse * (
-                                ( grid_.u()(i, j + 1) + grid_.u()(i - 1, j + 1) - grid_.u()(i, j) - grid_.u()(i - 1, j) ) * dy_inverse
-                                +
-                                ( grid_.v()(i, j) + grid_.v()(i, j - 1) - grid_.v()(i - 1, j) - grid_.v()(i - 1, j - 1)  ) * dx_inverse
-                            );
-        if (grid_.isEmpty(i - 1, j - 1) )
-            grid_.u()(i - 1, j - 1) = grid_.u()( i - 1 , j ) + (grid_.dy() / grid_.dx() ) * ( grid_.v()( i , j - 1 ) - grid_.v()( i - 1 , j - 1 ) )  ;
-        if (grid_.isEmpty(i + 1, j + 1) ) /////////////////////////// no values ////////////////////////////////
-            grid_.v()(i + 1, j)   = grid_.v()(i, j ) - (grid_.dx() / grid_.dy()) * ( grid_.u()(i, j + 1) - grid_.u()(i, j) ) ;
+            grid_.p()(i, j)   = -0.5 * Re_inverse * (
+                                    (grid_.u()(i, j + 1) + grid_.u()(i - 1, j + 1) - grid_.u()(i, j) - grid_.u()(i - 1, j)) * dy_inverse
+                                    +
+                                    (grid_.v()(i, j) + grid_.v()(i, j - 1) - grid_.v()(i - 1, j) - grid_.v()(i - 1, j - 1)) * dx_inverse
+                                );
+        if (grid_.isEmpty(i - 1, j - 1))
+            grid_.u()(i - 1, j - 1) = grid_.u()(i - 1 , j) + (grid_.dy() / grid_.dx()) * (grid_.v()(i , j - 1) - grid_.v()(i - 1 , j - 1))  ;
+        if (grid_.isEmpty(i + 1, j + 1))  /////////////////////////// no values ////////////////////////////////
+            grid_.v()(i + 1, j)   = grid_.v()(i, j) - (grid_.dx() / grid_.dy()) * (grid_.u()(i, j + 1) - grid_.u()(i, j)) ;
         grid_.u()(i, j - 1)   = grid_.u()(i, j)     ;
         grid_.v()(i + 1, j - 1) = grid_.v()(i, j - 1) ;
     }
 
     // Cell(i-1,j) and Cell(i,j+1) are empty cell  NW
-    else if (grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j + 1) )
+    else if (grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j + 1))
     {
-        grid_.u()(i - 1, j)   = grid_.u()( i , j ) ;
-        grid_.v()(i, j)     = grid_.v()( i  , j - 1 ) ;
+        grid_.u()(i - 1, j)   = grid_.u()(i , j) ;
+        grid_.v()(i, j)     = grid_.v()(i  , j - 1) ;
         if (compP)
-	  grid_.p()(i, j)   = -0.5 * Re_inverse * (
-                                ( grid_.u()(i, j) + grid_.u()(i - 1, j) - grid_.u()(i, j - 1) - grid_.u()(i - 1, j - 1) ) * dy_inverse
-                                +
-                                ( grid_.v()(i + 1, j) - grid_.v()(i + 1, j - 1) - grid_.v()(i, j) - grid_.v()(i, j - 1)  ) * dx_inverse
-                            ) ;
-        if (grid_.isEmpty(i - 1, j - 1) )
-            grid_.v()(i - 1, j - 1) = grid_.v()( i , j - 1 ) + ( grid_.dx() / grid_.dy() ) * ( grid_.u()( i - 1 , j ) - grid_.u()( i - 1 , j - 1 ) )  ;
-        if (grid_.isEmpty(i + 1, j + 1) ) ///////////////// no values ///////////////
-            grid_.u()(i, j + 1)   = grid_.u()(i, j ) - (grid_.dy() / grid_.dx()) * ( grid_.v()(i + 1, j) - grid_.v()(i, j) ) ;
+            grid_.p()(i, j)   = -0.5 * Re_inverse * (
+                                    (grid_.u()(i, j) + grid_.u()(i - 1, j) - grid_.u()(i, j - 1) - grid_.u()(i - 1, j - 1)) * dy_inverse
+                                    +
+                                    (grid_.v()(i + 1, j) - grid_.v()(i + 1, j - 1) - grid_.v()(i, j) - grid_.v()(i, j - 1)) * dx_inverse
+                                ) ;
+        if (grid_.isEmpty(i - 1, j - 1))
+            grid_.v()(i - 1, j - 1) = grid_.v()(i , j - 1) + (grid_.dx() / grid_.dy()) * (grid_.u()(i - 1 , j) - grid_.u()(i - 1 , j - 1))  ;
+        if (grid_.isEmpty(i + 1, j + 1))  ///////////////// no values ///////////////
+            grid_.u()(i, j + 1)   = grid_.u()(i, j) - (grid_.dy() / grid_.dx()) * (grid_.v()(i + 1, j) - grid_.v()(i, j)) ;
         grid_.u()(i - 1, j + 1)   = grid_.u()(i - 1, j) ;
         grid_.v()(i - 1, j)     = grid_.v()(i, j) ;
     }
 
     // Cell(i,j+1) and Cell(i+1,j) are empty cell NE
-    else if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j + 1) )
+    else if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j + 1))
     {
-        grid_.u()(i, j)  = grid_.u()( i - 1 , j ) ;
-        grid_.v()(i, j)  = grid_.v()( i  , j - 1 ) ;
+        grid_.u()(i, j)  = grid_.u()(i - 1 , j) ;
+        grid_.v()(i, j)  = grid_.v()(i  , j - 1) ;
         if (compP)
-	  grid_.p()(i, j)   =  0.5 * Re_inverse * (
-                                 ( grid_.u()(i, j) + grid_.u()(i, j - 1) - grid_.u()(i - 1, j - 1) - grid_.u()(i - 1, j) ) * dy_inverse
-                                 +
-                                 ( grid_.v()(i, j) + grid_.v()(i, j - 1) - grid_.v()(i - 1, j) - grid_.v()(i - 1, j - 1)  ) * dx_inverse
-                             ) ;
-        if (grid_.isEmpty(i + 1, j - 1) )
-            grid_.v()(i + 1, j - 1) = grid_.v()( i , j - 1 ) - ( grid_.dx() / grid_.dy() ) * ( grid_.u()( i , j ) - grid_.u()( i , j - 1 ) )  ;
-        if (grid_.isEmpty(i - 1, j + 1) )
-            grid_.u()(i - 1, j + 1) = grid_.u()(i - 1, j) - (grid_.dy() / grid_.dx()) * ( grid_.v()(i, j) - grid_.v()(i - 1, j) ) ;
+            grid_.p()(i, j)   =  0.5 * Re_inverse * (
+                                     (grid_.u()(i, j) + grid_.u()(i, j - 1) - grid_.u()(i - 1, j - 1) - grid_.u()(i - 1, j)) * dy_inverse
+                                     +
+                                     (grid_.v()(i, j) + grid_.v()(i, j - 1) - grid_.v()(i - 1, j) - grid_.v()(i - 1, j - 1)) * dx_inverse
+                                 ) ;
+        if (grid_.isEmpty(i + 1, j - 1))
+            grid_.v()(i + 1, j - 1) = grid_.v()(i , j - 1) - (grid_.dx() / grid_.dy()) * (grid_.u()(i , j) - grid_.u()(i , j - 1))  ;
+        if (grid_.isEmpty(i - 1, j + 1))
+            grid_.u()(i - 1, j + 1) = grid_.u()(i - 1, j) - (grid_.dy() / grid_.dx()) * (grid_.v()(i, j) - grid_.v()(i - 1, j)) ;
         grid_.u()(i, j + 1)   = grid_.u()(i, j) ;
         grid_.v()(i + 1, j)   = grid_.v()(i, j) ;
     }
 
     // Cell(i,j-1) and Cell(i-1,j) are empty cell SW
-    else if (grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1) )
+    else if (grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1))
     {
-        grid_.u()(i - 1, j)  = grid_.u()( i , j ) ;
-        grid_.v()(i, j - 1)  = grid_.v()( i , j ) ; 
+        grid_.u()(i - 1, j)  = grid_.u()(i , j) ;
+        grid_.v()(i, j - 1)  = grid_.v()(i , j) ;
         if (compP)
-	  grid_.p()(i, j)   =  0.5 * Re_inverse * (
-                                 ( grid_.u()(i - 1, j + 1) + grid_.u()(i, j + 1) - grid_.u()(i - 1, j) - grid_.u()(i, j) ) * dy_inverse
-                                 +
-                                 ( grid_.v()(i + 1, j) + grid_.v()(i + 1, j - 1) - grid_.v()(i, j) - grid_.v()(i, j - 1) ) * dx_inverse
-                             ) ;
-        if (grid_.isEmpty(i + 1, j - 1) )
-            grid_.u()(i, j - 1) = grid_.u()(i , j) + ( grid_.dy() / grid_.dx() ) * ( grid_.v()( i + 1 , j - 1) - grid_.v()( i , j - 1 ) )  ;
-        if (grid_.isEmpty(i - 1, j + 1) ) ////////////////////// no values //////////////////////////
-            grid_.v()(i - 1, j) = grid_.v()(i, j) + (grid_.dx() / grid_.dy()) * ( grid_.u()(i - 1, j + 1) - grid_.u()(i - 1, j) ) ;
-        grid_.u()(i - 1, j - 1)   = grid_.u()( i - 1 , j ) ;
-        grid_.v()(i - 1, j - 1)   = grid_.v()( i , j - 1 ) ;
+            grid_.p()(i, j)   =  0.5 * Re_inverse * (
+                                     (grid_.u()(i - 1, j + 1) + grid_.u()(i, j + 1) - grid_.u()(i - 1, j) - grid_.u()(i, j)) * dy_inverse
+                                     +
+                                     (grid_.v()(i + 1, j) + grid_.v()(i + 1, j - 1) - grid_.v()(i, j) - grid_.v()(i, j - 1)) * dx_inverse
+                                 ) ;
+        if (grid_.isEmpty(i + 1, j - 1))
+            grid_.u()(i, j - 1) = grid_.u()(i , j) + (grid_.dy() / grid_.dx()) * (grid_.v()(i + 1 , j - 1) - grid_.v()(i , j - 1))  ;
+        if (grid_.isEmpty(i - 1, j + 1))  ////////////////////// no values //////////////////////////
+            grid_.v()(i - 1, j) = grid_.v()(i, j) + (grid_.dx() / grid_.dy()) * (grid_.u()(i - 1, j + 1) - grid_.u()(i - 1, j)) ;
+        grid_.u()(i - 1, j - 1)   = grid_.u()(i - 1 , j) ;
+        grid_.v()(i - 1, j - 1)   = grid_.v()(i , j - 1) ;
     }
 
     // Case 2 : in this case we have two options for our two empty opposite neighbour
@@ -1027,24 +1027,24 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const int &dt, bool com
     {
         grid_.u()(i, j) += gx_ * dt ;
         grid_.u()(i - 1, j) = grid_.u()(i - 1, j) + gx_ * dt ;
-        if (grid_.isEmpty(i - 1, j - 1) )
-            grid_.v()( i - 1 , j - 1 ) = grid_.v()(i , j - 1) + (grid_.dx() / grid_.dy()) * ( grid_.u()(i - 1, j) - grid_.u()(i - 1, j - 1) ) ;
-        if (grid_.isEmpty(i + 1, j - 1) )
-            grid_.v()( i + 1 , j - 1 ) = grid_.v()(i , j - 1) - (grid_.dx() / grid_.dy()) * ( grid_.u()(i, j) - grid_.u()(i, j - 1) ) ;
+        if (grid_.isEmpty(i - 1, j - 1))
+            grid_.v()(i - 1 , j - 1) = grid_.v()(i , j - 1) + (grid_.dx() / grid_.dy()) * (grid_.u()(i - 1, j) - grid_.u()(i - 1, j - 1)) ;
+        if (grid_.isEmpty(i + 1, j - 1))
+            grid_.v()(i + 1 , j - 1) = grid_.v()(i , j - 1) - (grid_.dx() / grid_.dy()) * (grid_.u()(i, j) - grid_.u()(i, j - 1)) ;
         if (compP)
-	  grid_.p()(i, j) = 0.0 ;
+            grid_.p()(i, j) = 0.0 ;
     }
     // Cell(i,j+1) and Cell(i,j-1) are empty cell NS
     else if (grid_.isEmpty(i, j + 1)  && grid_.isEmpty(i, j - 1))
     {
         grid_.v()(i, j) += gy_ * dt ;
         grid_.v()(i, j - 1) = grid_.v()(i, j - 1) + gy_ * dt ;
-        if (grid_.isEmpty(i - 1, j - 1) )
-            grid_.u()( i - 1 , j - 1 ) = grid_.u()(i - 1 , j) + (grid_.dy() / grid_.dx()) * ( grid_.v()(i, j - 1) - grid_.v()(i - 1, j - 1) ) ;
-        if (grid_.isEmpty(i - 1, j + 1) )
-            grid_.u()( i - 1 , j + 1 ) = grid_.u()(i - 1 , j) - (grid_.dy() / grid_.dx()) * ( grid_.v()(i, j) - grid_.v()(i - 1, j) ) ;
+        if (grid_.isEmpty(i - 1, j - 1))
+            grid_.u()(i - 1 , j - 1) = grid_.u()(i - 1 , j) + (grid_.dy() / grid_.dx()) * (grid_.v()(i, j - 1) - grid_.v()(i - 1, j - 1)) ;
+        if (grid_.isEmpty(i - 1, j + 1))
+            grid_.u()(i - 1 , j + 1) = grid_.u()(i - 1 , j) - (grid_.dy() / grid_.dx()) * (grid_.v()(i, j) - grid_.v()(i - 1, j)) ;
         if (compP)
-	  grid_.p()(i, j) = 0.0 ;
+            grid_.p()(i, j) = 0.0 ;
     }
 
 }
@@ -1057,87 +1057,87 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const int &dt, bool c
     // Generally we have four option for our three empty neighbours
 
     // cell(i+1,j) , cell(i,j+1) , cell(i-1,j) are empty WNE
-    if ( grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j + 1)  && grid_.isEmpty(i - 1, j))
+    if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j + 1)  && grid_.isEmpty(i - 1, j))
     {
-	if (compP)
-	  grid_.p()(i, j) = 0.0 ;
+        if (compP)
+            grid_.p()(i, j) = 0.0 ;
         grid_.u()(i, j) += gx_ * dt ;
         grid_.u()(i - 1, j) = grid_.u()(i - 1, j) + gx_ * dt ;
-        grid_.v()(i, j) = grid_.v()(i, j - 1) - (grid_.dy() / grid_.dx() ) * ( grid_.u()(i, j) - grid_.u()(i - 1, j) ) ;
+        grid_.v()(i, j) = grid_.v()(i, j - 1) - (grid_.dy() / grid_.dx()) * (grid_.u()(i, j) - grid_.u()(i - 1, j)) ;
 
         grid_.u()(i - 1, j + 1) = grid_.u()(i - 1, j) ;
         grid_.u()(i, j + 1)   = grid_.u()(i, j) ;
         grid_.v()(i + 1, j)   = grid_.v()(i, j) ;
         grid_.v()(i - 1, j)   = grid_.v()(i, j) ;
 
-        if ( grid_.isEmpty(i + 1, j - 1) )
-            grid_.v()(i + 1, j - 1) = grid_.v()(i, j - 1) - (grid_.dx() / grid_.dy() ) * ( grid_.u()(i, j) - grid_.u()(i, j - 1) ) ;
+        if (grid_.isEmpty(i + 1, j - 1))
+            grid_.v()(i + 1, j - 1) = grid_.v()(i, j - 1) - (grid_.dx() / grid_.dy()) * (grid_.u()(i, j) - grid_.u()(i, j - 1)) ;
 
-        if ( grid_.isEmpty(i - 1, j - 1) )
-            grid_.v()(i - 1, j - 1) = grid_.v()(i, j - 1) + (grid_.dx() / grid_.dy() ) * ( grid_.u()(i - 1, j) - grid_.u()(i - 1, j - 1) ) ;
+        if (grid_.isEmpty(i - 1, j - 1))
+            grid_.v()(i - 1, j - 1) = grid_.v()(i, j - 1) + (grid_.dx() / grid_.dy()) * (grid_.u()(i - 1, j) - grid_.u()(i - 1, j - 1)) ;
     }
 
     // cell(i+1,j) , cell(i,j-1) , cell(i-1,j) are empty WSE
-    if ( grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i - 1, j))
+    if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i - 1, j))
     {
-	if (compP)
-	  grid_.p()(i, j) = 0.0 ;
+        if (compP)
+            grid_.p()(i, j) = 0.0 ;
         grid_.u()(i, j) += gx_ * dt ;
         grid_.u()(i - 1, j) = grid_.u()(i - 1, j) + gx_ * dt ;
-        grid_.v()(i - 1, j) = grid_.v()(i, j) + (grid_.dy() / grid_.dx() ) * ( grid_.u()(i, j) - grid_.u()(i - 1, j) ) ;
+        grid_.v()(i - 1, j) = grid_.v()(i, j) + (grid_.dy() / grid_.dx()) * (grid_.u()(i, j) - grid_.u()(i - 1, j)) ;
 
         grid_.u()(i - 1, j - 1)   = grid_.u()(i - 1, j) ;
         grid_.u()(i, j - 1)     = grid_.u()(i, j) ;
         grid_.v()(i + 1, j - 1)   = grid_.v()(i, j - 1) ;
         grid_.v()(i - 1, j - 1)   = grid_.v()(i, j - 1) ;
 
-        if ( grid_.isEmpty(i + 1, j + 1) ) /////////////// no values ////////////////////
-            grid_.v()(i + 1, j) = grid_.v()(i, j) + (grid_.dx() / grid_.dy() ) * ( grid_.u()(i, j + 1) - grid_.u()(i, j) ) ;
+        if (grid_.isEmpty(i + 1, j + 1))   /////////////// no values ////////////////////
+            grid_.v()(i + 1, j) = grid_.v()(i, j) + (grid_.dx() / grid_.dy()) * (grid_.u()(i, j + 1) - grid_.u()(i, j)) ;
 
-        if ( grid_.isEmpty(i - 1, j + 1) )
-            grid_.v()(i - 1, j) = grid_.v()(i, j) - (grid_.dx() / grid_.dy() ) * ( grid_.u()(i - 1, j + 1) - grid_.u()(i - 1, j) ) ;
+        if (grid_.isEmpty(i - 1, j + 1))
+            grid_.v()(i - 1, j) = grid_.v()(i, j) - (grid_.dx() / grid_.dy()) * (grid_.u()(i - 1, j + 1) - grid_.u()(i - 1, j)) ;
     }
 
     // cell(i-1,j) , cell(i,j-1) , cell(i,j+1) are empty WSN
-    if ( grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1) )
+    if (grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1))
     {
-	if (compP)
-	  grid_.p()(i, j) = 0.0 ;
+        if (compP)
+            grid_.p()(i, j) = 0.0 ;
         grid_.v()(i, j) += gy_ * dt ;
         grid_.v()(i, j - 1) = grid_.u()(i, j - 1) + gy_ * dt ;
-        grid_.u()(i - 1, j) = grid_.u()(i, j) + (grid_.dx() / grid_.dy() ) * ( grid_.v()(i, j) - grid_.v()(i, j - 1) ) ;
+        grid_.u()(i - 1, j) = grid_.u()(i, j) + (grid_.dx() / grid_.dy()) * (grid_.v()(i, j) - grid_.v()(i, j - 1)) ;
 
         grid_.u()(i - 1, j + 1)   = grid_.u()(i - 1, j) ;
         grid_.u()(i - 1, j - 1)   = grid_.u()(i - 1, j) ;
         grid_.v()(i - 1, j)     = grid_.v()(i, j) ;
         grid_.v()(i - 1, j - 1)   = grid_.v()(i, j - 1) ;
 
-        if ( grid_.isEmpty(i + 1, j + 1) ) /////////////////// no values /////////////////////
-            grid_.u()(i, j + 1) = grid_.u()(i, j) + (grid_.dy() / grid_.dx() ) * ( grid_.v()(i + 1, j) - grid_.v()(i, j) ) ;
+        if (grid_.isEmpty(i + 1, j + 1))   /////////////////// no values /////////////////////
+            grid_.u()(i, j + 1) = grid_.u()(i, j) + (grid_.dy() / grid_.dx()) * (grid_.v()(i + 1, j) - grid_.v()(i, j)) ;
 
-        if ( grid_.isEmpty(i + 1, j - 1) )
-            grid_.u()(i, j - 1) = grid_.u()(i, j) - (grid_.dy() / grid_.dx() ) * ( grid_.v()(i + 1, j - 1) - grid_.v()(i, j - 1) ) ;
+        if (grid_.isEmpty(i + 1, j - 1))
+            grid_.u()(i, j - 1) = grid_.u()(i, j) - (grid_.dy() / grid_.dx()) * (grid_.v()(i + 1, j - 1) - grid_.v()(i, j - 1)) ;
     }
 
     // cell(i+1,j) , cell(i,j-1) , cell(i,j+1) are empty ESN
-    if ( grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1) )
+    if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1))
     {
-	if (compP)
-	  grid_.p()(i, j) = 0.0 ;
+        if (compP)
+            grid_.p()(i, j) = 0.0 ;
         grid_.v()(i, j) += gy_ * dt ;
         grid_.v()(i, j - 1) = grid_.v()(i, j - 1) + gy_ * dt ;
-        grid_.u()(i, j) = grid_.u()(i - 1, j) - (grid_.dx() / grid_.dy() ) * ( grid_.v()(i, j) - grid_.v()(i, j - 1) ) ;
+        grid_.u()(i, j) = grid_.u()(i - 1, j) - (grid_.dx() / grid_.dy()) * (grid_.v()(i, j) - grid_.v()(i, j - 1)) ;
 
         grid_.u()(i, j + 1)     = grid_.u()(i, j) ;
         grid_.u()(i, j - 1)     = grid_.u()(i, j) ;
         grid_.v()(i + 1, j)     = grid_.v()(i, j) ;
         grid_.v()(i + 1, j - 1)   = grid_.v()(i, j - 1) ;
 
-        if ( grid_.isEmpty(i - 1, j + 1) )
-            grid_.u()(i - 1, j + 1) = grid_.u()(i - 1, j) - (grid_.dy() / grid_.dx() ) * ( grid_.v()(i, j) - grid_.v()(i - 1, j) ) ;
+        if (grid_.isEmpty(i - 1, j + 1))
+            grid_.u()(i - 1, j + 1) = grid_.u()(i - 1, j) - (grid_.dy() / grid_.dx()) * (grid_.v()(i, j) - grid_.v()(i - 1, j)) ;
 
-        if ( grid_.isEmpty(i - 1, j - 1) )
-            grid_.u()(i - 1, j - 1) = grid_.u()(i - 1, j) + (grid_.dy() / grid_.dx() ) * ( grid_.v()(i, j - 1) - grid_.v()(i - 1, j - 1) ) ;
+        if (grid_.isEmpty(i - 1, j - 1))
+            grid_.u()(i - 1, j - 1) = grid_.u()(i - 1, j) + (grid_.dy() / grid_.dx()) * (grid_.v()(i, j - 1) - grid_.v()(i - 1, j - 1)) ;
     }
 }
 //*******************************************************************************************************************
@@ -1145,10 +1145,10 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const int &dt, bool c
 void FluidSimulator::four_empty_neighbour(int i , int j , const int &dt, bool compP)
 {
     // According to page 96 of book number 5
-    if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1) )
+    if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1))
     {
-	if (compP)
-	  grid_.p()(i, j) = 0.0 ;
+        if (compP)
+            grid_.p()(i, j) = 0.0 ;
         grid_.u()(i, j) += gx_ * dt ;
         grid_.u()(i - 1, j) = grid_.u()(i - 1, j) + gx_ * dt ;
         grid_.v()(i, j) += gy_ * dt ;

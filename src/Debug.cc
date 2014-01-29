@@ -26,41 +26,41 @@ const char *LIGHTWHITE   = "\033[1;37m";
 namespace internal
 {
 
-void checkFct( bool b, const char *const expression, const std::string &message,
-               const char *const filename, int line )
+void checkFct(bool b, const char *const expression, const std::string &message,
+              const char *const filename, int line)
 {
-    if ( !b )
+    if (!b)
     {
         std::cerr << "Check failed!\n\tFile:       " << filename << ":" << line << "\n"
                   << "\tExpression: " << expression << std::endl;
-        if ( message.size() > 0 )
+        if (message.size() > 0)
             std::cerr << "\tMessage: \n\t" << message << std::endl;
     }
     std::abort();
 }
 
-void assertFct( bool b, const char *const expression, const std::string &message,
-                const char *const filename, int line )
+void assertFct(bool b, const char *const expression, const std::string &message,
+               const char *const filename, int line)
 {
-    if ( !b )
+    if (!b)
     {
         std::cerr << "Assertion failed!\n\tFile:       " << filename << ":" << line << "\n"
                   << "\tExpression: " << expression << std::endl;
 
-        if ( message.size() > 0 )
+        if (message.size() > 0)
             std::cerr << "\tMessage: \n\t" << message << std::endl;
     }
     std::abort();
 }
 
-void warnFct( const std::string &message, const char *const filename, int line )
+void warnFct(const std::string &message, const char *const filename, int line)
 {
     std::cerr << "Warning!\n\tFile:       " << filename << ":" << line << "\n";
     std::cerr <<  "\t" << message << std::endl;
 }
 
 // own "progress" function
-void progFct( const std::string &message, const char *const filename, int line )
+void progFct(const std::string &message, const char *const filename, int line)
 {
     std::cout << "- " << message << " ..." << std::endl;
 }

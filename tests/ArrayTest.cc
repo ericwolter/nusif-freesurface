@@ -6,54 +6,54 @@
 
 void copyTest()
 {
-   const int size = 10;
+    const int size = 10;
 
-   // Fill single array...
-   Array arr (size);
-   for ( int i = 0; i<size; ++i )
-      arr(i) = i;
+    // Fill single array...
+    Array arr(size);
+    for (int i = 0; i < size; ++i)
+        arr(i) = i;
 
-   // check if values where set correctly
-   for ( int i = 0; i<size; ++i )
-      CHECK( arr(i) == i );
-
-
-   // create a copy of the array, and check if values are the same
-   Array arrCopy (arr);
-   for ( int i = 0; i<size; ++i )
-      CHECK( arrCopy(i) == i );
+    // check if values where set correctly
+    for (int i = 0; i < size; ++i)
+        CHECK(arr(i) == i);
 
 
-   // write new values to copy
-   for ( int i = 0; i<size; ++i )
-      arrCopy(i) = 2*i;
+    // create a copy of the array, and check if values are the same
+    Array arrCopy(arr);
+    for (int i = 0; i < size; ++i)
+        CHECK(arrCopy(i) == i);
 
-   // and check both arrays again
-   for ( int i = 0; i<size; ++i )
-      CHECK( arr(i) == i );
-   for ( int i = 0; i<size; ++i )
-      CHECK( arrCopy(i) == 2*i );
+
+    // write new values to copy
+    for (int i = 0; i < size; ++i)
+        arrCopy(i) = 2 * i;
+
+    // and check both arrays again
+    for (int i = 0; i < size; ++i)
+        CHECK(arr(i) == i);
+    for (int i = 0; i < size; ++i)
+        CHECK(arrCopy(i) == 2 * i);
 
 }
 
 void  contiguousMemoryTest()
 {
-   Array arr ( 10, 5 );
+    Array arr(10, 5);
 
-   size_t memDifference =  & ( arr (9,4 ) ) - & ( arr(0,0) );
-   CHECK( memDifference == 10*5 - 1 );
+    size_t memDifference =  & (arr(9, 4)) - & (arr(0, 0));
+    CHECK(memDifference == 10 * 5 - 1);
 }
 
 
-int main( )
+int main()
 {
-   std::cout << "Copy Test: ";
-   copyTest();
-   std::cout << "OK" << std::endl;
+    std::cout << "Copy Test: ";
+    copyTest();
+    std::cout << "OK" << std::endl;
 
-   std::cout << "Contiguous Memory Test: ";
-   contiguousMemoryTest();
-   std::cout << "OK" << std::endl;
+    std::cout << "Contiguous Memory Test: ";
+    contiguousMemoryTest();
+    std::cout << "OK" << std::endl;
 
-   return 0;
+    return 0;
 }

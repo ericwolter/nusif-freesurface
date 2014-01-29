@@ -12,116 +12,120 @@
 const real pi = M_PI;
 
 
-void initGridSetup1( StaggeredGrid & grid )
+void initGridSetup1(StaggeredGrid &grid)
 {
-   PROG("initialize GridSetup1");
-   // Setup 1:
-   //    - grid.p   : init with random values
-   for (int i = 0; i < grid.p().getSize(0); i++) {
-       for (int j = 0; j < grid.p().getSize(1); j++) 
-           grid.p()(i,j) = sin(4*pi*i*grid.dx()) + sin(4*pi*j*grid.dy());
-   }
-   
-   //    - grid.rhs : init with zero
-   grid.rhs().fill(0);
+    PROG("initialize GridSetup1");
+    // Setup 1:
+    //    - grid.p   : init with random values
+    for (int i = 0; i < grid.p().getSize(0); i++)
+    {
+        for (int j = 0; j < grid.p().getSize(1); j++)
+            grid.p()(i, j) = sin(4 * pi * i * grid.dx()) + sin(4 * pi * j * grid.dy());
+    }
+
+    //    - grid.rhs : init with zero
+    grid.rhs().fill(0);
 }
 
-void initGridSetup2( StaggeredGrid & grid )
+void initGridSetup2(StaggeredGrid &grid)
 {
-   PROG("initialize GridSetup2");
-   // Setup 2:
-   //    - grid.p   : init with random values
-   for (int i = 0; i < grid.p().getSize(0); i++) {
-       for (int j = 0; j < grid.p().getSize(1); j++) 
-           grid.p()(i,j) = sin(4*pi*i*grid.dx()) + sin(4*pi*j*grid.dy());
-   }
-   //    - grid.rhs : f(x,y) = sin(2 * x * \pi)
-   for (int i = 0; i < grid.rhs().getSize(0); i++) {
-       for (int j = 0; j < grid.rhs().getSize(1); j++) 
-           grid.rhs()(i,j) = sin(2*i*grid.dx()*pi);
-   }
+    PROG("initialize GridSetup2");
+    // Setup 2:
+    //    - grid.p   : init with random values
+    for (int i = 0; i < grid.p().getSize(0); i++)
+    {
+        for (int j = 0; j < grid.p().getSize(1); j++)
+            grid.p()(i, j) = sin(4 * pi * i * grid.dx()) + sin(4 * pi * j * grid.dy());
+    }
+    //    - grid.rhs : f(x,y) = sin(2 * x * \pi)
+    for (int i = 0; i < grid.rhs().getSize(0); i++)
+    {
+        for (int j = 0; j < grid.rhs().getSize(1); j++)
+            grid.rhs()(i, j) = sin(2 * i * grid.dx() * pi);
+    }
 }
 
 
 
-int main( int argc, char** argv )
+int main(int argc, char **argv)
 {
-   if ( argc < 2 ) {
-       std::cerr << "No config file given" << std::endl;
-       return EXIT_FAILURE;
-   }
+    if (argc < 2)
+    {
+        std::cerr << "No config file given" << std::endl;
+        return EXIT_FAILURE;
+    }
 
-   ////////////////////////////////////////////////////////////// FluidSimulator //////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////// FluidSimulator //////////////////////////////////////////////////////////////
 
-   FileReader confi;
+    FileReader confi;
 
-   confi.registerStringParameter("name");
+    confi.registerStringParameter("name");
 
-   //////////////////////////////////////////////////////// Initialization ///////////////////////////////////////////////////////
-   confi.registerStringParameter("boundary_condition_N");
-   confi.registerStringParameter("boundary_condition_S");
-   confi.registerStringParameter("boundary_condition_E");
-   confi.registerStringParameter("boundary_condition_W");
+    //////////////////////////////////////////////////////// Initialization ///////////////////////////////////////////////////////
+    confi.registerStringParameter("boundary_condition_N");
+    confi.registerStringParameter("boundary_condition_S");
+    confi.registerStringParameter("boundary_condition_E");
+    confi.registerStringParameter("boundary_condition_W");
 
-   confi.registerRealParameter("boundary_velocity_N");
-   confi.registerRealParameter("boundary_velocity_S");
-   confi.registerRealParameter("boundary_velocity_E");
-   confi.registerRealParameter("boundary_velocity_W");
+    confi.registerRealParameter("boundary_velocity_N");
+    confi.registerRealParameter("boundary_velocity_S");
+    confi.registerRealParameter("boundary_velocity_E");
+    confi.registerRealParameter("boundary_velocity_W");
 
-   confi.registerRealParameter("GX");
-   confi.registerRealParameter("GY");
+    confi.registerRealParameter("GX");
+    confi.registerRealParameter("GY");
 
-   confi.registerRealParameter("Re");
+    confi.registerRealParameter("Re");
 
-   confi.registerRealParameter("U_INIT");
-   confi.registerRealParameter("V_INIT");
-   confi.registerRealParameter("P_INIT");
-   
-   //////////////////////////////////////////////////////// Geometry Data ////////////////////////////////////////////////////////
-   confi.registerRealParameter("xlength");
-   confi.registerRealParameter("ylength");
-   confi.registerIntParameter("imax");
-   confi.registerIntParameter("jmax");
-   
-   confi.registerRealParameter("RectangleX1");
-   confi.registerRealParameter("RectangleY1");           
-   confi.registerRealParameter("RectangleX2");           
-   confi.registerRealParameter("RectangleY2"); 
-   
-   confi.registerRealParameter("CircleX");
-   confi.registerRealParameter("CircleY");
-   confi.registerRealParameter("CircleR");
+    confi.registerRealParameter("U_INIT");
+    confi.registerRealParameter("V_INIT");
+    confi.registerRealParameter("P_INIT");
 
-   //////////////////////////////////////////////////////// Time Data ////////////////////////////////////////////////////////////
-   confi.registerRealParameter("dt");
-   confi.registerIntParameter("timesteps");
-   confi.registerRealParameter("safetyfactor");
+    //////////////////////////////////////////////////////// Geometry Data ////////////////////////////////////////////////////////
+    confi.registerRealParameter("xlength");
+    confi.registerRealParameter("ylength");
+    confi.registerIntParameter("imax");
+    confi.registerIntParameter("jmax");
 
-   //////////////////////////////////////////////////////// Pressure Iteration Data //////////////////////////////////////////////
-   confi.registerIntParameter("itermax");
-   confi.registerRealParameter("eps");
-   confi.registerRealParameter("omg");
-   confi.registerRealParameter("gamma");
-   confi.registerIntParameter("checkfrequency");
-   confi.registerIntParameter("normalizationfrequency");
+    confi.registerRealParameter("RectangleX1");
+    confi.registerRealParameter("RectangleY1");
+    confi.registerRealParameter("RectangleX2");
+    confi.registerRealParameter("RectangleY2");
 
-   //////////////////////////////////////////////////////// VTK Visualization Data ///////////////////////////////////////////////
-   confi.registerIntParameter("outputinterval");
+    confi.registerRealParameter("CircleX");
+    confi.registerRealParameter("CircleY");
+    confi.registerRealParameter("CircleR");
 
-   CHECK_MSG( confi.readFile( argv[1] ), "Could not open file " << argv[1] << " which has to be in the current directory." );
-   // Create staggered grid
-   StaggeredGrid grid ( confi );
+    //////////////////////////////////////////////////////// Time Data ////////////////////////////////////////////////////////////
+    confi.registerRealParameter("dt");
+    confi.registerIntParameter("timesteps");
+    confi.registerRealParameter("safetyfactor");
 
-   // create solver
-   SORSolver solver ( confi );
+    //////////////////////////////////////////////////////// Pressure Iteration Data //////////////////////////////////////////////
+    confi.registerIntParameter("itermax");
+    confi.registerRealParameter("eps");
+    confi.registerRealParameter("omg");
+    confi.registerRealParameter("gamma");
+    confi.registerIntParameter("checkfrequency");
+    confi.registerIntParameter("normalizationfrequency");
 
-   initGridSetup1( grid );
-   
-   CHECK_MSG( solver.solve( grid ), "Solver could not solve problem of setup 1!");
+    //////////////////////////////////////////////////////// VTK Visualization Data ///////////////////////////////////////////////
+    confi.registerIntParameter("outputinterval");
 
-   initGridSetup2( grid );
-   
-   CHECK_MSG( solver.solve( grid ), "Solver could not solve problem of setup 2!");
+    CHECK_MSG(confi.readFile(argv[1]), "Could not open file " << argv[1] << " which has to be in the current directory.");
+    // Create staggered grid
+    StaggeredGrid grid(confi);
 
-   return 0;
+    // create solver
+    SORSolver solver(confi);
+
+    initGridSetup1(grid);
+
+    CHECK_MSG(solver.solve(grid), "Solver could not solve problem of setup 1!");
+
+    initGridSetup2(grid);
+
+    CHECK_MSG(solver.solve(grid), "Solver could not solve problem of setup 2!");
+
+    return 0;
 }

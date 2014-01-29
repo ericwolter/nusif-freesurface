@@ -28,13 +28,13 @@ class StaggeredGrid
 public:
 
     // Constructors to manually create staggered grid
-    StaggeredGrid ( int xSize, int ySize, real ddx, real ddy );
+    StaggeredGrid(int xSize, int ySize, real ddx, real ddy);
 
     // Constructor to create a staggered grid from a parsed configuration file
-    StaggeredGrid ( const FileReader &configuration );
+    StaggeredGrid(const FileReader &configuration);
 
     // Assignment Operator
-    inline StaggeredGrid &operator = ( const StaggeredGrid &s );
+    inline StaggeredGrid &operator = (const StaggeredGrid &s);
 
     // Getters / Setters for member variables
     Array &p()
@@ -150,13 +150,13 @@ public:
     void setCellToObstacle(int x, int y);
     void createRectangle(real x1, real y1, real x2, real y2);
     void createCircle(real x, real y, real r);
-    void createPng( const std::string &pngFilename );
-    void readPng( const std::string &pngFilename );
+    void createPng(const std::string &pngFilename);
+    void readPng(const std::string &pngFilename);
     void markCells();
 
-//    // Interpolated function ( bilinear interpolation )
-//    real u_inter ( real x , real y ) ;
-//    real v_inter ( real x , real y ) ;
+    //    // Interpolated function ( bilinear interpolation )
+    //    real u_inter ( real x , real y ) ;
+    //    real v_inter ( real x , real y ) ;
 protected:
     Array p_;   //< pressure field
     Array rhs_; //< right hand side of the pressure equation
@@ -180,28 +180,28 @@ protected:
 
 inline bool StaggeredGrid::isFluid(const int x, const int y)
 {
-    return ( obs_(x, y) & FLUID );
+    return (obs_(x, y) & FLUID);
 }
 
 inline bool StaggeredGrid::isEmpty(const int x, const int y)
 {
-    return ( obs_(x, y) & EMPTY );
+    return (obs_(x, y) & EMPTY);
 }
 
 inline bool StaggeredGrid::isObstacle(const int x, const int y)
 {
-    return ( obs_(x, y) & OBS );
+    return (obs_(x, y) & OBS);
 }
 
 
 inline int StaggeredGrid::getNumFluid()
 {
     int sum = 0;
-    for ( int i = 0; i < obs_.getSize(0); ++i )
+    for (int i = 0; i < obs_.getSize(0); ++i)
     {
-        for ( int j = 0; j < obs_.getSize(1); ++j )
+        for (int j = 0; j < obs_.getSize(1); ++j)
         {
-            if ( isFluid(i,j) )
+            if (isFluid(i, j))
                 ++sum;
         }
     }
@@ -212,18 +212,18 @@ inline int StaggeredGrid::getNumFluid()
 
 inline real StaggeredGrid::u(const int x, const int y, Direction dir)
 {
-    if ( isFluid(x, y) && isFluid(x + 1, y) )
+    if (isFluid(x, y) && isFluid(x + 1, y))
         return u_(x, y);
 
-    if ( dir == NORTH )
+    if (dir == NORTH)
     {
-        if ( !isFluid(x, y) && !isFluid(x + 1, y) )
+        if (!isFluid(x, y) && !isFluid(x + 1, y))
             return -u_(x, y + 1);
     }
 
-    if ( dir == SOUTH )
+    if (dir == SOUTH)
     {
-        if ( !isFluid(x, y) && !isFluid(x + 1, y) )
+        if (!isFluid(x, y) && !isFluid(x + 1, y))
             return -u_(x, y - 1);
     }
 
@@ -233,18 +233,18 @@ inline real StaggeredGrid::u(const int x, const int y, Direction dir)
 
 inline real StaggeredGrid::v(const int x, const int y, Direction dir)
 {
-    if ( isFluid(x, y) && isFluid(x, y + 1) )
+    if (isFluid(x, y) && isFluid(x, y + 1))
         return v_(x, y);
 
-    if ( dir == WEST )
+    if (dir == WEST)
     {
-        if ( !isFluid(x, y) && !isFluid(x, y + 1) )
+        if (!isFluid(x, y) && !isFluid(x, y + 1))
             return -v_(x - 1, y);
     }
 
-    if ( dir == EAST )
+    if (dir == EAST)
     {
-        if ( !isFluid(x, y) && !isFluid(x, y + 1) )
+        if (!isFluid(x, y) && !isFluid(x, y + 1))
             return -v_(x + 1, y);
     }
 
@@ -255,19 +255,19 @@ inline real StaggeredGrid::v(const int x, const int y, Direction dir)
 
 inline real StaggeredGrid::p(const int x, const int y, Direction dir)
 {
-    if ( !isFluid(x,y) )
+    if (!isFluid(x, y))
     {
-        if ( dir == NORTH )
+        if (dir == NORTH)
         {
             return p_(x, y + 1);
 
         }
-        else if ( dir == SOUTH )
+        else if (dir == SOUTH)
         {
             return p_(x, y - 1);
 
         }
-        else if ( dir == WEST )
+        else if (dir == WEST)
         {
             return p_(x - 1, y);
 

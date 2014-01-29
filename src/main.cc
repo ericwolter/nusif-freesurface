@@ -6,10 +6,10 @@
 
 
 
-int main( int argc, char **argv )
+int main(int argc, char **argv)
 {
 
-    if ( argc < 2 )
+    if (argc < 2)
     {
         std::cerr << "No config file given" << std::endl;
         return EXIT_FAILURE;
@@ -83,10 +83,10 @@ int main( int argc, char **argv )
 
     //////////////////////////////////////////////////////// Test ////////////////////////////////////////////////////////////
 
-    CHECK_MSG( confi.readFile( argv[1] ), "Could not open file " << argv[1] << " which has to be in the current directory." );
+    CHECK_MSG(confi.readFile(argv[1]), "Could not open file " << argv[1] << " which has to be in the current directory.");
 
     // create simulator
-    FluidSimulator simulator ( confi );
+    FluidSimulator simulator(confi);
 
     // test
     simulator.backstep_test();

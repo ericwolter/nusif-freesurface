@@ -252,15 +252,15 @@ struct LodePNGDecompressSettings
     unsigned ignore_adler32; /*if 1, continue and don't give an error message if the Adler32 checksum is corrupted*/
 
     /*use custom zlib decoder instead of built in one (default: null)*/
-    unsigned (*custom_zlib)(unsigned char **, size_t *,
-                            const unsigned char *, size_t,
-                            const LodePNGDecompressSettings *);
+    unsigned(*custom_zlib)(unsigned char **, size_t *,
+                           const unsigned char *, size_t,
+                           const LodePNGDecompressSettings *);
     /*use custom deflate decoder instead of built in one (default: null)
     if custom_zlib is used, custom_deflate is ignored since only the built in
     zlib function will call custom_deflate*/
-    unsigned (*custom_inflate)(unsigned char **, size_t *,
-                               const unsigned char *, size_t,
-                               const LodePNGDecompressSettings *);
+    unsigned(*custom_inflate)(unsigned char **, size_t *,
+                              const unsigned char *, size_t,
+                              const LodePNGDecompressSettings *);
 
     void *custom_context; /*optional custom settings for custom functions*/
 };
@@ -286,15 +286,15 @@ unsigned nicematch; /*stop searching if >= this length found. Set to 258 for bes
 unsigned lazymatching; /*use lazy matching: better compression but a bit slower. Default: true*/
 
 /*use custom zlib encoder instead of built in one (default: null)*/
-unsigned (*custom_zlib)(unsigned char **, size_t *,
-                        const unsigned char *, size_t,
-                        const LodePNGCompressSettings *);
+unsigned(*custom_zlib)(unsigned char **, size_t *,
+                       const unsigned char *, size_t,
+                       const LodePNGCompressSettings *);
 /*use custom deflate encoder instead of built in one (default: null)
 if custom_zlib is used, custom_deflate is ignored since only the built in
 zlib function will call custom_deflate*/
-unsigned (*custom_deflate)(unsigned char **, size_t *,
-                           const unsigned char *, size_t,
-                           const LodePNGCompressSettings *);
+unsigned(*custom_deflate)(unsigned char **, size_t *,
+                          const unsigned char *, size_t,
+                          const LodePNGCompressSettings *);
 
 void *custom_context; /*optional custom settings for custom functions*/
 };

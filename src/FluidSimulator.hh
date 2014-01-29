@@ -48,12 +48,6 @@ public:
     void dcavity_test();
     void testFG();
 
-    // Compute surface boundary
-    //void set_UVP_surface(const int& dt) ;
-    void one_empty_neighbour   (int i , int j , const int& dt ) ;
-    void two_empty_neighbour   (int i , int j , const int& dt ) ;
-    void three_empty_neighbour (int i , int j , const int& dt ) ;
-    void four_empty_neighbour  (int i , int j , const int& dt ) ;
 private:
     // helper functions (derivatives)
     real dxuu(int i, int j), dyuv(int i, int j), ddxu(int i, int j), ddyu(int i, int j);
@@ -66,8 +60,12 @@ private:
     void refreshBoundaries();
 
     // compute surface boundary
-    void set_UVP_surface(const int& dt);
-    void set_UVP_surface(int i, int j , const int& dt);
+    void set_UVP_surface(const int& dt, bool compP);
+    void set_UVP_surface(int i, int j , const int& dt, bool compP);
+    void one_empty_neighbour   (int i , int j , const int& dt, bool compP ) ;
+    void two_empty_neighbour   (int i , int j , const int& dt, bool compP ) ;
+    void three_empty_neighbour (int i , int j , const int& dt, bool compP ) ;
+    void four_empty_neighbour  (int i , int j , const int& dt, bool compP ) ;
 //     real set_U_surface(int i, int j , const int &dt);
 //     real set_V_surface(int i, int j , const int &dt);
     // needed values

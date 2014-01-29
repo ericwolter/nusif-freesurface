@@ -73,6 +73,7 @@ private:
     real rectX_, rectXX_, rectY_, rectYY_, circX_, circY_, circR_;
     BCTYPE cond_N, cond_S, cond_E, cond_W;
     unsigned int timeStepNr, normfreq, outPutInt;
+    std::string name_;
     int imax, jmax;
     real rectX1_particle_ , rectX2_particle_ , rectY1_particle_ , rectY2_particle_, circX_particle_, circY_particle_, circR_particle_;
 

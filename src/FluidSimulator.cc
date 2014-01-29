@@ -9,6 +9,8 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
     : grid_(conf), solver_(conf)
 {
     particle_tracer_ = ParticleTracer(&grid_);
+    
+    name_ = conf.getStringParameter("name");
 
     PROG("construct FluidSimulator with a file");
     gamma_ = conf.getRealParameter("gamma");
@@ -354,29 +356,34 @@ void FluidSimulator::refreshBoundaries()
 
 void FluidSimulator::simulate(real duration)
 {
-    //VTKWriter vtkWriter ( "lidDrivenCavity" );
-    VTKWriter vtkWriter("BreakingDum");
+    VTKWriter vtkWriter ( name_ );
+
     real t = 0;
     unsigned int n = 0;
-
+    
     PROG("initialize u, v, p, rhs");
-    //     int half = (int) ( rectYY_ / grid_.dy() );
-    //     for ( int i = 0; i < grid_.u().getSize(0); ++i )
-    //     {
-    //         for ( int j = 0; j < grid_.u().getSize(1); ++j )
-    //         {
-    //             if ( j > half )
-    //             {
-    //                 grid_.u()(i, j) = 1;
-    //             }
-    //             else
-    //             {
-    //                 grid_.u()(i, j) = 0;
-    //             }
-    //         }
-    //     }
-
-    grid_.u().fill(uInit_);
+    if (name_ == "backstep") 
+    {
+        int half = (int) ( rectYY_ / grid_.dy() );
+        for ( int i = 0; i < grid_.u().getSize(0); ++i )
+        {
+            for ( int j = 0; j < grid_.u().getSize(1); ++j )
+            {
+                if ( j > half )
+                {
+                    grid_.u()(i, j) = 1;
+                }
+                else
+                {
+                    grid_.u()(i, j) = 0;
+                }
+            }
+        }
+    } 
+    else 
+    {
+	grid_.u().fill(uInit_);
+    }
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
     grid_.rhs().fill(0);
@@ -419,28 +426,32 @@ void FluidSimulator::simulate(real duration)
 
 void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
 {
-    VTKWriter vtkWriter("lidDrivenCavity");
-    // VTKWriter vtkWriter ( "BreakingDum" );
+    VTKWriter vtkWriter(name_);
     unsigned int n = 0;
 
     PROG("initialize u, v, p, rhs");
-    int half = (int)(rectYY_ / grid_.dy());
-    for (int i = 0; i < grid_.u().getSize(0); ++i)
+    if (name_ == "backstep")
     {
-        for (int j = 0; j < grid_.u().getSize(1); ++j)
-        {
-            if (j > half)
-            {
-                grid_.u()(i, j) = 1;
-            }
-            else
-            {
-                grid_.u()(i, j) = 0;
-            }
-        }
+	int half = (int)(rectYY_ / grid_.dy());
+	for (int i = 0; i < grid_.u().getSize(0); ++i)
+	{
+	    for (int j = 0; j < grid_.u().getSize(1); ++j)
+	    {
+		if (j > half)
+		{
+		    grid_.u()(i, j) = 1;
+		}
+		else
+		{
+		    grid_.u()(i, j) = 0;
+		}
+	    }
+	}
+    } 
+    else
+    {
+	grid_.u().fill(uInit_);
     }
-
-    // grid_.u().fill(uInit_);
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
     grid_.rhs().fill(0);

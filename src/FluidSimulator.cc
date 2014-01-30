@@ -484,7 +484,7 @@ void FluidSimulator::simulate(real duration)
             for (int j = 1; j <= jmax; ++j)
             {
 				if (!grid_.isObstacle(i,j))
-					particle_tracer_.fillCell(i,j,9,0);
+					particle_tracer_.fillCell(i,j,grid_.ppc(),0);
             }
         }
     }
@@ -568,7 +568,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
             for (int j = 1; j <= jmax; ++j)
             {
 				if (!grid_.isObstacle(i,j))
-					particle_tracer_.fillCell(i,j,9,0);
+					particle_tracer_.fillCell(i,j,grid_.ppc(),0);
             }
         }
     }
@@ -589,7 +589,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
             vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT(safetyfac_);
-        //particle_tracer_.markCells();
+        particle_tracer_.markCells();
         PROG(n << "'th timestep: set u, v, p at the free boundary");
         set_UVP_surface(dt_,true);
         computeFG();
@@ -603,7 +603,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         refreshBoundaries();
         PROG(n << "'th timestep: set u, v at the free boundary");
         set_UVP_surface(dt_,false);
-        //particle_tracer_.advanceParticles(dt_);
+        particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
         n++;

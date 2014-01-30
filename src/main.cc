@@ -44,7 +44,9 @@ int main(int argc, char **argv)
     confi.registerRealParameter("ylength");
     confi.registerIntParameter("imax");
     confi.registerIntParameter("jmax");
-
+	
+	confi.registerIntParameter("ppc");
+	
     confi.registerRealParameter("RectangleParticleX1");
     confi.registerRealParameter("RectangleParticleX2");
     confi.registerRealParameter("RectangleParticleY1");

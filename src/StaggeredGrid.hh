@@ -135,6 +135,14 @@ public:
     {
         return jmax_;
     }
+    
+    int ppc() const
+    {
+		if (ppc_ != 0)
+			return ppc_;
+		
+		return 9;
+    }
 
     inline bool isFluid(const int x, const int y);
     inline bool isEmpty(const int x, const int y);
@@ -170,8 +178,8 @@ protected:
     real dy_;   //< distance between two grid points in y direction
     real xSize_;
     real ySize_;
-    int imax_;
-    int jmax_;
+    int imax_, jmax_;
+    int ppc_;
 
     std::vector<Particle> particles_;
 };

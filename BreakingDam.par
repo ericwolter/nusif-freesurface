@@ -48,7 +48,7 @@ RectangleY2                   	4.0
 # ---------
 
 dt                     0.04      # time stepsize
-time                   5.0      # number of timesteps
+timesteps               125      # number of timesteps
 safetyfactor           0.5       # factor "tau" for timestep size control (<=0 means constant dt)
 
 # Pressure Iteration Data:

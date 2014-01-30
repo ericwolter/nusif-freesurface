@@ -41,6 +41,10 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
         ASSERT_MSG(vel_N == 0.0, "there should be no velocity values for an outflow boundary!");
         cond_N = OUTFLOW;
     }
+    else if (no == "free-slip")
+	{
+        cond_N = SLIP;
+	}
     else
     {
         cond_N = NOSLIP;
@@ -55,6 +59,10 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
         ASSERT_MSG(vel_S == 0.0, "there should be no velocity values for an outflow boundary!");
         cond_S = OUTFLOW;
     }
+    else if (so == "free-slip")
+	{
+        cond_S = SLIP;
+	}
     else
     {
         cond_S = NOSLIP;
@@ -69,6 +77,10 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
         ASSERT_MSG(vel_W == 0.0, "there should be no velocity values for an outflow boundary!");
         cond_W = OUTFLOW;
     }
+    else if (we == "free-slip")
+	{
+        cond_W = SLIP;
+	}
     else
     {
         cond_W = NOSLIP;
@@ -83,6 +95,10 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
         ASSERT_MSG(vel_E == 0.0, "there should be no velocity values for an outflow boundary!");
         cond_E = OUTFLOW;
     }
+    else if (es == "free-slip")
+	{
+        cond_E = SLIP;
+	}
     else
     {
         cond_E = NOSLIP;
@@ -233,12 +249,29 @@ void FluidSimulator::refreshBoundaries()
         }
 
     }
+    else if (cond_N == SLIP)       // free-slip
+    {
+        for (int i = 1; i <= imax; i++)
+        {
+            if (grid_.isFluid(i, jmax))
+            {
+                grid_.v()(i, jmax) = vel_N;
+                grid_.u()(i, jmax + 1) = grid_.u()(i, jmax);
+            }
+            else
+            {
+                grid_.v()(i, jmax) = 0;
+                grid_.u()(i, jmax + 1) = 2 * vel_N - grid_.u()(i, jmax);
+            }
+        }
+
+    }
     else     // outflow
     {
         for (int i = 1; i <= imax; i++)
         {
-            grid_.v()(i, jmax) = grid_.v()(i, jmax - 1);
-            grid_.u()(i, jmax + 1) = grid_.u()(i, jmax);
+			grid_.v()(i, jmax) = grid_.v()(i, jmax - 1);
+			grid_.u()(i, jmax + 1) = grid_.u()(i, jmax);			
         }
     }
 
@@ -260,6 +293,23 @@ void FluidSimulator::refreshBoundaries()
             {
                 grid_.v()(i, 0) = vel_S;
                 grid_.u()(i, 0) = - grid_.u()(i, 1);
+            }
+            else
+            {
+                grid_.v()(i, 0) = 0;
+                grid_.u()(i, 0) = 2 * vel_S - grid_.u()(i, 1);
+            }
+        }
+
+    }
+    else if (cond_S == SLIP)		// free-slip 
+    {
+        for (int i = 1; i <= imax; i++)
+        {
+            if (grid_.isFluid(i, 1))
+            {
+                grid_.v()(i, 0) = vel_S;
+                grid_.u()(i, 0) = grid_.u()(i, 1);
             }
             else
             {
@@ -306,6 +356,24 @@ void FluidSimulator::refreshBoundaries()
         }
 
     }
+    else if (cond_W == SLIP)       // free-slip
+    {
+        for (int j = 1; j <= jmax; j++)
+        {
+            if (grid_.isFluid(1, j))
+            {
+                grid_.u()(0, j) = vel_W;
+                grid_.v()(0, j) = grid_.v()(1, j);
+            }
+            else
+            {
+                grid_.u()(0, j) = 0;
+                grid_.v()(0, j) = 2 * vel_W - grid_.v()(1, j);
+            }
+
+        }
+
+    }
     else     // outflow
     {
         for (int j = 1; j <= jmax; j++)
@@ -333,6 +401,24 @@ void FluidSimulator::refreshBoundaries()
             {
                 grid_.u()(imax, j) = vel_E;
                 grid_.v()(imax + 1, j) = - grid_.v()(imax, j);
+            }
+            else
+            {
+                grid_.u()(imax, j) = 0;
+                grid_.v()(imax + 1, j) = 2 * vel_E - grid_.v()(imax, j);
+            }
+
+        }
+
+    }
+    else if (cond_E == SLIP)       // free-slip
+    {
+        for (int j = 1; j <= jmax; j++)
+        {
+            if (grid_.isFluid(imax, j))
+            {
+                grid_.u()(imax, j) = vel_E;
+                grid_.v()(imax + 1, j) = grid_.v()(imax, j);
             }
             else
             {
@@ -382,7 +468,7 @@ void FluidSimulator::simulate(real duration)
     } 
     else 
     {
-	grid_.u().fill(uInit_);
+		grid_.u().fill(uInit_);
     }
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
@@ -391,9 +477,23 @@ void FluidSimulator::simulate(real duration)
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectX2_particle_ / grid_.dy()), (int)(rectY1_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
-    particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
-
+    if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0) 
+    {	// fill non obstacle cells with particles
+        for (int i = 1; i <= imax; ++i)
+        {
+            for (int j = 1; j <= jmax; ++j)
+            {
+				if (!grid_.isObstacle(i,j))
+					particle_tracer_.fillCell(i,j,9,0);
+            }
+        }
+    }
+    else 
+    {
+        particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectX2_particle_ / grid_.dy()), (int)(rectY1_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
+        particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
+    }
+        
     refreshBoundaries();
 
     while (t <= duration)
@@ -404,7 +504,7 @@ void FluidSimulator::simulate(real duration)
             vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT(safetyfac_);
-        particle_tracer_.markCells();
+        //particle_tracer_.markCells();
         PROG(n << "'th timestep: set u, v, p at the free boundary");
         set_UVP_surface(dt_,true);
         computeFG();
@@ -418,7 +518,7 @@ void FluidSimulator::simulate(real duration)
         refreshBoundaries();
         PROG(n << "'th timestep: set u, v at the free boundary");
         set_UVP_surface(dt_,false);
-        particle_tracer_.advanceParticles(dt_);
+        //particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
         t += dt_;
@@ -439,20 +539,20 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
 	{
 	    for (int j = 0; j < grid_.u().getSize(1); ++j)
 	    {
-		if (j > half)
-		{
-		    grid_.u()(i, j) = 1;
-		}
-		else
-		{
-		    grid_.u()(i, j) = 0;
-		}
+			if (j > half)
+			{
+				grid_.u()(i, j) = 1;
+			}
+			else
+			{
+				grid_.u()(i, j) = 0;
+			}
 	    }
 	}
     } 
     else
     {
-	grid_.u().fill(uInit_);
+		grid_.u().fill(uInit_);
     }
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
@@ -461,8 +561,22 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
-    particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
+	if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0) 
+    {	// fill non obstacle cells with particles
+        for (int i = 1; i <= imax; ++i)
+        {
+            for (int j = 1; j <= jmax; ++j)
+            {
+				if (!grid_.isObstacle(i,j))
+					particle_tracer_.fillCell(i,j,9,0);
+            }
+        }
+    }
+    else 
+    {
+		particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
+		particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
+	}
     grid_.createPng("test.png");
 
     refreshBoundaries();
@@ -475,7 +589,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
             vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT(safetyfac_);
-        particle_tracer_.markCells();
+        //particle_tracer_.markCells();
         PROG(n << "'th timestep: set u, v, p at the free boundary");
         set_UVP_surface(dt_,true);
         computeFG();
@@ -489,7 +603,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         refreshBoundaries();
         PROG(n << "'th timestep: set u, v at the free boundary");
         set_UVP_surface(dt_,false);
-        particle_tracer_.advanceParticles(dt_);
+        //particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
         n++;

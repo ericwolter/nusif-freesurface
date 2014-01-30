@@ -72,21 +72,21 @@ void ParticleTracer::fillCell(int x, int y, int numParticles, int type)
 {
     real cellX = (x - 1) * grid_->dx();
     real cellY = (y - 1) * grid_->dy();
-    // std::cout << "TRACER cellX,Y: " << cellX << ", " << cellY << std::endl;
+    std::cout << "TRACER cellX,Y: " << cellX << ", " << cellY << std::endl;
 
     int particlesPerSide = (int)(sqrt(numParticles));
-    // std::cout << "TRACER particlesPerSide: " << particlesPerSide << std::endl;
+    std::cout << "TRACER particlesPerSide: " << particlesPerSide << std::endl;
 
     real deltaX = grid_->dx() / (particlesPerSide);
     real deltaY = grid_->dy() / (particlesPerSide);
-    // std::cout << "TRACER deltaX,Y: " << deltaX << ", " << deltaY << std::endl;
+    std::cout << "TRACER deltaX,Y: " << deltaX << ", " << deltaY << std::endl;
 
     for (int i = 1; i <= particlesPerSide; ++i)
     {
         for (int j = 1; j <= particlesPerSide; ++j)
         {
             Particle p(cellX + deltaX / 2 + (i - 1) * deltaX, cellY + deltaY / 2 + (j - 1) * deltaY, type);
-            // std::cout << "TRACER pX,Y: " << cellX + deltaX / 2 + (i - 1) * deltaX << ", " << cellY + deltaY / 2 + (j - 1) * deltaY << std::endl;
+            std::cout << "TRACER pX,Y: " << cellX + deltaX / 2 + (i - 1) * deltaX << ", " << cellY + deltaY / 2 + (j - 1) * deltaY << std::endl;
             particles_.push_back(p);
         }
     }

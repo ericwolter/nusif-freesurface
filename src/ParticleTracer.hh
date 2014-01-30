@@ -19,6 +19,7 @@ public:
     }
 
     void markCells();
+	void fillCell(int i, int j, int numParticles, int type);
     void addRectangle(int x1, int y1, int x2, int y2, int type);
     void addCircle(int x, int y, int r, int type);
 
@@ -26,7 +27,7 @@ public:
     void print();
 
 private:
-    void fillCell(int i, int j, int numParticles, int type);
+    
 
     std::vector<Particle> particles_;
     StaggeredGrid *grid_;

@@ -1,10 +1,10 @@
 #include "Particle.hh"
 
-Particle::Particle(real xx, real yy, int type)
+Particle::Particle(real xx, real yy, int ttype)
 {
     x_ = xx;
     y_ = yy;
-    type_ = type;
+    type_ = ttype;
 }
 
 int Particle::getCellX(real dx)

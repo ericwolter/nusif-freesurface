@@ -15,6 +15,7 @@ StaggeredGrid::StaggeredGrid(int xxSize, int yySize, real ddx, real ddy)
     ySize_ = yySize;
     imax_ = (int)(xSize_ / dx_);
     jmax_ = (int)(ySize_ / dy_);
+	ppc_ = 9;
 
     Array pp(imax_ + 2, jmax_ + 2);
     Array rhss(imax_, jmax_);
@@ -54,6 +55,8 @@ StaggeredGrid::StaggeredGrid(const FileReader &configuration)
     CHECK_MSG((iimax >= 0), "wrong input for imax: " << iimax);
     int jjmax = configuration.getIntParameter("jmax");
     CHECK_MSG((jjmax >= 0), "wrong input for jmax: " << jjmax);
+	int pppc = configuration.getIntParameter("ppc");
+    CHECK_MSG((pppc > 0), "wrong input for ppc: " << pppc);
 
     dx_ = xl / iimax;
     dy_ = yl / jjmax;
@@ -61,6 +64,8 @@ StaggeredGrid::StaggeredGrid(const FileReader &configuration)
     ySize_ = yl;
     imax_ = iimax;
     jmax_ = jjmax;
+	ppc_ = pppc;
+	
     Array pp(imax_ + 2, jmax_ + 2);
     Array rhss(imax_, jmax_);
     Array uu(imax_ + 1, jmax_ + 2);

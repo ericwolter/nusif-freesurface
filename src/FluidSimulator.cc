@@ -562,7 +562,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0)
+    if ((int)(rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_) == 0)
     {
         // fill non obstacle cells with particles
         for (int i = 1; i <= imax; ++i)

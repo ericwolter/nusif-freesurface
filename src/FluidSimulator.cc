@@ -9,7 +9,7 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
     : grid_(conf), solver_(conf)
 {
     particle_tracer_ = ParticleTracer(&grid_);
-    
+
     name_ = conf.getStringParameter("name");
 
     PROG("construct FluidSimulator with a file");
@@ -42,9 +42,9 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
         cond_N = OUTFLOW;
     }
     else if (no == "free-slip")
-	{
+    {
         cond_N = SLIP;
-	}
+    }
     else
     {
         cond_N = NOSLIP;
@@ -60,9 +60,9 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
         cond_S = OUTFLOW;
     }
     else if (so == "free-slip")
-	{
+    {
         cond_S = SLIP;
-	}
+    }
     else
     {
         cond_S = NOSLIP;
@@ -78,9 +78,9 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
         cond_W = OUTFLOW;
     }
     else if (we == "free-slip")
-	{
+    {
         cond_W = SLIP;
-	}
+    }
     else
     {
         cond_W = NOSLIP;
@@ -96,9 +96,9 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
         cond_E = OUTFLOW;
     }
     else if (es == "free-slip")
-	{
+    {
         cond_E = SLIP;
-	}
+    }
     else
     {
         cond_E = NOSLIP;
@@ -270,8 +270,8 @@ void FluidSimulator::refreshBoundaries()
     {
         for (int i = 1; i <= imax; i++)
         {
-			grid_.v()(i, jmax) = grid_.v()(i, jmax - 1);
-			grid_.u()(i, jmax + 1) = grid_.u()(i, jmax);			
+            grid_.v()(i, jmax) = grid_.v()(i, jmax - 1);
+            grid_.u()(i, jmax + 1) = grid_.u()(i, jmax);
         }
     }
 
@@ -302,7 +302,7 @@ void FluidSimulator::refreshBoundaries()
         }
 
     }
-    else if (cond_S == SLIP)		// free-slip 
+    else if (cond_S == SLIP)        // free-slip
     {
         for (int i = 1; i <= imax; i++)
         {
@@ -442,20 +442,20 @@ void FluidSimulator::refreshBoundaries()
 
 void FluidSimulator::simulate(real duration)
 {
-    VTKWriter vtkWriter (name_);
+    VTKWriter vtkWriter(name_);
 
     real t = 0;
     unsigned int n = 0;
-    
+
     PROG("initialize u, v, p, rhs");
-    if (name_ == "backstep") 
+    if (name_ == "backstep")
     {
-        int half = (int) ( rectYY_ / grid_.dy() );
-        for ( int i = 0; i < grid_.u().getSize(0); ++i )
+        int half = (int)(rectYY_ / grid_.dy());
+        for (int i = 0; i < grid_.u().getSize(0); ++i)
         {
-            for ( int j = 0; j < grid_.u().getSize(1); ++j )
+            for (int j = 0; j < grid_.u().getSize(1); ++j)
             {
-                if ( j > half )
+                if (j > half)
                 {
                     grid_.u()(i, j) = 1;
                 }
@@ -465,10 +465,10 @@ void FluidSimulator::simulate(real duration)
                 }
             }
         }
-    } 
-    else 
+    }
+    else
     {
-		grid_.u().fill(uInit_);
+        grid_.u().fill(uInit_);
     }
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
@@ -477,23 +477,24 @@ void FluidSimulator::simulate(real duration)
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-    if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0) 
-    {	// fill non obstacle cells with particles
+    if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0)
+    {
+        // fill non obstacle cells with particles
         for (int i = 1; i <= imax; ++i)
         {
             for (int j = 1; j <= jmax; ++j)
             {
-				if (!grid_.isObstacle(i,j))
-					particle_tracer_.fillCell(i,j,grid_.ppc(),0);
+                if (!grid_.isObstacle(i, j))
+                    particle_tracer_.fillCell(i, j, grid_.ppc(), 0);
             }
         }
     }
-    else 
+    else
     {
         particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectX2_particle_ / grid_.dy()), (int)(rectY1_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
         particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
     }
-        
+
     refreshBoundaries();
 
     while (t <= duration)
@@ -506,7 +507,7 @@ void FluidSimulator::simulate(real duration)
         determineNextDT(safetyfac_);
         //particle_tracer_.markCells();
         PROG(n << "'th timestep: set u, v, p at the free boundary");
-        set_UVP_surface(dt_,true);
+        set_UVP_surface(dt_, true);
         computeFG();
         PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
         composeRHS();
@@ -517,7 +518,7 @@ void FluidSimulator::simulate(real duration)
         PROG(n << "'th timestep: refresh boundaries");
         refreshBoundaries();
         PROG(n << "'th timestep: set u, v at the free boundary");
-        set_UVP_surface(dt_,false);
+        set_UVP_surface(dt_, false);
         //particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
@@ -534,25 +535,25 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     PROG("initialize u, v, p, rhs");
     if (name_ == "backstep")
     {
-	int half = (int)(rectYY_ / grid_.dy());
-	for (int i = 0; i < grid_.u().getSize(0); ++i)
-	{
-	    for (int j = 0; j < grid_.u().getSize(1); ++j)
-	    {
-			if (j > half)
-			{
-				grid_.u()(i, j) = 1;
-			}
-			else
-			{
-				grid_.u()(i, j) = 0;
-			}
-	    }
-	}
-    } 
+        int half = (int)(rectYY_ / grid_.dy());
+        for (int i = 0; i < grid_.u().getSize(0); ++i)
+        {
+            for (int j = 0; j < grid_.u().getSize(1); ++j)
+            {
+                if (j > half)
+                {
+                    grid_.u()(i, j) = 1;
+                }
+                else
+                {
+                    grid_.u()(i, j) = 0;
+                }
+            }
+        }
+    }
     else
     {
-		grid_.u().fill(uInit_);
+        grid_.u().fill(uInit_);
     }
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
@@ -561,22 +562,23 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial partciles");
-	if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0) 
-    {	// fill non obstacle cells with particles
+    if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0)
+    {
+        // fill non obstacle cells with particles
         for (int i = 1; i <= imax; ++i)
         {
             for (int j = 1; j <= jmax; ++j)
             {
-				if (!grid_.isObstacle(i,j))
-					particle_tracer_.fillCell(i,j,grid_.ppc(),0);
+                if (!grid_.isObstacle(i, j))
+                    particle_tracer_.fillCell(i, j, grid_.ppc(), 0);
             }
         }
     }
-    else 
+    else
     {
-		particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
-		particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
-	}
+        particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
+        particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
+    }
     grid_.createPng("test.png");
 
     refreshBoundaries();
@@ -591,7 +593,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         determineNextDT(safetyfac_);
         //particle_tracer_.markCells();
         PROG(n << "'th timestep: set u, v, p at the free boundary");
-        set_UVP_surface(dt_,true);
+        set_UVP_surface(dt_, true);
         computeFG();
         PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
         composeRHS();
@@ -602,7 +604,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         PROG(n << "'th timestep: refresh boundaries");
         refreshBoundaries();
         PROG(n << "'th timestep: set u, v at the free boundary");
-        set_UVP_surface(dt_,false);
+        set_UVP_surface(dt_, false);
         //particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
@@ -675,7 +677,7 @@ real FluidSimulator::dyuv(int i, int j)
     ASSERT_MSG((i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
     ASSERT_MSG((j - 1 >= 0), "wrong input for j: " << j);
     ASSERT_MSG((j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
-// 	real diag = grid_.v(i + 1, j - 1, DIAG);
+    //  real diag = grid_.v(i + 1, j - 1, DIAG);
     real diag = 0.0;
     if (grid_.isFluid(i + 1, j - 1))
     {
@@ -700,7 +702,7 @@ real FluidSimulator::dxuv(int i, int j)
     ASSERT_MSG((j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
     ASSERT_MSG((i - 1 >= 0), "wrong input for i: " << i);
     ASSERT_MSG((i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
-// 	real diag = grid_.u(i - 1, j + 1, DIAG);
+    //  real diag = grid_.u(i - 1, j + 1, DIAG);
     real diag = 0.0;
     if (grid_.isFluid(i - 1, j + 1))
     {

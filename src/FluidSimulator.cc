@@ -573,7 +573,10 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
             for (int j = 1; j <= jmax; ++j)
             {
                 if (!grid_.isObstacle(i, j))
+                {
                     particle_tracer_.fillCell(i, j, grid_.ppc(), 0);
+                    grid_.setCellToFluid(i,j) ;
+                }
             }
         }
     }

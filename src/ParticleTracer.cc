@@ -76,6 +76,8 @@ void ParticleTracer::addCircle(int x, int y, int r, int type)
 
 void ParticleTracer::fillCell(int x, int y, int numParticles, int type)
 {
+    grid_->setCellToFluid(x, y);
+
     real cellX = (x - 1) * grid_->dx();
     real cellY = (y - 1) * grid_->dy();
     // std::cout << "TRACER cellX,Y: " << cellX << ", " << cellY << std::endl;

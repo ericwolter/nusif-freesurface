@@ -119,6 +119,71 @@ void testInterpolatedCellsCorrect()
     CHECK(fabs(u - 0.5) < 1e-5);
 }
 
+void testMarkCellsNoParticles()
+{
+    StaggeredGrid grid(3, 3, 1, 1);
+    grid.u().fill(0.0);
+    grid.v().fill(0.0);
+
+    ParticleTracer tracer(&grid);
+
+    tracer.markCells();
+    for (int i = 1; i <= 3; ++i)
+    {
+        for (int j = 1; j <= 3; ++j)
+        {
+            CHECK(grid.isEmpty(i, j));
+        }
+    }
+}
+
+void testMarkCellsFullParticles()
+{
+    StaggeredGrid grid(3, 3, 1, 1);
+    grid.u().fill(0.0);
+    grid.v().fill(0.0);
+
+    ParticleTracer tracer(&grid);
+    tracer.addRectangle(0, 0, 3, 3, 0);
+
+    tracer.markCells();
+    for (int i = 1; i <= 3; ++i)
+    {
+        for (int j = 1; j <= 3; ++j)
+        {
+            CHECK(grid.isFluid(i, j));
+        }
+    }
+}
+
+void testMarkCellsPartialParticles() {
+
+    StaggeredGrid grid(3, 3, 1, 1);
+    grid.u().fill(0.0);
+    grid.v().fill(0.0);
+
+    ParticleTracer tracer(&grid);
+
+    // leave one column to the right empty
+    tracer.addRectangle(0, 0, 2, 3, 0);
+
+    tracer.markCells();
+    for (int i = 1; i <= 2; ++i)
+    {
+        for (int j = 1; j <= 3; ++j)
+        {
+            CHECK(grid.isFluid(i, j));
+        }
+    }
+    for (int i = 3; i <= 3; ++i)
+    {
+        for (int j = 1; j <= 3; ++j)
+        {
+            CHECK(grid.isEmpty(i, j));
+        }
+    }
+}
+
 int main()
 {
     testTotalNumber();
@@ -144,5 +209,15 @@ int main()
 
     testInterpolatedCellsCorrect();
     std::cout << "[TEST] Correct Interpolate Cells: OK" << std::endl;
+
+    testMarkCellsNoParticles();
+    std::cout << "[TEST] Marked Cells No Particles: OK" << std::endl;
+
+    testMarkCellsFullParticles();
+    std::cout << "[TEST] Marked Cells Full Particles: OK" << std::endl;
+
+    testMarkCellsPartialParticles();
+    std::cout << "[TEST] Marked Cells Partial Particles: OK" << std::endl;
+
     return 0;
 }

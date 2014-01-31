@@ -20,7 +20,7 @@ void ParticleTracer::markCells()
     {
         for (int j = 1; j <= grid_->jmax(); ++j)
         {
-            if (!grid_->isFluid(i, j)) continue;
+            if (grid_->isObstacle(i,j)) continue;
 
             grid_->setCellToEmpty(i, j);
         }

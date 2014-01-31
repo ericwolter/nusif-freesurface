@@ -14,7 +14,7 @@ GY                     -1.0			#
 
 Re                     40.0		# Reynolds number
 
-U_INIT                 0.0		   # initial value for velocity in x-direction
+U_INIT                 1.0		   # initial value for velocity in x-direction
 V_INIT                 0.0		   # initial value for velocity in y-direction
 P_INIT                 0.0		   # initial value for pressure
 
@@ -32,17 +32,17 @@ jmax                   30		   # number of interior cells in y-direction //Orgina
 # Initial Particle Position:
 # -------------
 
-RectangleX1                	0.0	 
-RectangleX2	                2.0      
-RectangleY1   	                0.0       
-RectangleY2                   	6.0
+RectangleParticleX1                	0.0	 
+RectangleParticleX2	                2.0      
+RectangleParticleY1   	            0.0       
+RectangleParticleY2                 6.0
 
 
 # Time Data:
 # ---------
 
 dt                     0.02      # time stepsize
-time                   0.0      # number of timesteps
+timesteps                   40      # number of timesteps
 safetyfactor           0.5       # factor "tau" for timestep size control (<=0 means constant dt)
 
 # Pressure Iteration Data:
@@ -58,6 +58,6 @@ normalizationfrequency 100       # every n'th time step in the fluid solver the 
 
 # VTK Visualization Data:
 # -----------------------
-outputinterval 5                 # every n'th time step the visualization should be printed to a file
+outputinterval 1                 # every n'th time step the visualization should be printed to a file
 
 #======================================================================================================================

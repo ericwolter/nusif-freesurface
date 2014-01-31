@@ -140,13 +140,13 @@ FluidSimulator::FluidSimulator(const FileReader &conf)
     // particle
     // rectangle
     rectX1_particle_ = conf.getRealParameter("RectangleParticleX1");
-    CHECK_MSG((rectX_ >= 0), "wrong input for RectangleX1: " << rectX_);
+    CHECK_MSG((rectX1_particle_ >= 0), "wrong input for RectangleParticleX1: " << rectX1_particle_);
     rectX2_particle_ = conf.getRealParameter("RectangleParticleX2");
-    CHECK_MSG((rectXX_ >= 0), "wrong input for RectangleX2: " << rectXX_);
+    CHECK_MSG((rectX2_particle_ >= 0), "wrong input for RectangleParticleX2: " << rectX2_particle_);
     rectY1_particle_ = conf.getRealParameter("RectangleParticleY1");
-    CHECK_MSG((rectY_ >= 0), "wrong input for RectangleY1: " << rectY_);
+    CHECK_MSG((rectY1_particle_ >= 0), "wrong input for RectangleParticleY1: " << rectY1_particle_);
     rectY2_particle_ = conf.getRealParameter("RectangleParticleY2");
-    CHECK_MSG((rectYY_ >= 0), "wrong input for RectangleY2: " << rectYY_);
+    CHECK_MSG((rectY2_particle_ >= 0), "wrong input for RectangleParticleY2: " << rectY2_particle_);
     // circle
     circX_particle_ = conf.getRealParameter("CircleParticleX");
     CHECK_MSG((circX_particle_ >= 0), "wrong input for CircleParticleX: " << circX_particle_);
@@ -495,6 +495,7 @@ void FluidSimulator::simulate(real duration)
         particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
     }
 
+    PROG("initial refreshBoundaries");
     refreshBoundaries();
 
     while (t <= duration)
@@ -558,12 +559,14 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     grid_.v().fill(vInit_);
     grid_.p().fill(pInit_);
     grid_.rhs().fill(0);
+
     PROG("set inner obstacles");
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial particles");
     if ((int)(rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_) == 0)
     {
+        PROG("no explicit particles defined -> fill all");
         // fill non obstacle cells with particles
         for (int i = 1; i <= imax; ++i)
         {
@@ -576,11 +579,13 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     }
     else
     {
+        PROG("adding particles");
         particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
         particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
     }
     grid_.createPng("test.png");
 
+    PROG("initial refreshBoundaries");
     refreshBoundaries();
 
     while (n <= nrOfTimeSteps)
@@ -589,22 +594,22 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         // if ( n%outPutInt == 0 && n != 0 )
         if (n % outPutInt == 0)
             vtkWriter.write(grid_, &particle_tracer_);
-        // PROG(n << "'th timestep: determine next dt");
-        // determineNextDT(safetyfac_);
-        //particle_tracer_.markCells();
-        // PROG(n << "'th timestep: set u, v, p at the free boundary");
-        // set_UVP_surface(dt_, true);
-        // computeFG();
-        // PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
-        // composeRHS();
-        // PROG(n << "'th timestep: solve pressure equation");
-        // solv().solve(grid_);
-        // PROG(n << "'th timestep: update u and v in fluid domain");
-        // updateVelocities();
-        // PROG(n << "'th timestep: refresh boundaries");
-        // refreshBoundaries();
-        // PROG(n << "'th timestep: set u, v at the free boundary");
-        // set_UVP_surface(dt_, false);
+        PROG(n << "'th timestep: determine next dt");
+        determineNextDT(safetyfac_);
+        particle_tracer_.markCells();
+        PROG(n << "'th timestep: set u, v, p at the free boundary");
+        set_UVP_surface(dt_, true);
+        computeFG();
+        PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
+        composeRHS();
+        PROG(n << "'th timestep: solve pressure equation");
+        solv().solve(grid_);
+        PROG(n << "'th timestep: update u and v in fluid domain");
+        updateVelocities();
+        PROG(n << "'th timestep: refresh boundaries");
+        refreshBoundaries();
+        PROG(n << "'th timestep: set u, v at the free boundary");
+        set_UVP_surface(dt_, false);
         particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();

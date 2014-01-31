@@ -38,10 +38,10 @@ jmax                   20		   # number of interior cells in y-direction //Orgina
 
 ppc				16
 
-RectangleX1                	0.0	 
-RectangleX2	                2.0      
-RectangleY1   	                0.0       
-RectangleY2                   	4.0
+RectangleParticleX1                	0.0	 
+RectangleParticleX2	                2.0      
+RectangleParticleY1   	            0.0       
+RectangleParticleY2                 4.0
 
 
 # Time Data:

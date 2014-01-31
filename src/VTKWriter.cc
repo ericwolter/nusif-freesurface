@@ -93,7 +93,6 @@ void VTKWriter::write(const StaggeredGrid &grid, const ParticleTracer *tracer)
         fileStreamParticles << "POINTS " << tracer->particles().size() << " " << RealTypeToString<real>::str << std::endl;
         for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
         {
-
             fileStreamParticles << std::fixed << std::setprecision(5) << p->x() - 0.5 * grid.dy() << " " << p->y() - 0.5 * grid.dy() << " 0\n";
         }
         fileStreamParticles << "CELLS 0 0" << std::endl;

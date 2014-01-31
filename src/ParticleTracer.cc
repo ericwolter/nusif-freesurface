@@ -20,7 +20,7 @@ void ParticleTracer::markCells()
     {
         for (int j = 1; j <= grid_->jmax(); ++j)
         {
-            if (grid_->isObstacle(i,j)) continue;
+            //if (grid_->isObstacle(i,j)) continue;
 
             grid_->setCellToEmpty(i, j);
         }
@@ -51,6 +51,8 @@ void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2, int type)
         {
             // std::cout << "TRACER fillCell: " << i + 1 << ", " << j + 1 << std::endl;
             this->fillCell(i + 1, j + 1, grid_->ppc(), type);
+            grid_->setCellToFluid(i, j);
+
         }
     }
 }
@@ -66,6 +68,8 @@ void ParticleTracer::addCircle(int x, int y, int r, int type)
         for (int j = -h; j < h; ++j)
         {
             this->fillCell(x + i, y + j, grid_->ppc(), type);
+            grid_->setCellToFluid(i, j);
+
         }
     }
 }

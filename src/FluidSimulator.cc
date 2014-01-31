@@ -584,7 +584,51 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
     }
     grid_.createPng("test.png");
-
+    particle_tracer_.markCells();
+    // Initialize
+	for (int i = 0; i < grid_.u().getSize(0); ++i)
+	{
+	    for (int j = 0; j < grid_.u().getSize(1); ++j)
+	    {
+	    	if(grid_.isFluid(i,j))
+	    	{
+	    		grid_.u() (i,j) =uInit_ ;
+	    	}
+	    	else
+	    	{
+	    		grid_.u() (i,j) =0.0 ;
+	    	}
+	    }
+	}
+	for (int i = 0; i < grid_.v().getSize(0); ++i)
+	{
+	    for (int j = 0; j < grid_.v().getSize(1); ++j)
+	    {
+	    	if(grid_.isFluid(i,j))
+	    	{
+	    		grid_.v() (i,j) =vInit_ ;
+	    	}
+	    	else
+	    	{
+	    		grid_.v() (i,j) =0.0 ;
+	    	}
+	    }
+	}
+	for (int i = 0; i < grid_.p().getSize(0); ++i)
+	{
+	    for (int j = 0; j < grid_.p().getSize(1); ++j)
+	    {
+	    	if(grid_.isFluid(i,j))
+	    	{
+	    		grid_.p() (i,j) =pInit_ ;
+	    	}
+	    	else
+	    	{
+	    		grid_.p() (i,j) =0.0 ;
+	    	}
+	    }
+	}
+    //
     PROG("initial refreshBoundaries");
     refreshBoundaries();
 

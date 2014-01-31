@@ -27,7 +27,7 @@ VTKWriter::VTKWriter(const std::string &basename)
 {
 }
 
-void VTKWriter::write(const StaggeredGrid &grid, const ParticleTracer *tracer)
+void VTKWriter::write(const StaggeredGrid &grid, const ParticleTracer & tracer)
 {
     std::stringstream fileNameFluid;
     fileNameFluid << baseName_ << "_" <<  std::setw(4) << std::setfill('0') << counter_ << "_fluid.vtk";
@@ -79,8 +79,8 @@ void VTKWriter::write(const StaggeredGrid &grid, const ParticleTracer *tracer)
         }
     }
 
-    if (tracer != NULL)
-    {
+   // if (tracer.end(() != NULL)
+   // {
         std::stringstream fileNameParticles;
         fileNameParticles << baseName_ << "_" <<  std::setw(4) << std::setfill('0') << counter_ << "_particles.vtk";
         std::ofstream fileStreamParticles(fileNameParticles.str().c_str());
@@ -90,24 +90,24 @@ void VTKWriter::write(const StaggeredGrid &grid, const ParticleTracer *tracer)
         fileStreamParticles << "ASCII\n";
         fileStreamParticles << "DATASET UNSTRUCTURED_GRID\n";
 
-        fileStreamParticles << "POINTS " << tracer->particles().size() << " " << RealTypeToString<real>::str << std::endl;
-        for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
+        fileStreamParticles << "POINTS " << tracer.particles().size() << " " << RealTypeToString<real>::str << std::endl;
+        for (std::vector<Particle>::const_iterator p = tracer.particles().begin() ; p != tracer.particles().end(); ++p)
         {
 
             fileStreamParticles << std::fixed << std::setprecision(5) << p->x() - 0.5 * grid.dy() << " " << p->y() - 0.5 * grid.dy() << " 0\n";
         }
         fileStreamParticles << "CELLS 0 0" << std::endl;
         fileStreamParticles << "CELL_TYPES 0" << std::endl;
-        fileStreamParticles << "POINT_DATA " << tracer->particles().size() << std::endl;
+        fileStreamParticles << "POINT_DATA " << tracer.particles().size() << std::endl;
         fileStreamParticles << "SCALARS type int" << RealTypeToString<real>::str << std::endl;
         fileStreamParticles << "LOOKUP_TABLE default" << std::endl;
-        for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
+        for (std::vector<Particle>::const_iterator p = tracer.particles().begin() ; p != tracer.particles().end(); ++p)
         {
             fileStreamParticles << p->type() << std::endl;
         }
 
         fileStreamParticles << "\n";
-    }
+   // }
 
     ++counter_;
 }

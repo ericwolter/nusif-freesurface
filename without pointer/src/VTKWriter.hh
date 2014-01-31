@@ -30,7 +30,7 @@ public:
 
     VTKWriter(const std::string &basename);
 
-    void write(const StaggeredGrid &grid, const ParticleTracer *tracer);
+    void write(const StaggeredGrid &grid, const ParticleTracer & tracer);
 
 private:
     std::string baseName_;

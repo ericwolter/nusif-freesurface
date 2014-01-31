@@ -33,6 +33,8 @@ void ParticleTracer::markCells()
 
         grid_->setCellToFluid(i, j);
     }
+
+    grid_->refreshEmpty();
 }
 
 void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2, int type)

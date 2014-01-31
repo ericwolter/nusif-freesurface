@@ -15,7 +15,7 @@ StaggeredGrid::StaggeredGrid(int xxSize, int yySize, real ddx, real ddy)
     ySize_ = yySize;
     imax_ = (int)(xSize_ / dx_);
     jmax_ = (int)(ySize_ / dy_);
-	ppc_ = 9;
+    ppc_ = 9;
 
     Array pp(imax_ + 2, jmax_ + 2);
     Array rhss(imax_, jmax_);
@@ -55,9 +55,9 @@ StaggeredGrid::StaggeredGrid(const FileReader &configuration)
     CHECK_MSG((iimax >= 0), "wrong input for imax: " << iimax);
     int jjmax = configuration.getIntParameter("jmax");
     CHECK_MSG((jjmax >= 0), "wrong input for jmax: " << jjmax);
-	int pppc = configuration.getIntParameter("ppc");
-	if (pppc <= 0)
-		pppc = 9;
+    int pppc = configuration.getIntParameter("ppc");
+    if (pppc <= 0)
+        pppc = 9;
 
     dx_ = xl / iimax;
     dy_ = yl / jjmax;
@@ -65,8 +65,8 @@ StaggeredGrid::StaggeredGrid(const FileReader &configuration)
     ySize_ = yl;
     imax_ = iimax;
     jmax_ = jjmax;
-	ppc_ = pppc;
-	
+    ppc_ = pppc;
+
     Array pp(imax_ + 2, jmax_ + 2);
     Array rhss(imax_, jmax_);
     Array uu(imax_ + 1, jmax_ + 2);
@@ -255,15 +255,32 @@ void StaggeredGrid::setCellToFluid(int x, int y)
 void StaggeredGrid::setCellToEmpty(int x, int y)
 {
     obs_(x, y) = EMPTY; // set cell to empty
-    if (x < u_.getSize(0) && y < u_.getSize(1))
-        u_(x, y) = 0;
-    if (x < v_.getSize(0) && y < v_.getSize(1))
-        v_(x, y) = 0;
+}
+
+void StaggeredGrid::refreshEmpty()
+{
+    for (int i = 1; i <= imax_; ++i)
+    {
+        for (int j = 1; j <= jmax_; ++j)
+        {
+            if(!isEmpty(i,j)) continue;
+            
+            // TODO: why exactly do we need these checks?
+            if (i < u_.getSize(0) && j < u_.getSize(1))
+                u_(i, j) = 0;
+            if (i < v_.getSize(0) && j < v_.getSize(1))
+                v_(i, j) = 0;
+        }
+    }
 }
 
 void StaggeredGrid::setCellToObstacle(int x, int y)
 {
     obs_(x, y) = OBS; // set cell to obstacle
+
+    // it is okay to set the velocities of obstacles right here
+    // because they are never updated or moved
+    // this IS NOT the case for empty cells which change constantly
     if (x < u_.getSize(0) && y < u_.getSize(1))
         u_(x, y) = 0;
     if (x < v_.getSize(0) && y < v_.getSize(1))

@@ -155,6 +155,7 @@ public:
 
     void setCellToFluid(int x, int y);
     void setCellToEmpty(int x, int y);
+    void refreshEmpty();
     void setCellToObstacle(int x, int y);
     void createRectangle(real x1, real y1, real x2, real y2);
     void createCircle(real x, real y, real r);

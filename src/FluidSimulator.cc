@@ -561,7 +561,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     PROG("set inner obstacles");
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
-    PROG("set initial partciles");
+    PROG("set initial particles");
     if ((int)(rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_) == 0)
     {
         // fill non obstacle cells with particles
@@ -589,23 +589,23 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         // if ( n%outPutInt == 0 && n != 0 )
         if (n % outPutInt == 0)
             vtkWriter.write(grid_, &particle_tracer_);
-        PROG(n << "'th timestep: determine next dt");
-        determineNextDT(safetyfac_);
+        // PROG(n << "'th timestep: determine next dt");
+        // determineNextDT(safetyfac_);
         //particle_tracer_.markCells();
-        PROG(n << "'th timestep: set u, v, p at the free boundary");
-        set_UVP_surface(dt_, true);
-        computeFG();
-        PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
-        composeRHS();
-        PROG(n << "'th timestep: solve pressure equation");
-        solv().solve(grid_);
-        PROG(n << "'th timestep: update u and v in fluid domain");
-        updateVelocities();
-        PROG(n << "'th timestep: refresh boundaries");
-        refreshBoundaries();
-        PROG(n << "'th timestep: set u, v at the free boundary");
-        set_UVP_surface(dt_, false);
-        //particle_tracer_.advanceParticles(dt_);
+        // PROG(n << "'th timestep: set u, v, p at the free boundary");
+        // set_UVP_surface(dt_, true);
+        // computeFG();
+        // PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
+        // composeRHS();
+        // PROG(n << "'th timestep: solve pressure equation");
+        // solv().solve(grid_);
+        // PROG(n << "'th timestep: update u and v in fluid domain");
+        // updateVelocities();
+        // PROG(n << "'th timestep: refresh boundaries");
+        // refreshBoundaries();
+        // PROG(n << "'th timestep: set u, v at the free boundary");
+        // set_UVP_surface(dt_, false);
+        particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
         n++;

@@ -58,6 +58,7 @@ private:
     void updateVelocities();
     void determineNextDT(real const &limit);
     void refreshBoundaries();
+	void refreshObsBoundaries();
 
     // compute surface boundary
     void set_UVP_surface(const real &dt, bool compP);

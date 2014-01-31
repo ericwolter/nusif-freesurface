@@ -56,7 +56,8 @@ StaggeredGrid::StaggeredGrid(const FileReader &configuration)
     int jjmax = configuration.getIntParameter("jmax");
     CHECK_MSG((jjmax >= 0), "wrong input for jmax: " << jjmax);
 	int pppc = configuration.getIntParameter("ppc");
-    CHECK_MSG((pppc > 0), "wrong input for ppc: " << pppc);
+	if (pppc <= 0)
+		pppc = 9;
 
     dx_ = xl / iimax;
     dy_ = yl / jjmax;

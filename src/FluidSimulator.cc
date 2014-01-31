@@ -589,7 +589,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
             vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT(safetyfac_);
-        particle_tracer_.markCells();
+        //particle_tracer_.markCells();
         PROG(n << "'th timestep: set u, v, p at the free boundary");
         set_UVP_surface(dt_,true);
         computeFG();
@@ -603,7 +603,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
         refreshBoundaries();
         PROG(n << "'th timestep: set u, v at the free boundary");
         set_UVP_surface(dt_,false);
-        particle_tracer_.advanceParticles(dt_);
+        //particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
         n++;
@@ -675,6 +675,7 @@ real FluidSimulator::dyuv(int i, int j)
     ASSERT_MSG((i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
     ASSERT_MSG((j - 1 >= 0), "wrong input for j: " << j);
     ASSERT_MSG((j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
+// 	real diag = grid_.v(i + 1, j - 1, DIAG);
     real diag = 0.0;
     if (grid_.isFluid(i + 1, j - 1))
     {
@@ -699,6 +700,7 @@ real FluidSimulator::dxuv(int i, int j)
     ASSERT_MSG((j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
     ASSERT_MSG((i - 1 >= 0), "wrong input for i: " << i);
     ASSERT_MSG((i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
+// 	real diag = grid_.u(i - 1, j + 1, DIAG);
     real diag = 0.0;
     if (grid_.isFluid(i - 1, j + 1))
     {
@@ -993,6 +995,7 @@ void FluidSimulator::set_UVP_surface(int i, int j , const real &dt, bool compP)
 
 //*******************************************************************************************************************
 
+// TODO: diag wrapper usage
 void FluidSimulator::one_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
     // According to page 92 ,case 1 of the book

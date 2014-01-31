@@ -10,7 +10,7 @@ typedef double real;
 typedef enum { NOSLIP, SLIP, INFLOW, OUTFLOW, PERIODIC } BCTYPE;
 
 // Directions
-typedef enum {NORTH, EAST, SOUTH, WEST} Direction;
+typedef enum {NORTH, EAST, SOUTH, WEST, DIAG} Direction;
 
 // Flags
 typedef unsigned char flag;

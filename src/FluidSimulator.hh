@@ -58,7 +58,7 @@ public:
     void testFG();
 
     // only public for tests
-    void set_UVP_surface(int i, int j , const real &dt, bool compP);
+    void set_UVP_surface(const real &dt, bool compP);
 
 private:
     // helper functions (derivatives)
@@ -72,7 +72,7 @@ private:
     void refreshBoundaries();
 
     // compute surface boundary
-    void set_UVP_surface(const real &dt, bool compP);
+    void set_UVP_surface(int i, int j , const real &dt, bool compP);
     void one_empty_neighbour(int i , int j , const real &dt, bool compP) ;
     void two_empty_neighbour(int i , int j , const real &dt, bool compP) ;
     void three_empty_neighbour(int i , int j , const real &dt, bool compP) ;

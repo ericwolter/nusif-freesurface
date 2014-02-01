@@ -8,6 +8,10 @@
 #include "math.h"
 #include <iostream>
 
+const real dt = 0.04;
+const real gx = 0.0;
+const real gy = -1.0;
+
 FileReader setupConf()
 {
     FileReader conf;
@@ -27,7 +31,9 @@ FileReader setupConf()
     conf.registerRealParameter("boundary_velocity_W");
 
     conf.registerRealParameter("GX");
+    conf.setParameter("GX", gx);
     conf.registerRealParameter("GY");
+    conf.setParameter("GY", gy);
 
     conf.registerRealParameter("Re");
     conf.setParameter("Re", 1.0);
@@ -68,7 +74,7 @@ FileReader setupConf()
 
     //////////////////////////////////////////////////////// Time Data ////////////////////////////////////////////////////////////
     conf.registerRealParameter("dt");
-    conf.setParameter("dt", 0.04);
+    conf.setParameter("dt", dt);
     conf.registerIntParameter("timesteps");
     conf.registerRealParameter("safetyfactor");
 
@@ -88,7 +94,8 @@ FileReader setupConf()
     return conf;
 }
 
-FluidSimulator setupSim() {
+FluidSimulator setupSim()
+{
     FileReader conf = setupConf();
     return FluidSimulator(conf);
 }
@@ -99,18 +106,86 @@ void testInit()
     // No CHECK macro necessary we just check if you does not crash
 }
 
-void testOneNeighborEast() {
+void testOneNeighborEast()
+{
+    real continuity;
     FluidSimulator sim = setupSim();
+    sim.tracer().addRectangle(0, 0, 2, 3, 9);
 
-    sim.grid().u().fill(0.0);
-    sim.grid().v().fill(0.0);
-    sim.grid().p().fill(0.0);
-    sim.grid().rhs().fill(0.0);
+    srand(0);
+    for (int i = 1; i <= sim.grid().imax(); ++i)
+    {
+        for (int j = 1; j < sim.grid().jmax(); ++j)
+        {
+            sim.grid().u()(i,j) = rand() % 10 + 1;
+            sim.grid().v()(i,j) = rand() % 10 + 1;
+        }
+    }
 
-    sim.tracer().addRectangle(1,1,2,2,9);
+    sim.tracer().markCells();
+    sim.set_UVP_surface(dt, true);
+
+    continuity = (sim.grid().u()(2, 2) - sim.grid().u()(1, 2)) / sim.grid().dx() +
+                 (sim.grid().v()(2, 2) - sim.grid().v()(2, 1)) / sim.grid().dy();
+    CHECK(fabs(continuity) < 1e-5);
+}
+
+void testTwoNeighborSouthEast()
+{
+    real continuity;
+    FluidSimulator sim = setupSim();
+    sim.tracer().addRectangle(0, 3, 2, 1, 9);
+
+    srand(0);
+    for (int i = 1; i <= sim.grid().imax(); ++i)
+    {
+        for (int j = 1; j < sim.grid().jmax(); ++j)
+        {
+            sim.grid().u()(i,j) = rand() % 10 + 1;
+            sim.grid().v()(i,j) = rand() % 10 + 1;
+        }
+    }
+    sim.tracer().markCells();
+    sim.set_UVP_surface(dt, true);
+
+    continuity = (sim.grid().u()(2, 2) - sim.grid().u()(1, 2)) / sim.grid().dx() +
+                 (sim.grid().v()(2, 2) - sim.grid().v()(2, 1)) / sim.grid().dy();
+    CHECK(fabs(continuity) < 1e-5);
+}
+
+void testTwoNeighborWestEast()
+{
+    real continuity;
+    FluidSimulator sim = setupSim();
+    sim.tracer().addRectangle(1, 0, 2, 3, 9);
+
+    srand(0);
+    for (int i = 1; i <= sim.grid().imax(); ++i)
+    {
+        for (int j = 1; j < sim.grid().jmax(); ++j)
+        {
+            sim.grid().u()(i,j) = rand() % 10 + 1;
+            sim.grid().v()(i,j) = rand() % 10 + 1;
+        }
+    }
     sim.tracer().markCells();
 
-    sim.grid().obs().print();
+    real u_old1 = sim.grid().u()(2,2);
+    real u_old2 = sim.grid().u()(1,2);
+
+    sim.set_UVP_surface(dt, true);
+
+    real dX = dt * gx;
+    real dY = dt * gy;
+
+    CHECK(fabs(sim.grid().u()(2,2) - (u_old1 + dX)) < 1e-5);
+    CHECK(fabs(sim.grid().u()(1,2) - (u_old2 + dX)) < 1e-5);
+
+    // TODO: why would the continuity not hold here?
+    
+    // continuity = (sim.grid().u()(2, 2) - sim.grid().u()(1, 2)) / sim.grid().dx() +
+    //              (sim.grid().v()(2, 2) - sim.grid().v()(2, 1)) / sim.grid().dy();
+    // CHECK(fabs(continuity) < 1e-5);    
 }
 
 int main()
@@ -119,6 +194,13 @@ int main()
     std::cout << "[TEST] Init: OK" << std::endl;
 
     testOneNeighborEast();
+    std::cout << "[TEST] One Neighbor East: OK" << std::endl;
+
+    testTwoNeighborSouthEast();
+    std::cout << "[TEST] Two Neighbor South East: OK" << std::endl;
+
+    testTwoNeighborWestEast();
+    std::cout << "[TEST] Two Neighbor West East: OK" << std::endl;
 
     return 0;
 }

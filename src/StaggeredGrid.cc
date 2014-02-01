@@ -204,6 +204,8 @@ void StaggeredGrid::refreshEmpty()
         {
             if(!isEmpty(i,j)) continue;
 
+            p_(i,j) = 0;
+
             if(!isFluid(i+1,j)) {
                 u_(i, j) = 0;
             }

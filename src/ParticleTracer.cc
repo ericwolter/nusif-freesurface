@@ -20,7 +20,7 @@ void ParticleTracer::markCells()
     {
         for (int j = 1; j <= grid_->jmax(); ++j)
         {
-            if (grid_->isObstacle(i,j)) continue;
+            if (grid_->isObstacle(i, j)) continue;
 
             grid_->setCellToEmpty(i, j);
         }
@@ -75,7 +75,7 @@ void ParticleTracer::fillCell(int x, int y, int numParticles, int type)
     real cellX = (x - 1) * grid_->dx();
     real cellY = (y - 1) * grid_->dy();
     // std::cout << "TRACER cellX,Y: " << cellX << ", " << cellY << std::endl;
-    
+
     int particlesPerSide = (int)(sqrt(numParticles));
     // std::cout << "TRACER particlesPerSide: " << particlesPerSide << std::endl;
 
@@ -157,10 +157,10 @@ real ParticleTracer::interpolateU(real x, real y)
 
     // TODO: use u accessor function to incooperate obstacles
     real u1, u2, u3, u4;
-    u1 = grid_->u()(i - 1 , j - 1 );
-    u2 = grid_->u()(i     , j - 1 );
-    u3 = grid_->u()(i - 1 , j     );
-    u4 = grid_->u()(i     , j     );
+    u1 = grid_->u(i - 1 , j - 1 , DIAG);
+    u2 = grid_->u(i     , j - 1 , NORTH);
+    u3 = grid_->u(i - 1 , j     , EAST);
+    u4 = grid_->u()(i     , j);
     // std::cout << "interpolateU u1,u2: " << u1 << ", " << u2 << std::endl;
     // std::cout << "interpolateU u3,u4: " << u3 << ", " << u4 << std::endl;
 
@@ -193,10 +193,10 @@ real ParticleTracer::interpolateV(real x, real y)
 
     // TODO: use u accessor function to incooperate obstacles
     real v1, v2, v3, v4;
-    v1 = grid_->v()(i - 1 , j - 1 );
-    v2 = grid_->v()(i     , j - 1 );
-    v3 = grid_->v()(i - 1 , j     );
-    v4 = grid_->v()(i     , j     );
+    v1 = grid_->v(i - 1 , j - 1 , DIAG);
+    v2 = grid_->v(i     , j - 1 , NORTH);
+    v3 = grid_->v(i - 1 , j     , EAST);
+    v4 = grid_->v()(i     , j);
 
     real v = (1 / (grid_->dx() * grid_->dy())) * (
                  (x2 - x) * (y2 - y) * v1 +

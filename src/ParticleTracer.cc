@@ -106,29 +106,29 @@ void ParticleTracer::advanceParticles(real const dt)
 {
     PROG("advancing particles");
 
-    grid_->u().print();
-    grid_->v().print();
+//     grid_->u().print();
+//     grid_->v().print();
 
     for (unsigned int i = 0; i < particles_.size(); ++i)
     {
         Particle *p = &particles_[i];
         real u = interpolateU(p->x(), p->y());
         real v = interpolateV(p->x(), p->y());
-        std::cout << "TRACER u,v: " << u << ", " << v << std::endl;
+        //std::cout << "TRACER u,v: " << u << ", " << v << std::endl;
 
-        std::cout << "TRACER oldPosX,Y: " << p->x() << ", " << p->y() << std::endl;
+        //std::cout << "TRACER oldPosX,Y: " << p->x() << ", " << p->y() << std::endl;
         p->setX(p->x() + dt * u);
         p->setY(p->y() + dt * v);
-        std::cout << "TRACER newPosX,Y: " << p->x() << ", " << p->y() << std::endl;
+        //std::cout << "TRACER newPosX,Y: " << p->x() << ", " << p->y() << std::endl;
 
         int newCellX = p->getCellX(grid_->dx());
         int newCellY = p->getCellY(grid_->dy());
-        std::cout << "TRACER cellX,Y: " << newCellX << ", " << newCellY << std::endl;
+        //std::cout << "TRACER cellX,Y: " << newCellX << ", " << newCellY << std::endl;
 
         // if the particle moved into an obstacle cell or outside the domain just delete it
         bool isOutsideDomain = newCellX < 1 || newCellX > grid_->imax() || newCellY < 1 || newCellY > grid_->jmax();
         bool isObstacle = grid_->isObstacle(newCellX, newCellY);
-        std::cout << "TRACER outside: " << isOutsideDomain << ", " << isObstacle << std::endl;
+        //std::cout << "TRACER outside: " << isOutsideDomain << ", " << isObstacle << std::endl;
 
         if (isOutsideDomain || isObstacle)
         {

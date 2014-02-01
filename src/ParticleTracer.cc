@@ -153,10 +153,10 @@ real ParticleTracer::interpolateU(real x, real y)
 
     // TODO: use u accessor function to incooperate obstacles
     real u1, u2, u3, u4;
-    u1 = grid_->u(i - 1 , j - 1 , EAST);
-    u2 = grid_->u(i     , j - 1 , WEST);
-    u3 = grid_->u(i - 1 , j     , EAST);
-    u4 = grid_->u(i     , j     , WEST);
+    u1 = grid_->u()(i - 1 , j - 1 );
+    u2 = grid_->u()(i     , j - 1 );
+    u3 = grid_->u()(i - 1 , j     );
+    u4 = grid_->u()(i     , j     );
     // std::cout << "interpolateU u1,u2: " << u1 << ", " << u2 << std::endl;
     // std::cout << "interpolateU u3,u4: " << u3 << ", " << u4 << std::endl;
 
@@ -189,10 +189,10 @@ real ParticleTracer::interpolateV(real x, real y)
 
     // TODO: use u accessor function to incooperate obstacles
     real v1, v2, v3, v4;
-    v1 = grid_->v(i - 1 , j - 1 , NORTH);
-    v2 = grid_->v(i     , j - 1 , NORTH);
-    v3 = grid_->v(i - 1 , j     , SOUTH);
-    v4 = grid_->v(i     , j     , SOUTH);
+    v1 = grid_->v()(i - 1 , j - 1 );
+    v2 = grid_->v()(i     , j - 1 );
+    v3 = grid_->v()(i - 1 , j     );
+    v4 = grid_->v()(i     , j     );
 
     real v = (1 / (grid_->dx() * grid_->dy())) * (
                  (x2 - x) * (y2 - y) * v1 +

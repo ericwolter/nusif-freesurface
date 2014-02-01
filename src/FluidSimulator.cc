@@ -1322,7 +1322,7 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
         if (compP)
             grid_.p()(i, j) = 0.0 ;
         grid_.v()(i, j) += gy_ * dt ;
-        grid_.v()(i, j - 1) = grid_.u(i, j - 1, NORTH) + gy_ * dt ;
+        grid_.v()(i, j - 1) = grid_.v(i, j - 1, NORTH) + gy_ * dt ;
         grid_.u()(i - 1, j) = grid_.u()(i, j) + (grid_.dx() / grid_.dy()) * (grid_.v()(i, j) - grid_.v(i, j - 1, NORTH)) ;
 
         grid_.u()(i - 1, j + 1)   = grid_.u(i - 1, j, EAST) ;

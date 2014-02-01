@@ -42,6 +42,15 @@ public:
         return solver_;
     };
 
+    ParticleTracer &tracer()
+    {
+        return particle_tracer_;
+    };
+    const ParticleTracer &tracer() const
+    {
+        return particle_tracer_;
+    };
+
 
     void backstep_test();
     void normalization();

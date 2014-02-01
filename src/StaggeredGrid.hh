@@ -294,18 +294,18 @@ inline real StaggeredGrid::u(const int x, const int y, Direction dir)
 // 	if (!( (x + 1 < u_.getSize(0)) && (x >= 0) && (y >= 0) && (y < u_.getSize(1)) ))
 // 		return 0; // desert index out of bounds
 	
-    if (isFluid(x, y) && isFluid(x + 1, y))
+    if (!isObstacle(x, y) && !isObstacle(x + 1, y))
         return u_(x, y);
 
     if (dir == NORTH /*&& (y + 1 < u_.getSize(1))*/) // desert index out of bounds
     {
-        if (!isFluid(x, y) && !isFluid(x + 1, y))
+        if (isObstacle(x, y) && isObstacle(x + 1, y))
             return -u_(x, y + 1);
     }
 
     if (dir == SOUTH /*&& (y - 1 >= 0)*/) // desert index out of bounds
     {
-        if (!isFluid(x, y) && !isFluid(x + 1, y))
+        if (isObstacle(x, y) && isObstacle(x + 1, y))
             return -u_(x, y - 1);
     }
     
@@ -333,18 +333,18 @@ inline real StaggeredGrid::v(const int x, const int y, Direction dir)
 // 	if (!( (y + 1 < v_.getSize(1)) && (y >= 0) && (x >= 0) && (x < v_.getSize(0)) ))
 // 		return 0; // desert index out of bounds
 		
-    if (isFluid(x, y) && isFluid(x, y + 1))
+    if (!isObstacle(x, y) && !isObstacle(x, y + 1))
         return v_(x, y);
 
     if (dir == WEST /*&& (x - 1 >= 0)*/) // desert index out of bounds
     {
-        if (!isFluid(x, y) && !isFluid(x, y + 1))
+        if (isObstacle(x, y) && isObstacle(x, y + 1))
             return -v_(x - 1, y);
     }
 
     if (dir == EAST /*&& (x + 1 < v_.getSize(0))*/) // desert index out of bounds
     {
-        if (!isFluid(x, y) && !isFluid(x, y + 1))
+        if (isObstacle(x, y) && isObstacle(x, y + 1))
             return -v_(x + 1, y);
     }
     
@@ -370,7 +370,7 @@ inline real StaggeredGrid::v(const int x, const int y, Direction dir)
 
 inline real StaggeredGrid::p(const int x, const int y, Direction dir)
 {
-    if (!isFluid(x, y))
+    if (isObstacle(x, y))
     {
         if (dir == NORTH)
         {
@@ -393,28 +393,28 @@ inline real StaggeredGrid::p(const int x, const int y, Direction dir)
         }
         else // diagonal 
 		{
-			if (isFluid(x + 1, y) && isFluid(x, y + 1)) // NE boundary of obstacle
+			if (!isObstacle(x + 1, y) && !isObstacle(x, y + 1)) // NE boundary of obstacle
 				return 0.5*(p_(x + 1, y) + p_(x, y + 1));
 			
-			if (isFluid(x - 1, y) && isFluid(x, y + 1)) // NW boundary of obstacle
+			if (!isObstacle(x - 1, y) && !isObstacle(x, y + 1)) // NW boundary of obstacle
 				return 0.5*(p_(x - 1, y) + p_(x, y + 1));
 		
-			if (isFluid(x + 1, y) && isFluid(x, y - 1)) // SE boundary of obstacle
+			if (!isObstacle(x + 1, y) && !isObstacle(x, y - 1)) // SE boundary of obstacle
 				return 0.5*(p_(x + 1, y) + p_(x, y - 1));
 			
-			if (isFluid(x - 1, y) && isFluid(x, y + 1)) // SW boundary of obstacle
+			if (!isObstacle(x - 1, y) && !isObstacle(x, y + 1)) // SW boundary of obstacle
 				return 0.5*(p_(x - 1, y) + p_(x, y + 1));
 			
-			if (isFluid(x, y + 1)) // N boundary of obstacle
+			if (!isObstacle(x, y + 1)) // N boundary of obstacle
 				return p_(x, y + 1);
 			
-			if (isFluid(x, y - 1)) // S boundary of obstacle
+			if (!isObstacle(x, y - 1)) // S boundary of obstacle
 				return p_(x, y - 1);
 		
-			if (isFluid(x + 1, y)) // E boundary of obstacle
+			if (!isObstacle(x + 1, y)) // E boundary of obstacle
 				return p_(x + 1, y);
 			
-			if (isFluid(x - 1, y)) // W boundary of obstacle
+			if (!isObstacle(x - 1, y)) // W boundary of obstacle
 				return p_(x - 1, y);
 		}
     }

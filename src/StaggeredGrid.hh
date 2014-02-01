@@ -206,9 +206,9 @@ inline bool StaggeredGrid::isObstacle(const int x, const int y)
 inline int StaggeredGrid::getNumFluid()
 {
     int sum = 0;
-    for (int i = 0; i < obs_.getSize(0); ++i)
+    for (int i = 0; i < imax_; ++i)
     {
-        for (int j = 0; j < obs_.getSize(1); ++j)
+        for (int j = 0; j < jmax_; ++j)
         {
             if (isFluid(i, j))
                 ++sum;

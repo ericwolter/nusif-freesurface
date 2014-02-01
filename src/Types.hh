@@ -13,7 +13,7 @@ typedef enum { NOSLIP, SLIP, INFLOW, OUTFLOW, PERIODIC } BCTYPE;
 typedef enum {NORTH, EAST, SOUTH, WEST, DIAG} Direction;
 
 // Flags
-typedef unsigned char flag;
+typedef unsigned int flag;
 
 const flag OBS = 1 << 0; // OBS = OBSCENTER(old)
 const flag FLUID = 1 << 1; // FLUID = FREE(old)

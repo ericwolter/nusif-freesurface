@@ -22,7 +22,7 @@ void ParticleTracer::markCells()
         {
             if (grid_->isObstacle(i,j)) continue;
 
-            // grid_->setCellToEmpty(i, j);
+            grid_->setCellToEmpty(i, j);
         }
     }
 
@@ -34,7 +34,7 @@ void ParticleTracer::markCells()
         grid_->setCellToFluid(i, j);
     }
 
-    grid_->refreshEmpty();
+    //grid_->refreshEmpty();
 }
 
 void ParticleTracer::addRectangle(int x1, int y1, int x2, int y2, int type)
@@ -75,7 +75,7 @@ void ParticleTracer::fillCell(int x, int y, int numParticles, int type)
     real cellX = (x - 1) * grid_->dx();
     real cellY = (y - 1) * grid_->dy();
     // std::cout << "TRACER cellX,Y: " << cellX << ", " << cellY << std::endl;
-
+    
     int particlesPerSide = (int)(sqrt(numParticles));
     // std::cout << "TRACER particlesPerSide: " << particlesPerSide << std::endl;
 
@@ -106,25 +106,29 @@ void ParticleTracer::advanceParticles(real const dt)
 {
     PROG("advancing particles");
 
+    grid_->u().print();
+    grid_->v().print();
+
     for (unsigned int i = 0; i < particles_.size(); ++i)
     {
         Particle *p = &particles_[i];
         real u = interpolateU(p->x(), p->y());
         real v = interpolateV(p->x(), p->y());
+        std::cout << "TRACER u,v: " << u << ", " << v << std::endl;
 
-        // std::cout << "TRACER oldPosX,Y: " << p->x() << ", " << p->y() << std::endl;
+        std::cout << "TRACER oldPosX,Y: " << p->x() << ", " << p->y() << std::endl;
         p->setX(p->x() + dt * u);
         p->setY(p->y() + dt * v);
-        // std::cout << "TRACER newPosX,Y: " << p->x() << ", " << p->y() << std::endl;
+        std::cout << "TRACER newPosX,Y: " << p->x() << ", " << p->y() << std::endl;
 
         int newCellX = p->getCellX(grid_->dx());
         int newCellY = p->getCellY(grid_->dy());
-        // std::cout << "TRACER cellX,Y: " << newCellX << ", " << newCellY << std::endl;
+        std::cout << "TRACER cellX,Y: " << newCellX << ", " << newCellY << std::endl;
 
         // if the particle moved into an obstacle cell or outside the domain just delete it
         bool isOutsideDomain = newCellX < 1 || newCellX > grid_->imax() || newCellY < 1 || newCellY > grid_->jmax();
         bool isObstacle = grid_->isObstacle(newCellX, newCellY);
-        // std::cout << "TRACER outside: " << isOutsideDomain << ", " << isObstacle << std::endl;
+        std::cout << "TRACER outside: " << isOutsideDomain << ", " << isObstacle << std::endl;
 
         if (isOutsideDomain || isObstacle)
         {

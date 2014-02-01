@@ -1277,10 +1277,16 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
         grid_.u()(i - 1, j) = grid_.u(i - 1, j, EAST) + gx_ * dt ;
         grid_.v()(i, j) = grid_.v(i, j - 1, NORTH) - (grid_.dy() / grid_.dx()) * (grid_.u()(i, j) - grid_.u(i - 1, j, EAST)) ;
 
-        grid_.u()(i - 1, j + 1) = grid_.u(i - 1, j, EAST) ;
-        grid_.u()(i, j + 1)   = grid_.u()(i, j) ;
-        grid_.v()(i + 1, j)   = grid_.v()(i, j) ;
-        grid_.v()(i - 1, j)   = grid_.v()(i, j) ;
+		if (grid_.isEmpty(i - 1, j + 1))
+		{
+			grid_.u()(i, j + 1)   = grid_.u()(i, j) ;
+			grid_.v()(i - 1, j)   = grid_.v()(i, j) ;
+		}
+		if (grid_.isEmpty(i + 1, j + 1))
+		{
+			grid_.u()(i - 1, j + 1) = grid_.u(i - 1, j, EAST) ;
+			grid_.v()(i + 1, j)   = grid_.v()(i, j) ;
+		}
 
         if (grid_.isEmpty(i + 1, j - 1))
             grid_.v()(i + 1, j - 1) = grid_.v(i, j - 1, NORTH) - (grid_.dx() / grid_.dy()) * (grid_.u()(i, j) - grid_.u(i, j - 1, NORTH)) ;
@@ -1304,16 +1310,23 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
         grid_.u()(i - 1, j) = grid_.u(i - 1, j, EAST) + gx_ * dt ;
         grid_.v()(i, j - 1) = grid_.v()(i, j) + (grid_.dy() / grid_.dx()) * (grid_.u()(i, j) - grid_.u(i - 1, j, EAST)) ;
 
-        grid_.u()(i - 1, j - 1)   = grid_.u(i - 1, j, EAST) ;
-        grid_.u()(i, j - 1)     = grid_.u()(i, j) ;
-        grid_.v()(i + 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
-        grid_.v()(i - 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		if (grid_.isEmpty(i - 1, j - 1))
+		{
+			grid_.u()(i - 1, j - 1)   = grid_.u(i - 1, j, EAST) ;
+			grid_.v()(i - 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		}
+		if (grid_.isEmpty(i + 1, j - 1))
+		{
+			grid_.u()(i, j - 1)     = grid_.u()(i, j) ;
+			grid_.v()(i + 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		}
+        
 
-        if (grid_.isEmpty(i + 1, j + 1))   /////////////// no values ////////////////////
-            grid_.v()(i + 1, j) = grid_.v()(i, j) + (grid_.dx() / grid_.dy()) * (grid_.u(i, j + 1, SOUTH) - grid_.u()(i, j)) ;
-
-        if (grid_.isEmpty(i - 1, j + 1))
-            grid_.v()(i - 1, j) = grid_.v()(i, j) - (grid_.dx() / grid_.dy()) * (grid_.u(i - 1, j + 1, DIAG) - grid_.u(i - 1, j, EAST)) ;
+//         if (grid_.isEmpty(i + 1, j + 1))   /////////////// no values ////////////////////
+//             grid_.v()(i + 1, j) = grid_.v()(i, j) + (grid_.dx() / grid_.dy()) * (grid_.u(i, j + 1, SOUTH) - grid_.u()(i, j)) ;
+// 
+//         if (grid_.isEmpty(i - 1, j + 1))
+//             grid_.v()(i - 1, j) = grid_.v()(i, j) - (grid_.dx() / grid_.dy()) * (grid_.u(i - 1, j + 1, DIAG) - grid_.u(i - 1, j, EAST)) ;
     }
 
     // cell(i-1,j) , cell(i,j-1) , cell(i,j+1) are empty WSN
@@ -1325,16 +1338,22 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
         grid_.v()(i, j - 1) = grid_.v(i, j - 1, NORTH) + gy_ * dt ;
         grid_.u()(i - 1, j) = grid_.u()(i, j) + (grid_.dx() / grid_.dy()) * (grid_.v()(i, j) - grid_.v(i, j - 1, NORTH)) ;
 
-        grid_.u()(i - 1, j + 1)   = grid_.u(i - 1, j, EAST) ;
-        grid_.u()(i - 1, j - 1)   = grid_.u(i - 1, j, EAST) ;
-        grid_.v()(i - 1, j)     = grid_.v()(i, j) ;
-        grid_.v()(i - 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		if (grid_.isEmpty(i - 1, j + 1))
+		{
+			grid_.u()(i - 1, j + 1)   = grid_.u(i - 1, j, EAST) ;
+			grid_.v()(i - 1, j)     = grid_.v()(i, j) ;
+		}
+		if (grid_.isEmpty(i - 1, j - 1))
+		{
+			grid_.u()(i - 1, j - 1)   = grid_.u(i - 1, j, EAST) ; 
+			grid_.v()(i - 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		}
 
-        if (grid_.isEmpty(i + 1, j + 1))   /////////////////// no values /////////////////////
-            grid_.u()(i, j + 1) = grid_.u()(i, j) + (grid_.dy() / grid_.dx()) * (grid_.v(i + 1, j, WEST) - grid_.v()(i, j)) ;
-
-        if (grid_.isEmpty(i + 1, j - 1))
-            grid_.u()(i, j - 1) = grid_.u()(i, j) - (grid_.dy() / grid_.dx()) * (grid_.v(i + 1, j - 1, DIAG) - grid_.v(i, j - 1, NORTH)) ;
+//         if (grid_.isEmpty(i + 1, j + 1))   /////////////////// no values /////////////////////
+//             grid_.u()(i, j + 1) = grid_.u()(i, j) + (grid_.dy() / grid_.dx()) * (grid_.v(i + 1, j, WEST) - grid_.v()(i, j)) ;
+// 
+//         if (grid_.isEmpty(i + 1, j - 1))
+//             grid_.u()(i, j - 1) = grid_.u()(i, j) - (grid_.dy() / grid_.dx()) * (grid_.v(i + 1, j - 1, DIAG) - grid_.v(i, j - 1, NORTH)) ;
     }
 
     // cell(i+1,j) , cell(i,j-1) , cell(i,j+1) are empty ESN
@@ -1346,10 +1365,16 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
         grid_.v()(i, j - 1) = grid_.v(i, j - 1, NORTH) + gy_ * dt ;
         grid_.u()(i, j) = grid_.u(i - 1, j, EAST) - (grid_.dx() / grid_.dy()) * (grid_.v()(i, j) - grid_.v(i, j - 1, NORTH)) ;
 
-        grid_.u()(i, j + 1)     = grid_.u()(i, j) ;
-        grid_.u()(i, j - 1)     = grid_.u()(i, j) ;
-        grid_.v()(i + 1, j)     = grid_.v()(i, j) ;
-        grid_.v()(i + 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		if (grid_.isEmpty(i + 1, j + 1)) 
+		{
+			grid_.u()(i, j + 1)     = grid_.u()(i, j) ;
+			grid_.v()(i + 1, j)     = grid_.v()(i, j) ;
+		}
+		if (grid_.isEmpty(i + 1, j - 1)) 
+		{
+			grid_.u()(i, j - 1)     = grid_.u()(i, j) ; 
+			grid_.v()(i + 1, j - 1) = grid_.v(i, j - 1, NORTH) ;
+		}
 
         if (grid_.isEmpty(i - 1, j + 1))
             grid_.u()(i - 1, j + 1) = grid_.u(i - 1, j, EAST) - (grid_.dy() / grid_.dx()) * (grid_.v()(i, j) - grid_.v(i - 1, j, EAST)) ;

@@ -48,7 +48,7 @@ RectangleParticleY2                 4.0
 # ---------
 
 dt                     0.04      # time stepsize
-timesteps              50000      # number of timesteps
+timesteps              125      # number of timesteps
 safetyfactor           0.5       # factor "tau" for timestep size control (<=0 means constant dt)
 
 # Pressure Iteration Data:
@@ -64,6 +64,6 @@ normalizationfrequency 100       # every n'th time step in the fluid solver the 
 
 # VTK Visualization Data:
 # -----------------------
-outputinterval 100                 # every n'th time step the visualization should be printed to a file
+outputinterval 5                 # every n'th time step the visualization should be printed to a file
 
 #======================================================================================================================

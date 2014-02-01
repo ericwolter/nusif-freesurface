@@ -186,75 +186,14 @@ void StaggeredGrid::readPng(const std::string &pngFilename)
 
 }
 
-//real StaggeredGrid::u_inter ( real x , real y )
-//{
-//    int i = (int) (x / dx_) + 1                 ;
-//    int j = (int) (( y + 0.5 * dy_ ) / dy_) + 1   ;
-//
-//    real x1 , x2 , y1 , y2 ;
-//
-//    x1 = (real) (i - 1) * dx_       ;
-//    x2 = (real) i * dx_           ;
-//    y1 = (real) ((j - 1) - 0.5) * dy_ ;
-//    y2 = (real) (j - 1) * dy_       ;
-//
-//    real u1 = u_( i - 1 , j - 1 ) ;
-//    real u2 = u_( i   , j - 1 ) ;
-//    real u3 = u_( i - 1 , j   ) ;
-//    real u4 = u_( i   , j   ) ;
-//
-//    real u_interpolate ;
-//
-//    real coeeficient = (real) ( 1.0 / (dx_ * dy_) ) ;
-//
-//    u_interpolate = coeeficient * (   (real) ( x2 - x  ) * ( y2 - y  ) * u1
-//                                      + (real) ( x  - x1 ) * ( y2 - y  ) * u2
-//                                      + (real) ( x2 - x  ) * ( y  - y1 ) * u3
-//                                      + (real) ( x  - x1 ) * ( y  - y1 ) * u4
-//                                  ) ;
-//
-//    return u_interpolate ;
-//
-//}
-//
-//real StaggeredGrid::v_inter ( real x , real y )
-//{
-//    int i = (int) (( x + 0.5 * dx_ ) / dx_) + 1 ;
-//    int j = (int) ( y  / dy_) + 1               ;
-//
-//    real x1 , x2 , y1 , y2 ;
-//
-//    x1 = (real) ((i - 1) - 0.5) * dx_ ;
-//    x2 = (real) (i - 0.5)    * dx_ ;
-//    y1 = (real) (j - 1) * dy_       ;
-//    y2 = (real)     j * dy_       ;
-//
-//    real v1 = v_( i - 1 , j - 1 ) ;
-//    real v2 = v_( i   , j - 1 ) ;
-//    real v3 = v_( i - 1 , j   ) ;
-//    real v4 = v_( i   , j   ) ;
-//
-//    real v_interpolate ;
-//
-//    real coeeficient = (real) ( 1.0 / (dx_ * dy_) ) ;
-//
-//    v_interpolate = coeeficient * (   (real) ( x2 - x  ) * ( y2 - y  ) * v1
-//                                      + (real) ( x  - x1 ) * ( y2 - y  ) * v2
-//                                      + (real) ( x2 - x  ) * ( y  - y1 ) * v3
-//                                      + (real) ( x  - x1 ) * ( y  - y1 ) * v4
-//                                  ) ;
-//
-//    return v_interpolate;
-//}
-
 void StaggeredGrid::setCellToFluid(int x, int y)
 {
-    obs_(x, y) = FLUID; // set cell to fluid
+    obs_(x, y) = FLUID;
 }
 
 void StaggeredGrid::setCellToEmpty(int x, int y)
 {
-    obs_(x, y) = EMPTY; // set cell to empty
+    obs_(x, y) = EMPTY;
 }
 
 void StaggeredGrid::refreshEmpty()
@@ -296,27 +235,3 @@ void StaggeredGrid::setCellToObstacle(int x, int y)
     //     if ( (y + 1) < obs_.getSize(1) ) // north
     //         obs_(x, y + 1) = obs_(x, y + 1) | OBSSOUTH;
 }
-
-void StaggeredGrid::markCells()
-{
-    for (int i = 1; i <= imax_; ++i)
-    {
-        for (int j = 1; j <= jmax_; ++j)
-        {
-            if (!isFluid(i, j)) continue;
-
-            setCellToEmpty(i, j);
-        }
-    }
-
-    for (std::vector<Particle>::iterator it = particles_.begin() ; it != particles_.end(); ++it)
-    {
-        Particle prtcl = *it;
-
-        int i = prtcl.getCellX(dx_);
-        int j = prtcl.getCellY(dy_);
-
-        setCellToFluid(i, j);
-    }
-}
-

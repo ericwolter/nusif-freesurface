@@ -57,6 +57,9 @@ public:
     void dcavity_test();
     void testFG();
 
+    // only public for tests
+    void set_UVP_surface(int i, int j , const real &dt, bool compP);
+
 private:
     // helper functions (derivatives)
     real dxuu(int i, int j), dyuv(int i, int j), ddxu(int i, int j), ddyu(int i, int j);
@@ -70,7 +73,6 @@ private:
 
     // compute surface boundary
     void set_UVP_surface(const real &dt, bool compP);
-    void set_UVP_surface(int i, int j , const real &dt, bool compP);
     void one_empty_neighbour(int i , int j , const real &dt, bool compP) ;
     void two_empty_neighbour(int i , int j , const real &dt, bool compP) ;
     void three_empty_neighbour(int i , int j , const real &dt, bool compP) ;

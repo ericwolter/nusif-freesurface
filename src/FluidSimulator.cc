@@ -1047,7 +1047,6 @@ void FluidSimulator::set_UVP_surface(int i, int j , const real &dt, bool compP)
 
 //*******************************************************************************************************************
 
-// TODO: diag wrapper usage
 void FluidSimulator::one_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
     // According to page 92 ,case 1 of the book

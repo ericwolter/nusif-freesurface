@@ -1338,7 +1338,7 @@ void FluidSimulator::four_empty_neighbour(int i , int j , const real &dt, bool c
         grid_.u()(i, j) += gx_ * dt ;
         grid_.u()(i - 1, j) = grid_.u()(i - 1, j) + gx_ * dt ;
         grid_.v()(i, j) += gy_ * dt ;
-        grid_.v()(i, j - 1) = grid_.u()(i, j - 1) + gy_ * dt ;
+        grid_.v()(i, j - 1) = grid_.v()(i, j - 1) + gy_ * dt ;
 
         grid_.u()(i, j + 1)     = grid_.u()(i, j) ;
         grid_.u()(i, j - 1)     = grid_.u()(i, j) ;

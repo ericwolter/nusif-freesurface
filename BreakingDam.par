@@ -29,7 +29,7 @@ P_INIT                 0.0		   # initial value for pressure
 
 xlength                10.0		   # domain size in x-direction
 ylength                4.0		   # domain size in y-direction
-imax                   50		   # number of interior cells in x-direction //Orginal:100
+imax                   100		   # number of interior cells in x-direction //Orginal:100
 jmax                   20		   # number of interior cells in y-direction //Orginal:25
 
 
@@ -48,7 +48,7 @@ RectangleParticleY2                 4.0
 # ---------
 
 dt                     0.04      # time stepsize
-timesteps               125      # number of timesteps
+timesteps              50000      # number of timesteps
 safetyfactor           0.5       # factor "tau" for timestep size control (<=0 means constant dt)
 
 # Pressure Iteration Data:
@@ -64,6 +64,6 @@ normalizationfrequency 100       # every n'th time step in the fluid solver the 
 
 # VTK Visualization Data:
 # -----------------------
-outputinterval 5                 # every n'th time step the visualization should be printed to a file
+outputinterval 100                 # every n'th time step the visualization should be printed to a file
 
 #======================================================================================================================

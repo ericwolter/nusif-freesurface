@@ -14,7 +14,7 @@ GY                     -1.0			#
 
 Re                     40.0		# Reynolds number
 
-U_INIT                 1.0		   # initial value for velocity in x-direction
+U_INIT                 0.0		   # initial value for velocity in x-direction
 V_INIT                 0.0		   # initial value for velocity in y-direction
 P_INIT                 0.0		   # initial value for pressure
 

@@ -22,7 +22,7 @@ void ParticleTracer::markCells()
         {
             if (grid_->isObstacle(i,j)) continue;
 
-            grid_->setCellToEmpty(i, j);
+            // grid_->setCellToEmpty(i, j);
         }
     }
 

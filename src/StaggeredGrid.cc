@@ -203,12 +203,14 @@ void StaggeredGrid::refreshEmpty()
         for (int j = 1; j <= jmax_; ++j)
         {
             if(!isEmpty(i,j)) continue;
-            
-            // TODO: why exactly do we need these checks?
-            if (i < u_.getSize(0) && j < u_.getSize(1))
+
+            if(!isFluid(i+1,j)) {
                 u_(i, j) = 0;
-            if (i < v_.getSize(0) && j < v_.getSize(1))
+            }
+
+            if(!isFluid(i,j+1)) {
                 v_(i, j) = 0;
+            }
         }
     }
 }

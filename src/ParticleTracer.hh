@@ -18,6 +18,7 @@ public:
         return particles_;
     }
 
+
     void markCells();
 	void fillCell(int i, int j, int numParticles, int type);
     void addRectangle(int x1, int y1, int x2, int y2, int type);

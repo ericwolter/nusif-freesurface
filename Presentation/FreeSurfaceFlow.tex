@@ -90,8 +90,7 @@ Has a vector of particles
 \begin{lstlisting}
 while (n <= nrOfTimeSteps)
 {
-    ...
-    determineNextDT(safetyfac_);
+... determineNextDT(safetyfac_);
     particle_tracer_.markCells();
     set_UVP_surface(dt_, true);
     computeFG();
@@ -100,8 +99,7 @@ while (n <= nrOfTimeSteps)
     updateVelocities();
     refreshBoundaries();
     set_UVP_surface(dt_, false);
-    particle_tracer_.advanceParticles(dt_);
-    ...
+... particle_tracer_.advanceParticles(dt_);
 }
 \end{lstlisting}
 \end{frame}

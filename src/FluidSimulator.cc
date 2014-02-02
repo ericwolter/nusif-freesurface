@@ -467,95 +467,9 @@ void FluidSimulator::simulate(real duration)
     real t = 0;
     unsigned int n = 0;
 
-    PROG("initialize u, v, p, rhs");
-    if (name_ == "backstep")
-    {
-        int half = (int)(rectYY_ / grid_.dy());
-        for (int i = 0; i < grid_.u().getSize(0); ++i)
-        {
-            for (int j = 0; j < grid_.u().getSize(1); ++j)
-            {
-                if (j > half)
-                {
-                    grid_.u()(i, j) = 1;
-                }
-                else
-                {
-                    grid_.u()(i, j) = 0;
-                }
-            }
-        }
-    }
-    else
-    {
-        grid_.u().fill(uInit_);
-    }
-    grid_.v().fill(vInit_);
-    grid_.p().fill(pInit_);
-    grid_.rhs().fill(0);
     PROG("set inner obstacles");
     grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
     grid_.createCircle(circX_, circY_, circR_);
-    PROG("set initial partciles");
-    if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0.0)
-    {
-        // fill non obstacle cells with particles
-        for (int i = 1; i <= imax; ++i)
-        {
-            for (int j = 1; j <= jmax; ++j)
-            {
-                if (!grid_.isObstacle(i, j))
-                    particle_tracer_.fillCell(i, j, grid_.ppc(), 0);
-            }
-        }
-    }
-    else
-    {
-        particle_tracer_.addRectangle(rectX1_particle_, rectX2_particle_, rectY1_particle_, rectY2_particle_, 0);
-        particle_tracer_.addCircle(circX_particle_, circY_particle_, circR_particle_, 1);
-    }
-
-    PROG("initial refreshBoundaries");
-    refreshBoundaries();
-
-    while (t <= duration)
-    {
-        // without 0th step:
-        // if ( n%outPutInt == 0 && n != 0 )
-        if (n % outPutInt == 0)
-            vtkWriter.write(grid_, &particle_tracer_);
-        PROG(n << "'th timestep: determine next dt");
-        determineNextDT(safetyfac_);
-        //particle_tracer_.markCells();
-        PROG(n << "'th timestep: set u, v, p at the free boundary");
-        set_UVP_surface(dt_, true);
-        computeFG();
-        PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
-        composeRHS();
-        PROG(n << "'th timestep: solve pressure equation");
-        solv().solve(grid_);
-        PROG(n << "'th timestep: update u and v in fluid domain");
-        updateVelocities();
-        PROG(n << "'th timestep: refresh boundaries");
-        refreshBoundaries();
-        PROG(n << "'th timestep: set u, v at the free boundary");
-        set_UVP_surface(dt_, false);
-        //particle_tracer_.advanceParticles(dt_);
-        if (n % normfreq == 0)
-            normalization();
-        t += dt_;
-        n++;
-    }
-}
-
-void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
-{
-    VTKWriter vtkWriter(name_);
-    unsigned int n = 0;
-
-    PROG("set inner obstacles");
-    //grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
-    //grid_.createCircle(circX_, circY_, circR_);
     PROG("set initial particles");
     if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0.0)
     {
@@ -574,7 +488,140 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     }
     else
     {
-        PROG("adding particles");
+        particle_tracer_.addRectangle(rectX1_particle_, rectY1_particle_, rectX2_particle_, rectY2_particle_, 0);
+        particle_tracer_.addCircle(circX_particle_, circY_particle_, circR_particle_, 1);
+    }
+    grid_.createPng("test.png");
+    particle_tracer_.markCells();
+
+    PROG("initialize u, v, p, rhs");
+    if (name_ == "backstep")
+    {
+        int half = (int)(rectYY_ / grid_.dy());
+        for (int i = 0; i < grid_.u().getSize(0); ++i)
+        {
+            for (int j = 0; j < grid_.u().getSize(1); ++j)
+            {
+                if (j > half && grid_.isFluid(i, j))
+                {
+                    grid_.u()(i, j) = 1.0;
+                }
+                else
+                {
+                    grid_.u()(i, j) = 0.0;
+                }
+            }
+        }
+    }
+    else
+    {
+        for (int i = 0; i < grid_.u().getSize(0); ++i)
+        {
+            for (int j = 0; j < grid_.u().getSize(1); ++j)
+            {
+                if (grid_.isFluid(i, j))
+                {
+                    grid_.u()(i, j) = uInit_ ;
+                }
+                else
+                {
+                    grid_.u()(i, j) = 0.0 ;
+                }
+            }
+        }
+    }
+
+    for (int i = 0; i < grid_.v().getSize(0); ++i)
+    {
+        for (int j = 0; j < grid_.v().getSize(1); ++j)
+        {
+            if (grid_.isFluid(i, j))
+            {
+                grid_.v()(i, j) = vInit_ ;
+            }
+            else
+            {
+                grid_.v()(i, j) = 0.0 ;
+            }
+        }
+    }
+
+    for (int i = 0; i < grid_.p().getSize(0); ++i)
+    {
+        for (int j = 0; j < grid_.p().getSize(1); ++j)
+        {
+            if (grid_.isFluid(i, j))
+            {
+                grid_.p()(i, j) = pInit_ ;
+            }
+            else
+            {
+                grid_.p()(i, j) = 0.0 ;
+            }
+        }
+    }
+
+    grid_.rhs().fill(0);
+
+    PROG("initial refreshBoundaries");
+    refreshBoundaries();
+	
+    while (t <= duration)
+    {
+        // without 0th step:
+        // if ( n%outPutInt == 0 && n != 0 )
+        if (n % outPutInt == 0)
+            vtkWriter.write(grid_, &particle_tracer_);
+        PROG(n << "'th timestep: determine next dt");
+        determineNextDT(safetyfac_);
+        particle_tracer_.markCells();
+        PROG(n << "'th timestep: set u, v, p at the free boundary");
+        set_UVP_surface(dt_, true);
+        computeFG();
+        PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
+        composeRHS();
+        PROG(n << "'th timestep: solve pressure equation");
+        solv().solve(grid_);
+        PROG(n << "'th timestep: update u and v in fluid domain");
+        updateVelocities();
+        PROG(n << "'th timestep: refresh boundaries");
+        refreshBoundaries();
+        PROG(n << "'th timestep: set u, v at the free boundary");
+        set_UVP_surface(dt_, false);
+        particle_tracer_.advanceParticles(dt_);
+        if (n % normfreq == 0)
+            normalization();
+        t += dt_;
+        n++;
+    }
+}
+
+void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
+{
+    VTKWriter vtkWriter(name_);
+    unsigned int n = 0;
+
+    PROG("set inner obstacles");
+    grid_.createRectangle(rectX_, rectY_, rectXX_, rectYY_);
+    grid_.createCircle(circX_, circY_, circR_);
+    PROG("set initial particles");
+    if (rectX1_particle_ + rectX2_particle_ + rectY1_particle_ + rectY2_particle_ + circR_particle_ + circX_particle_ + circY_particle_ == 0.0)
+    {
+        PROG("no explicit particles defined -> fill all");
+        // fill non obstacle cells with particles
+        for (int i = 1; i <= imax; ++i)
+        {
+            for (int j = 1; j <= jmax; ++j)
+            {
+                if (!grid_.isObstacle(i, j))
+                {
+                    particle_tracer_.fillCell(i, j, grid_.ppc(), 0);
+                }
+            }
+        }
+    }
+    else
+    {
         particle_tracer_.addRectangle(rectX1_particle_, rectY1_particle_, rectX2_particle_, rectY2_particle_, 0);
         particle_tracer_.addCircle(circX_particle_, circY_particle_, circR_particle_, 1);
     }
@@ -661,43 +708,20 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
             vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT(safetyfac_);
-        //         std::cout << dt_ << std::endl;
         particle_tracer_.markCells();
-        //         grid_.obs().print();
-        //         grid_.u().print();
-        //         grid_.v().print();
-        //         grid_.p().print();
         PROG(n << "'th timestep: set u, v, p at the free boundary");
         set_UVP_surface(dt_, true);
-        //         grid_.u().print();
-        //         grid_.v().print();
-        //         grid_.p().print();
         computeFG();
-        //         grid_.f().print();
-        //         grid_.g().print();
         PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
         composeRHS();
-        //         grid_.rhs().print();
         PROG(n << "'th timestep: solve pressure equation");
         solv().solve(grid_);
-        //         grid_.u().print();
-        //         grid_.v().print();
-        //         grid_.p().print();
         PROG(n << "'th timestep: update u and v in fluid domain");
         updateVelocities();
-        //         grid_.u().print();
-        //         grid_.v().print();
-        //         grid_.p().print();
         PROG(n << "'th timestep: refresh boundaries");
         refreshBoundaries();
-        //         grid_.u().print();
-        //         grid_.v().print();
-        //         grid_.p().print();
         PROG(n << "'th timestep: set u, v at the free boundary");
         set_UVP_surface(dt_, false);
-        //         grid_.u().print();
-        //         grid_.v().print();
-        //         grid_.p().print();
         particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
@@ -725,8 +749,7 @@ void FluidSimulator::normalization()
     }
 
     real pMean = psum / grid_.getNumFluid();
-    //     std::cout << "norm1: " << grid_.getNumFluid() << std::endl;
-    //     std::cout << "norm2: " << count << std::endl;
+
     // substract the mean
     for (int i = 1; i <= imax; i++)
     {
@@ -768,7 +791,7 @@ real FluidSimulator::dyvv(int i, int j)
 
     return res;
 }
-////////////////////////////////////////////////////////////////////////////////
+
 // d(uv)/dy
 real FluidSimulator::dyuv(int i, int j)
 {
@@ -777,15 +800,6 @@ real FluidSimulator::dyuv(int i, int j)
     ASSERT_MSG((j - 1 >= 0), "wrong input for j: " << j);
     ASSERT_MSG((j + 1 < grid_.u().getSize(1)), "wrong input for j: " << j);
     real diag = grid_.v(i + 1, j - 1, DIAG);
-    //     real diag = 0.0;
-    //     if (grid_.isFluid(i + 1, j - 1))
-    //     {
-    //         diag = grid_.v()(i + 1, j - 1);
-    //     }
-    //     else
-    //     {
-    //         diag = 0.5 * (grid_.v(i + 1, j, WEST) + grid_.v(i, j - 1, NORTH));
-    //     }
     real res = ((grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * (grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * 0.25) / grid_.dy();
     res -= ((grid_.v(i, j - 1, NORTH) + diag) * (grid_.u(i, j - 1, NORTH) + grid_.u()(i, j)) * 0.25) / grid_.dy();
     res += gamma_ * (fabs(grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * (grid_.u()(i, j) - grid_.u(i, j + 1, SOUTH)) * 0.25) / grid_.dy();
@@ -802,15 +816,6 @@ real FluidSimulator::dxuv(int i, int j)
     ASSERT_MSG((i - 1 >= 0), "wrong input for i: " << i);
     ASSERT_MSG((i + 1 < grid_.v().getSize(0)), "wrong input for i: " << i);
     real diag = grid_.u(i - 1, j + 1, DIAG);
-    //     real diag = 0.0;
-    //     if (grid_.isFluid(i - 1, j + 1))
-    //     {
-    //         diag = grid_.u()(i - 1, j + 1);
-    //     }
-    //     else
-    //     {
-    //         diag = 0.5 * (grid_.u(i, j + 1, EAST) + grid_.u(i - 1, j, SOUTH));
-    //     }
     real res = ((grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * (grid_.v()(i, j) + grid_.v(i + 1, j, WEST)) * 0.25) / grid_.dx();
     res -= ((grid_.u(i - 1, j, EAST) + diag) * (grid_.v(i - 1, j, EAST) + grid_.v()(i, j)) * 0.25) / grid_.dx();
     res += gamma_ * (fabs(grid_.u()(i, j) + grid_.u(i, j + 1, SOUTH)) * (grid_.v()(i, j) - grid_.v(i + 1, j, WEST)) * 0.25) / grid_.dx();
@@ -919,6 +924,7 @@ void FluidSimulator::computeFG()
 
 }
 
+//*******************************************************************************************************************
 
 // helper functions for testing
 
@@ -947,9 +953,9 @@ void FluidSimulator::set_UVP_surface(const real &dt, bool compP)
 
     for (int i = 1; i <= imax; i++)
     {
-        for (int j = 1; j < jmax; j++)   // !?!
+        for (int j = 1; j <= jmax; j++)   
         {
-
+			// set for cell (i, j)
             set_UVP_surface(i, j, dt, compP);
         }
     }
@@ -975,7 +981,7 @@ void FluidSimulator::set_UVP_surface(int i, int j , const real &dt, bool compP)
 
     }
     switch (number_of_empty_neighbour)
-    {
+    { // handling of cells
     case (1):
         one_empty_neighbour(i , j , dt, compP) ;
         break;
@@ -991,123 +997,9 @@ void FluidSimulator::set_UVP_surface(int i, int j , const real &dt, bool compP)
     }
 }
 
-// real FluidSimulator::set_U_surface(int i, int j , const real &dt) // not finished yet!!!
-// {
-//     int number_of_empty_neighbour = 0 ;
-//
-//     if ( grid_.isFluid(i, j) )
-//     {
-//         // Count the number of empty neighbour cell
-//         if ( grid_.isEmpty(i + 1, j) )
-//             ++ number_of_empty_neighbour ;
-//         if ( grid_.isEmpty(i - 1, j) )
-//             ++ number_of_empty_neighbour ;
-//         if ( grid_.isEmpty(i, j + 1) )
-//             ++ number_of_empty_neighbour ;
-//         if ( grid_.isEmpty(i, j - 1) )
-//             ++ number_of_empty_neighbour ;
-//
-//     }
-//
-//     switch (number_of_empty_neighbour )
-//     {
-//
-//     case (1): // one empty neighbour in the
-//       if ( grid_.isEmpty(i+1, j) ) // east
-//  return  grid_.u()(i - 1 , j) - ( grid_.dx() / grid_.dy()) * ( grid_.v()( i , j ) - grid_.v()( i , j - 1 ) ) ;
-//       else // south/north/west
-//  return grid_.u()(i,j) ;
-//
-//     case (2): // two empty neighbours in the
-//       if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j - 1) ) // east and south
-//         return grid_.u()( i - 1 , j ) ;
-//       else if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j + 1) ) // east and north
-//         return grid_.u()(i - 1 , j) ;
-//       else if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i - 1, j)) // east and west
-//         return grid_.u()(i, j) + gx_ * dt ;
-//       else // north and south
-//  return grid_.u()(i,j) ;
-//
-//     case (3): // three empty neighbours in the
-//       if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j + 1) && grid_.isEmpty(i - 1, j)) // east, north and west
-//         return grid_.u()(i, j) + gx_ * dt ;
-//       else if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j - 1) && grid_.isEmpty(i - 1, j)) // east, south and west
-//         return grid_.u()(i, j) + gx_ * dt ;
-//       else if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j - 1) && grid_.isEmpty(i, j + 1) ) // east, south and north
-//         return grid_.u()(i - 1, j) - (grid_.dx() / grid_.dy() ) * ( grid_.v()(i, j) - grid_.v()(i, j - 1) ) ;
-//       else // north, south and west
-//  return grid_.u()(i,j) ;
-//
-//     case (4): // four empty neighbours
-//       return grid_.u()(i, j) + gx_ * dt ;
-//
-//     }
-// }
-//
-// real FluidSimulator::set_V_surface(int i, int j , const real &dt) already finished!
-// {
-//     int number_of_empty_neighbour = 0 ;
-//
-//     if ( grid_.isFluid(i, j) )
-//     {
-//         // Count the number of empty neighbour cell
-//         if ( grid_.isEmpty(i + 1, j) )
-//             ++ number_of_empty_neighbour ;
-//         if ( grid_.isEmpty(i - 1, j) )
-//             ++ number_of_empty_neighbour ;
-//         if ( grid_.isEmpty(i, j + 1) )
-//             ++ number_of_empty_neighbour ;
-//         if ( grid_.isEmpty(i, j - 1) )
-//             ++ number_of_empty_neighbour ;
-//
-//     }
-//
-//     switch (number_of_empty_neighbour )
-//     {
-//
-//     case (1): // one empty neighbour in the
-//       if ( grid_.isEmpty(i, j + 1) ) // north
-//  return  grid_.v()(i , j - 1) - ( grid_.dy() / grid_.dx()) * ( grid_.u()( i , j ) - grid_.u()( i - 1 , j ) ) ;
-//       else // south/east/west
-//  return grid_.v()(i,j) ;
-//
-//     case (2): // two empty neighbours in the
-//       if (grid_.isEmpty(i - 1, j) && grid_.isEmpty(i, j + 1) ) // west and north
-//  return grid_.v()( i  , j - 1 ) ;
-//       else if (grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j + 1) ) // east and north
-//         return grid_.v()( i  , j - 1 ) ;
-//       else if (grid_.isEmpty(i, j + 1) && grid_.isEmpty(i, j - 1)) // south and north
-//         return grid_.v()(i, j) + gy_ * dt ;
-//       else // east and west
-//  return grid_.v()(i,j) ;
-//
-//     case (3): // three empty neighbours in the
-//       if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j + 1)  && grid_.isEmpty(i - 1, j)) // east, north and west
-//         return grid_.v()(i, j) = grid_.v()(i, j - 1) - (grid_.dy() / grid_.dx() ) * ( grid_.u()(i, j) - grid_.u()(i - 1, j) ) ;
-//       else if ( grid_.isEmpty(i - 1, j) && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1) ) // west, south and east
-//         return grid_.v()(i, j) + gy_ * dt ;
-//       else if ( grid_.isEmpty(i + 1, j) && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1) ) // east, south and north
-//  return grid_.v()(i, j) + gy_ * dt ;
-//       else // east, south and west
-//  return grid_.v()(i,j) ;
-//
-//     case (4): // four empty neighbours
-//       return grid_.v()(i, j) + gy_ * dt ;
-//
-//     }
-// }
-
-
-//*******************************************************************************************************************
-
 void FluidSimulator::one_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
-    // According to page 92 ,case 1 of the book
-    // If cell (i,j) is Fluid, one of the other neighbour(North,East,West,South) is empty cell.
-    // In any case of empty neighbour cell the formula is the same but we need to change for indices for mentioning
-    // right neighbour cell.
-
-    // EAST : only the cell (i+1,j) is empty (exactly like one which has been mentioned in the book)
+    // EAST : only cell (i+1,j) is empty 
 
     if (grid_.isEmpty(i + 1, j))
     {
@@ -1117,12 +1009,10 @@ void FluidSimulator::one_empty_neighbour(int i , int j , const real &dt, bool co
 
         if (grid_.isEmpty(i + 1, j - 1))
             grid_.v()(i + 1, j - 1) = grid_.v(i , j - 1, NORTH) - (grid_.dx() / grid_.dy()) * (grid_.u()(i , j) - grid_.u(i , j - 1, NORTH)) ;
-        //         else ///////////////////////////////////////////// conti ////////////////////////////////////////////////////////////////////////
-        //             grid_.v()(i + 1, j - 1) = grid_.v(i + 1 , j - 2, DIAG) - ( grid_.dy() / grid_.dx()) * ( grid_.u( i + 1 , j - 1, DIAG) - grid_.u( i , j - 1, NORTH ) ) ;
 
     }
 
-    // WEST : only the cell (i-1,j) is empty (West of cell(i,j) )
+    // WEST : only cell (i-1,j) is empty 
 
     else if (grid_.isEmpty(i - 1, j))
     {
@@ -1132,11 +1022,10 @@ void FluidSimulator::one_empty_neighbour(int i , int j , const real &dt, bool co
 
         if (grid_.isEmpty(i - 1, j - 1))
             grid_.v()(i - 1, j - 1) = grid_.v(i, j - 1, NORTH) + (grid_.dx() / grid_.dy()) * (grid_.u()(i - 1, j) - grid_.u(i - 1, j - 1, NORTH)) ;
-        //         else ///////////////////////////////////////////// conti ////////////////////////////////////////////////////////////////////////
-        //             grid_.v()(i - 1, j - 1) = grid_.v(i - 1 , j - 2, DIAG) - ( grid_.dy() / grid_.dx()) * ( grid_.u( i - 1 , j - 1, DIAG ) - grid_.u( i - 2 , j - 1, DIAG ) ) ;
-    }
+    
+	}
 
-    // NORTH : only the cell (i,j+1) is empty (North of cell(i,j) )
+    // NORTH : only cell (i,j+1) is empty 
 
     else if (grid_.isEmpty(i, j + 1))
     {
@@ -1146,11 +1035,10 @@ void FluidSimulator::one_empty_neighbour(int i , int j , const real &dt, bool co
 
         if (grid_.isEmpty(i - 1, j + 1))
             grid_.u()(i - 1, j + 1) =  grid_.u(i - 1, j, EAST) - (grid_.dy() / grid_.dx()) * (grid_.v()(i , j) - grid_.v(i - 1, j, EAST)) ;
-        //         else ///////////////////////////////////////////// conti + no values(?) ////////////////////////////////////////////////////////////
-        //             grid_.u()(i - 1, j + 1) =  grid_.u(i - 2 , j + 1, DIAG) - ( grid_.dx() / grid_.dy()) * ( grid_.v( i - 1 , j + 1, DIAG ) - grid_.v( i - 1 , j, EAST ) ) ;
+
     }
 
-    // SOUTH : only the cell (i,j-1) is empty (South of cell(i,j) )
+    // SOUTH : only cell (i,j-1) is empty 
 
     else if (grid_.isEmpty(i, j - 1))
     {
@@ -1160,11 +1048,9 @@ void FluidSimulator::one_empty_neighbour(int i , int j , const real &dt, bool co
 
         if (grid_.isEmpty(i - 1, j - 1))
             grid_.u()(i - 1, j - 1) =  grid_.u(i - 1, j, EAST) + (grid_.dy() / grid_.dx()) * (grid_.v()(i , j - 1) - grid_.v(i - 1, j - 1, EAST)) ;
-        //         else ///////////////////////////////////////////// conti + no values(?) //////////////////////////////////////////////////////////////
-        //             grid_.u()(i - 1, j - 1) =  grid_.u(i - 2 , j + 1, DIAG ) - ( grid_.dx() / grid_.dy()) * ( grid_.v( i - 1 , j - 1, DIAG ) - grid_.v( i - 1 , j - 2, DIAG ) ) ;
-    }
+
+	}
 }
-//*******************************************************************************************************************
 
 void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
@@ -1173,13 +1059,9 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool co
     real dy_inverse = (real) 1.0 / grid_.dy() ;
     real dx_inverse = (real) 1.0 / grid_.dx() ;
 
-    // According to page 93 and 95 ,this case divides into two parts :
-    // 1- two empty cells have a corner in share , e.g. Cell(i+1,j) and Cell(i,j-1) are two empty cell
-    // 2- two empty cells are on the opposite, e.g. Cell(i+1,j) and Cell(i-1,j)
+    // Case 1 : in this case we have four options for our two empty neighbours
 
-    // Case 1 : in this case we have four options for our two empty neighbour
-
-    // Cell(i+1,j) and Cell(i,j-1) are empty cell (Like one in book page 94 ) SE
+    // cell (i+1,j) and cell (i,j-1) are empty cells: SE
 
     if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1))
     {
@@ -1200,7 +1082,7 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool co
         }
     }
 
-    // Cell(i-1,j) and Cell(i,j+1) are empty cell  NW
+    // cell (i-1,j) and cell (i,j+1) are empty cells: NW
     else if (grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j + 1))
     {
         grid_.u()(i - 1, j)   = grid_.u()(i , j) ;
@@ -1220,7 +1102,7 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool co
         }
     }
 
-    // Cell(i,j+1) and Cell(i+1,j) are empty cell NE
+    // cell (i,j+1) and cell (i+1,j) are empty cells: NE
     else if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j + 1))
     {
         grid_.u()(i, j)  = grid_.u(i - 1, j, EAST) ;
@@ -1243,7 +1125,7 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool co
 
     }
 
-    // Cell(i,j-1) and Cell(i-1,j) are empty cell SW
+    // cell (i,j-1) and cell (i-1,j) are empty cells: SW
     else if (grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1))
     {
         grid_.u()(i - 1, j)  = grid_.u()(i , j) ;
@@ -1262,9 +1144,9 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool co
         }
     }
 
-    // Case 2 : in this case we have two options for our two empty opposite neighbour
+    // Case 2 : in this case we have two options for our two empty opposite neighbours
 
-    // Cell(i+1,j) and Cell(i-1,j) are empty cell WE
+    // cell (i+1,j) and cell (i-1,j) are empty cells: WE
     else if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i - 1, j))
     {
         grid_.u()(i, j) += gx_ * dt ;
@@ -1276,7 +1158,7 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool co
         if (compP)
             grid_.p()(i, j) = 0.0 ;
     }
-    // Cell(i,j+1) and Cell(i,j-1) are empty cell NS
+    // cell (i,j+1) and cell (i,j-1) are empty cells: NS
     else if (grid_.isEmpty(i, j + 1)  && grid_.isEmpty(i, j - 1))
     {
         grid_.v()(i, j) += gy_ * dt ;
@@ -1290,18 +1172,14 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool co
     }
 
 }
-//*******************************************************************************************************************
 
 void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
-    //     std::cout << "three_empty_neighbour: " << i << ", " << j << std::endl;
-    // According to page 96 of book
-    // Generally we have four option for our three empty neighbours
+    // Generally we have four options for our three empty neighbours
 
-    // cell(i+1,j) , cell(i,j+1) , cell(i-1,j) are empty WNE
+    // cell (i+1,j) , cell (i,j+1) , cell (i-1,j) are empty: NWE
     if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j + 1)  && grid_.isEmpty(i - 1, j))
     {
-        //         std::cout << "WNE" << std::endl;
         if (compP)
             grid_.p()(i, j) = 0.0 ;
         grid_.u()(i, j) += gx_ * dt ;
@@ -1326,15 +1204,9 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
             grid_.v()(i - 1, j - 1) = grid_.v(i, j - 1, NORTH) + (grid_.dx() / grid_.dy()) * (grid_.u(i - 1, j, EAST) - grid_.u(i - 1, j - 1, DIAG)) ;
     }
 
-    // cell(i+1,j) , cell(i,j-1) , cell(i-1,j) are empty WSE
+    // cell (i+1,j) , cell (i,j-1) , cell (i-1,j) are empty: SWE
     if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i - 1, j))
     {
-        //         std::cout << "WSE" << std::endl;
-        //         std::cout << "grid_.v()(i, j): " << grid_.v()(i, j) << std::endl;
-        //         std::cout << "grid_.u()(i, j): " << grid_.u()(i, j) << std::endl;
-        //         std::cout << "grid_.u()(i - 1, j): " << grid_.u()(i - 1, j) << std::endl;
-        //         std::cout << "grid_.v()(i - 1, j): " << grid_.v()(i - 1, j) << std::endl;
-
         if (compP)
             grid_.p()(i, j) = 0.0 ;
         grid_.u()(i, j) += gx_ * dt ;
@@ -1351,16 +1223,9 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
             grid_.u()(i, j - 1)     = grid_.u()(i, j) ;
             grid_.v()(i + 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
         }
-
-
-        //         if (grid_.isEmpty(i + 1, j + 1))   /////////////// no values ////////////////////
-        //             grid_.v()(i + 1, j) = grid_.v()(i, j) + (grid_.dx() / grid_.dy()) * (grid_.u(i, j + 1, SOUTH) - grid_.u()(i, j)) ;
-        //
-        //         if (grid_.isEmpty(i - 1, j + 1))
-        //             grid_.v()(i - 1, j) = grid_.v()(i, j) - (grid_.dx() / grid_.dy()) * (grid_.u(i - 1, j + 1, DIAG) - grid_.u(i - 1, j, EAST)) ;
     }
 
-    // cell(i-1,j) , cell(i,j-1) , cell(i,j+1) are empty WSN
+    // cell (i-1,j) , cell (i,j-1) , cell (i,j+1) are empty: NSW
     if (grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1))
     {
         if (compP)
@@ -1379,12 +1244,6 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
             grid_.u()(i - 1, j - 1)   = grid_.u(i - 1, j, EAST) ;
             grid_.v()(i - 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
         }
-
-        //         if (grid_.isEmpty(i + 1, j + 1))   /////////////////// no values /////////////////////
-        //             grid_.u()(i, j + 1) = grid_.u()(i, j) + (grid_.dy() / grid_.dx()) * (grid_.v(i + 1, j, WEST) - grid_.v()(i, j)) ;
-        //
-        //         if (grid_.isEmpty(i + 1, j - 1))
-        //             grid_.u()(i, j - 1) = grid_.u()(i, j) - (grid_.dy() / grid_.dx()) * (grid_.v(i + 1, j - 1, DIAG) - grid_.v(i, j - 1, NORTH)) ;
     }
 
     // cell(i+1,j) , cell(i,j-1) , cell(i,j+1) are empty ESN
@@ -1414,17 +1273,12 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
             grid_.u()(i - 1, j - 1) = grid_.u(i - 1, j, EAST) + (grid_.dy() / grid_.dx()) * (grid_.v(i, j - 1, NORTH) - grid_.v(i - 1, j - 1, DIAG)) ;
     }
 }
-//*******************************************************************************************************************
 
 void FluidSimulator::four_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
-    //     std::cout << "four_empty_neighbour:" << i << ", " << j << std::endl;
-    // According to page 96 of book number 5
+    // Just one option for four empty neighbours
     if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1))
     {
-        //         std::cout << "grid_.v()(i, j): " << grid_.v()(i, j) << std::endl;
-        //         std::cout << "grid_.v()(i, j - 1): " << grid_.v()(i, j - 1) << std::endl;
-        //         std::cout << "gy_ * dt: " << gy_ * dt << std::endl;
         if (compP)
             grid_.p()(i, j) = 0.0 ;
         grid_.u()(i, j) += gx_ * dt ;
@@ -1453,6 +1307,6 @@ void FluidSimulator::four_empty_neighbour(int i , int j , const real &dt, bool c
 			grid_.u()(i - 1, j - 1)   = grid_.u(i - 1, j, EAST) ;
 			grid_.v()(i - 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
 		}
-        
+		
     }
 }

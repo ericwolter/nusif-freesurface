@@ -161,7 +161,7 @@ bool SORSolver::solve(StaggeredGrid &grid)
 
                     int number_of_empty_neighbour = 0 ;
 
-                    // Count the number of empty neighbour cell
+                    // Count the number of empty neighbour cells
                     if (grid.isEmpty(i + 1, j))
                         ++ number_of_empty_neighbour ;
                     if (grid.isEmpty(i - 1, j))

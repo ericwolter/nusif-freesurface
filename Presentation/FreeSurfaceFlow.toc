@@ -1,6 +1,13 @@
-\beamer@endinputifotherversion {3.24pt}
+\beamer@endinputifotherversion {3.10pt}
 \beamer@sectionintoc {1}{Problem description}{2}{0}{1}
-\beamer@sectionintoc {2}{Implementation}{3}{0}{2}
-\beamer@sectionintoc {3}{Results}{6}{0}{3}
-\beamer@subsectionintoc {3}{1}{The Breaking Dam}{6}{0}{3}
-\beamer@subsectionintoc {3}{2}{The Splash of a Liquid Drop}{8}{0}{3}
+\beamer@sectionintoc {2}{Free Surface Flow}{3}{0}{2}
+\beamer@subsectionintoc {2}{1}{Application}{3}{0}{2}
+\beamer@subsectionintoc {2}{2}{Theory}{4}{0}{2}
+\beamer@subsectionintoc {2}{3}{Free surface treatment}{4}{0}{2}
+\beamer@sectionintoc {3}{Implementation}{10}{0}{3}
+\beamer@subsectionintoc {3}{1}{Creating New Code}{10}{0}{3}
+\beamer@subsectionintoc {3}{2}{Changing Old Classes And Functions}{11}{0}{3}
+\beamer@subsectionintoc {3}{3}{Main Algorithm}{13}{0}{3}
+\beamer@sectionintoc {4}{Results}{14}{0}{4}
+\beamer@subsectionintoc {4}{1}{The Breaking Dam}{14}{0}{4}
+\beamer@subsectionintoc {4}{2}{The Splash of a Liquid Drop}{16}{0}{4}

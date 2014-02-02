@@ -6,6 +6,7 @@
 \usepackage{amsmath, amssymb, graphicx}
 \usepackage{listings}
 \usepackage{color}
+
 %\usepackage{beamerthemeshadow}
 %\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 \usetheme{Ilmenau}
@@ -31,8 +32,62 @@ $\beta(t) \in \left[0, \frac{\pi}{2}\right[ \mbox{f\"ur alle  } t \in \left[0,t^
   
 \end{enumerate}
 }
+\section{Free Surface Flow} 
+\subsection{Application}
 
+\begin{frame}
+ 		\begin{figure}
+ 			\begin{subfigure}[c]{0.45\textwidth}
+ 		 	      \includegraphics[width=1\textwidth]{pic/images.jpg}
+ 		 	\end{subfigure} 		 	
+ 		 	 \begin{subfigure}[c]{0.45\textwidth}
+ 		 	      \includegraphics[width=1\textwidth]{Images/images1.jpg}
+ 		 	\end{subfigure}
+ 		 	
+ 		 	\vspace{1em}
+ 		 	
+ 			\begin{subfigure}[c]{0.45\textwidth}
+ 		 	      \includegraphics[width=1\textwidth]{Images/images2.jpg}
+ 		 	\end{subfigure}
+ 		 	 \begin{subfigure}[c]{0.45\textwidth}
+ 		 	      \includegraphics[width=1\textwidth]{Images/images3.jpg}
+ 		 	\end{subfigure}   
+ 		\end{figure}
+\end{frame}	
 
+\subsection{Theory}
+\begin{frame}
+ 			\begin{figure}0.45\textwidth}
+ 		 	      \includegraphics[width=1\textwidth]{pic/all.pdf}
+ 		 	\end{figure}
+\end{frame}
+
+\subsection{Free surface treatment}
+	\begin{frame}{One empty neighbor}
+		\begin{figure}
+			\includegraphics[width=1\textwidth]{Images/one.pdf}
+		\end{figure}			
+		
+	\end{frame}	
+	
+	\begin{frame}{Two empty neighbor-common corner}
+			\includegraphics[width=0.49\textwidth]{Images/two1.pdf}
+
+	\end{frame}	
+	
+	\begin{frame}{Two empty neighbor-opposite side}
+			\includegraphics[width=0.49\textwidth]{Images/two2.pdf}
+
+	\end{frame}	
+	
+	\begin{frame}{Three empty neighbor}
+			\includegraphics[width=0.49\textwidth]{Images/three.pdf}
+	\end{frame}	
+		
+	\begin{frame}{Four empty neighbor}
+			\includegraphics[width=0.49\textwidth]{Images/four.pdf}
+
+	\end{frame}	 	
 \section{Implementation} 
 \subsection{Creating New Code}
 \frame{\frametitle{Particle and ParticleTracer}
@@ -90,7 +145,8 @@ Has a vector of particles
 \begin{lstlisting}
 while (n <= nrOfTimeSteps)
 {
-... determineNextDT(safetyfac_);
+    ...
+    determineNextDT(safetyfac_);
     particle_tracer_.markCells();
     set_UVP_surface(dt_, true);
     computeFG();
@@ -99,7 +155,8 @@ while (n <= nrOfTimeSteps)
     updateVelocities();
     refreshBoundaries();
     set_UVP_surface(dt_, false);
-... particle_tracer_.advanceParticles(dt_);
+    particle_tracer_.advanceParticles(dt_);
+    ...
 }
 \end{lstlisting}
 \end{frame}

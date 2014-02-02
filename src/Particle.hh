@@ -4,18 +4,8 @@
 #include <iostream>
 #include "Types.hh"
 
-
-//*******************************************************************************************************************
-/*    Particl class for 2 dimensions
-*
-*
-*/
-//*******************************************************************************************************************
-
-
 class Particle
 {
-
 public:
 
     Particle(real x, real y, int type);
@@ -51,7 +41,7 @@ private:
     real x_ ;   // "x" position of particle
     real y_ ;   // "y" position of particle
 
-    int type_;
+    int type_;  // encodes different particle types used for visualization
 };
 
 inline void Particle::setX(real xx)
@@ -62,6 +52,5 @@ inline void Particle::setY(real yy)
 {
     y_ = yy;
 }
-
 
 #endif //PARTICLE_HHH

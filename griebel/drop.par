@@ -45,7 +45,7 @@ none            file to write particle positions of streaklines
 0.0             TI:
 
 1		wW: flags for boundary conditions
-3		wO:   1 = slip         3 = inflow/outflow
-3		wN:   2 = no-slip      4 = periodic
+1		wO:   1 = slip         3 = inflow/outflow
+1		wN:   2 = no-slip      4 = periodic
 1		wS:  
  

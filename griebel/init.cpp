@@ -2,7 +2,7 @@
 # include <iostream>
 # include <iomanip>
 # include <cstring>
-
+#include <stdio.h>
 using namespace std;
 
 # include "datadef.hpp"

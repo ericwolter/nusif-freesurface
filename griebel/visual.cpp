@@ -1,7 +1,7 @@
 # include <cstdlib>
 # include <iostream>
 # include <iomanip>
-
+#include <stdio.h>
 using namespace std;
 
 # include "datadef.hpp"

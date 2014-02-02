@@ -13,9 +13,11 @@
 \headcommand {\slideentry {2}{1}{1}{3/3}{Application}{0}}
 \headcommand {\beamer@framepages {3}{3}}
 \headcommand {\beamer@subsectionentry {0}{2}{2}{4}{Theory}}\headcommand {\beamer@subsectionpages {3}{3}}
-\headcommand {\beamer@subsectionentry {0}{2}{3}{4}{Free surface treatment}}\headcommand {\beamer@subsectionpages {4}{3}}
-\headcommand {\slideentry {2}{3}{1}{4/4}{Free surface treatment}{0}}
+\headcommand {\slideentry {2}{2}{1}{4/4}{Theory}{0}}
 \headcommand {\beamer@framepages {4}{4}}
+\headcommand {\beamer@subsectionentry {0}{2}{3}{5}{Free surface treatment}}\headcommand {\beamer@subsectionpages {4}{4}}
+\headcommand {\slideentry {2}{3}{1}{5/5}{Free surface treatment}{0}}
+\headcommand {\beamer@framepages {5}{5}}
 \headcommand {\slideentry {2}{3}{2}{6/6}{Free surface treatment}{0}}
 \headcommand {\beamer@framepages {6}{6}}
 \headcommand {\slideentry {2}{3}{3}{7/7}{Free surface treatment}{0}}
@@ -26,7 +28,7 @@
 \headcommand {\beamer@framepages {9}{9}}
 \headcommand {\sectionentry {3}{Implementation}{10}{Implementation}{0}}
 \headcommand {\beamer@sectionpages {3}{9}}
-\headcommand {\beamer@subsectionpages {4}{9}}
+\headcommand {\beamer@subsectionpages {5}{9}}
 \headcommand {\beamer@subsectionentry {0}{3}{1}{10}{Creating New Code}}\headcommand {\beamer@subsectionpages {10}{9}}
 \headcommand {\slideentry {3}{1}{1}{10/10}{Creating New Code}{0}}
 \headcommand {\beamer@framepages {10}{10}}
@@ -53,4 +55,4 @@
 \headcommand {\beamer@subsectionpages {16}{16}}
 \headcommand {\beamer@sectionpages {14}{16}}
 \headcommand {\beamer@documentpages {16}}
-\headcommand {\def \inserttotalframenumber {15}}
+\headcommand {\def \inserttotalframenumber {16}}

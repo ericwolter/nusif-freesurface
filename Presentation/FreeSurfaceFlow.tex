@@ -1,0 +1,133 @@
+\documentclass{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{graphicx}
+\usepackage{amsmath, amssymb, graphicx}
+%\usepackage{beamerthemeshadow}
+%\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
+\usetheme{Ilmenau}
+\begin{document}
+\title{Free Surface Flows} 
+\date{03.02.2014}
+\author{M. Farahani, E. Wolter, A. Hahn}
+\frame{\titlepage}
+%\frame{\frametitle{Structure}\tableofcontents} 
+
+
+\section[Problem]{Problem description} 
+%\subsection{}
+\frame{ %\frametitle{ } 
+Finde eine st\"uckweise zwei mal stetig differenzierbare Bahnkurve der Hinterachse $\Phi \in C^1([0,t^*],\mathbb{R}^2)$, sodass\\
+\begin{enumerate}[(I)]
+\item das Auto zu jedem Zeitpunkt $t$ in einem Gebiet $G$ ist
+\item die Randbedingungen f\"ur $\Phi(0), [\Phi(t^*)]_2$ erf\"ullt sind und
+  $\frac{\Phi'(0)}{\|\Phi'(0)\|} = \frac{\Phi'(t^*)}{\|\Phi'(t^*)\|} =\begin{pmatrix}-1 \\ 0 \end{pmatrix}$
+\item f\"ur $-\frac{\Phi^{'}(t)}{\| \Phi^{'}(t) \|_2} = \begin{pmatrix} \cos \beta(t)\\ \sin \beta(t) \end{pmatrix}$\\
+$\beta(t) \in \left[0, \frac{\pi}{2}\right[ \mbox{f\"ur alle  } t \in \left[0,t^*\right]$ erf\"ullt ist
+\item (Wendekreisbeschr\"ankung erf\"ullt)
+  
+\end{enumerate}
+}
+
+
+\section[Creating new functions ]{Implementation} 
+\frame{\frametitle{New functions}
+%Es ist $x(t) = \Phi(t) + \begin{pmatrix} (l-h)\cos \beta(t) - \frac{b}{2} (-\sin \beta(t)) \\
+%-h\sin \beta(t)-\frac{b}{2} \cos \beta(t)\end{pmatrix}$.
+\begin{figure}[ht]
+	\centering
+	 \fbox{
+  %\includegraphics[width=0.8\textwidth]{bilder/A_in_G_standart.pdf}
+	%\caption{um 30 Grad gedreht}
+	\label{fig1}
+	}
+\end{figure}
+}
+
+\frame{\frametitle{Changing old functions}
+%Es ist $x(t) = \Phi(t) + \begin{pmatrix} (l-h)\cos \beta(t) - \frac{b}{2} (-\sin \beta(t)) \\
+%-h\sin \beta(t)-\frac{b}{2} \cos \beta(t)\end{pmatrix}$.
+\begin{figure}[ht]
+	\centering
+	 \fbox{
+  %\includegraphics[width=0.8\textwidth]{bilder/A_in_G_1.pdf}
+	%\caption{um 30 Grad gedreht}
+	\label{fig1}
+	}
+\end{figure}
+}
+
+\frame{\frametitle{Veranschaulichung Bedingung $(ii)$}
+%Es ist $x(t) = \Phi(t) + \begin{pmatrix} (l-h)\cos \beta(t) - \frac{b}{2} (-\sin \beta(t)) \\
+%-h\sin \beta(t)-\frac{b}{2} \cos \beta(t)\end{pmatrix}$.
+\begin{figure}[ht]
+	\centering
+	 \fbox{
+  %\includegraphics[width=0.8\textwidth]{bilder/A_in_G_2.pdf}
+	%\caption{um 30 Grad gedreht}
+	\label{fig1}
+	}
+\end{figure}
+
+}
+
+\section{Results}
+\subsection{The Breaking Dam}
+\frame{\frametitle{Breaking dam with outflow at the east wall}
+\begin{equation*} \label{Ansatz Geraden Kreise}
+\Phi(t)= 
+\left\{ 
+\begin{aligned} 
+\Phi(0) - 
+\begin{pmatrix}
+1\\0\\
+\end{pmatrix}
+	t && \text{ für } t\in [0,t_0] \\
+M^1 + r_1 
+\begin{pmatrix}
+-\sin\left(\frac{t-t_0}{r_1}\right)\\
+\cos\left(\frac{t-t_0}{r_1}\right)
+\end{pmatrix}
+	&& \text{ für } t\in [t_0,t_1] \\
+\Phi(t_1) +  
+\begin{pmatrix}
+-\cos\left(\frac{t_1-t_0}{r_1}\right)\\
+-\sin\left(\frac{t_1-t_0}{r_1}\right)
+\end{pmatrix}
+(t-t_1)
+	&& \text{ für } t\in [t_1,t_2] \\
+M^2 + r_2 
+\begin{pmatrix}
+\sin\left(\frac{t^*-t}{r_2}\right)\\
+-\cos\left(\frac{t^*-t}{r_2}\right)
+\end{pmatrix}
+	&& \text{ für } t\in [t_2, t^*] \\
+\end{aligned} 
+\right.
+\end{equation*}
+}
+
+\frame{\frametitle{Breaking dam with free-slip at the east wall}
+%Es ist $x(t) = \Phi(t) + \begin{pmatrix} (l-h)\cos \beta(t) - \frac{b}{2} (-\sin \beta(t)) \\
+%-h\sin \beta(t)-\frac{b}{2} \cos \beta(t)\end{pmatrix}$.
+\begin{figure}[ht]
+	\centering
+	 \fbox{
+  %\includegraphics[width=0.8\textwidth]{bilder/Phi_ansatz.pdf}
+	%\caption{um 30 Grad gedreht}
+	\label{fig1}
+	}
+\end{figure}
+
+}
+
+\subsection{The Splash of a Liquid Drop}
+\frame{\frametitle{Falling drop}
+\begin{itemize}
+\item Umschreibung der Bedingungen in die Variablen $t_0,t_1,r_1$ und $t_2$.
+\item L\"osung des entstehenden Optimierungsproblems
+\end{itemize}
+}
+
+\end{document}

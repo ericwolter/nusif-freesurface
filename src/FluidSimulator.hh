@@ -52,7 +52,7 @@ public:
     };
 
 
-    void backstep_test();
+    void test();
     void normalization();
     void dcavity_test();
     void testFG();
@@ -77,8 +77,7 @@ private:
     void two_empty_neighbour(int i , int j , const real &dt, bool compP) ;
     void three_empty_neighbour(int i , int j , const real &dt, bool compP) ;
     void four_empty_neighbour(int i , int j , const real &dt, bool compP) ;
-    //     real set_U_surface(int i, int j , const real &dt);
-    //     real set_V_surface(int i, int j , const real &dt);
+
     // needed values
     real safetyfac_, gamma_, Re_, gx_, gy_, dt_, vel_N, vel_S, vel_E, vel_W, uInit_, vInit_, pInit_;
     real rectX_, rectXX_, rectY_, rectYY_, circX_, circY_, circR_;

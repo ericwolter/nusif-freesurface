@@ -928,7 +928,7 @@ void FluidSimulator::computeFG()
 
 // helper functions for testing
 
-void FluidSimulator::backstep_test()
+void FluidSimulator::test()
 {
     //simulate(dt_*timeStepNr);
     simulateTimeStepCount(timeStepNr);

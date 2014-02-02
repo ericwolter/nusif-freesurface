@@ -16,7 +16,6 @@ int main(int argc, char **argv)
     }
 
     FileReader confi;
-    //////////////////////////////////////////////////////// Breaking dum /////////////////////////////////////////////////////////////
     confi.registerStringParameter("name");
 
     //////////////////////////////////////////////////////// Initialization ///////////////////////////////////////////////////////
@@ -91,7 +90,7 @@ int main(int argc, char **argv)
     FluidSimulator simulator(confi);
 
     // test
-    simulator.backstep_test();
+    simulator.test();
 
     std::cout << "Program end with: " << argv[1] << std::endl;
 

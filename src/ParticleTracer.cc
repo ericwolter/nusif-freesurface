@@ -136,6 +136,9 @@ void ParticleTracer::advanceParticles(real const dt)
             // the vector has now shrunk so we need to check the element which moved into the empty place
             i--;
         }
+        //else
+        	//boundary_particle(i,j,x,y,u,v, dt) ;
+
     }
 }
 
@@ -207,5 +210,9 @@ real ParticleTracer::interpolateV(real x, real y)
 
     return v;
 }
+// TODO: implement a treatment for particle near the boundary
+void ParticleTracer::particle_boundary(int i , int j ,real x,real y , real u , real v , const real dt)
+{
 
+}
 

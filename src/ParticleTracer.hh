@@ -25,6 +25,8 @@ public:
     void addCircle(int x, int y, int r, int type);
 
     void advanceParticles(real const dt);
+    void particle_boundary(int i , int j ,real x,real y , real u , real v , const real dt)
+
     void print();
 
 private:

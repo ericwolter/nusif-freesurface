@@ -31,7 +31,7 @@ P_INIT                 0.0		   # initial value for pressure
 xlength                8.0		   # domain size in x-direction
 ylength                6.0		   # domain size in y-direction
 imax                   40		   # number of interior cells in x-direction //Orginal:100
-jmax                   20		   # number of interior cells in y-direction //Orginal:25
+jmax                   30		   # number of interior cells in y-direction //Orginal:25
 
 
 # Initial Particle Position:
@@ -52,8 +52,8 @@ CircleParticleR                 0.6
 # Time Data:
 # ---------
 
-dt                     0.01      # time stepsize
-timesteps              125      # number of timesteps
+dt                     0.04      # time stepsize
+timesteps              500     # number of timesteps
 safetyfactor           0.2       # factor "tau" for timestep size control (<=0 means constant dt)
 
 # Pressure Iteration Data:

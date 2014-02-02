@@ -52,8 +52,8 @@ CircleParticleR                 0.6
 # Time Data:
 # ---------
 
-dt                     0.04      # time stepsize
-timesteps              500     # number of timesteps
+dt                     0.01      # time stepsize
+timesteps              1000     # number of timesteps
 safetyfactor           0.2       # factor "tau" for timestep size control (<=0 means constant dt)
 
 # Pressure Iteration Data:
@@ -69,6 +69,6 @@ normalizationfrequency 100       # every n'th time step in the fluid solver the 
 
 # VTK Visualization Data:
 # -----------------------
-outputinterval 1                 # every n'th time step the visualization should be printed to a file
+outputinterval 5                 # every n'th time step the visualization should be printed to a file
 
 #======================================================================================================================

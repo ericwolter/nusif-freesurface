@@ -155,7 +155,6 @@ void testTwoNeighborSouthEast()
 
 void testTwoNeighborWestEast()
 {
-    real continuity;
     FluidSimulator sim = setupSim();
     sim.tracer().addRectangle(1, 0, 2, 3, 9);
 
@@ -176,16 +175,9 @@ void testTwoNeighborWestEast()
     sim.set_UVP_surface(dt, true);
 
     real dX = dt * gx;
-    real dY = dt * gy;
 
     CHECK(fabs(sim.grid().u()(2,2) - (u_old1 + dX)) < 1e-5);
-    CHECK(fabs(sim.grid().u()(1,2) - (u_old2 + dX)) < 1e-5);
-
-    // TODO: why would the continuity not hold here?
-    
-    // continuity = (sim.grid().u()(2, 2) - sim.grid().u()(1, 2)) / sim.grid().dx() +
-    //              (sim.grid().v()(2, 2) - sim.grid().v()(2, 1)) / sim.grid().dy();
-    // CHECK(fabs(continuity) < 1e-5);    
+    CHECK(fabs(sim.grid().u()(1,2) - (u_old2 + dX)) < 1e-5);  
 }
 
 int main()

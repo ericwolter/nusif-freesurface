@@ -11,7 +11,7 @@ void testTotalNumber()
 {
     StaggeredGrid grid(2, 2, 1, 1);
     ParticleTracer tracer(&grid);
-    tracer.addRectangle(0, 0, 2, 2, 0);
+    tracer.addRectangle(0.0, 0.0, 2.0, 2.0, 0);
 
     CHECK(tracer.particles().size() == 4 * 9);
 }
@@ -20,7 +20,7 @@ void testTotalNumberLarge()
 {
     StaggeredGrid grid(1.0, 1.0, 1.0 / 30, 1.0 / 30);
     ParticleTracer tracer(&grid);
-    tracer.addRectangle(0, 0, 30, 30, 0);
+    tracer.addRectangle(0, 0, 1.0, 1.0, 0);
 
     CHECK(tracer.particles().size() == 30 * 30 * 9);
 }
@@ -29,7 +29,7 @@ void testCellCorrect()
 {
     StaggeredGrid grid(2, 2, 1, 1);
     ParticleTracer tracer(&grid);
-    tracer.addRectangle(0, 0, 2, 2, 0);
+    tracer.addRectangle(0.0, 0.0, 2.0, 2.0, 0);
 
     Particle p = tracer.particles()[0];
 
@@ -41,7 +41,7 @@ void testFirstPositionCorrect()
 {
     StaggeredGrid grid(2, 2, 1, 1);
     ParticleTracer tracer(&grid);
-    tracer.addRectangle(0, 0, 2, 2, 0);
+    tracer.addRectangle(0.0, 0.0, 2.0, 2.0, 0);
 
     Particle p = tracer.particles()[0];
     CHECK(fabs(p.x() - 0.16667) < 1e-5);
@@ -52,7 +52,7 @@ void testCenterPositionCorrect()
 {
     StaggeredGrid grid(3, 3, 1, 1);
     ParticleTracer tracer(&grid);
-    tracer.addRectangle(0, 0, 3, 3, 0);
+    tracer.addRectangle(0.0, 0.0, 3.0, 3.0, 0);
 
     unsigned int centerOffset = 9 * 4 /* jump over cells */ + 4 /* the index of the center particle in a cell */;
     Particle p = tracer.particles()[centerOffset];
@@ -67,7 +67,7 @@ void testCenterZeroInterpolate()
     grid.v().fill(0.0);
 
     ParticleTracer tracer(&grid);
-    tracer.addRectangle(0, 0, 3, 3, 0);
+    tracer.addRectangle(0.0, 0.0, 3.0, 3.0, 0);
 
     unsigned int centerOffset = 9 * 4 /* jump over cells */ + 4 /* the index of the center particle in a cell */;
     Particle p = tracer.particles()[centerOffset];
@@ -85,7 +85,7 @@ void testCenterSingleInterpolate()
     grid.v().fill(0.0);
 
     ParticleTracer tracer(&grid);
-    tracer.addRectangle(0, 0, 3, 3, 0);
+    tracer.addRectangle(0.0, 0.0, 3.0, 3.0, 0);
 
     grid.u()(2, 2) = 1.0;
     grid.v()(2, 2) = 1.0;
@@ -106,7 +106,7 @@ void testInterpolatedCellsCorrect()
     grid.v().fill(0.0);
 
     ParticleTracer tracer(&grid);
-    tracer.addRectangle(0, 0, 3, 3, 0);
+    tracer.addRectangle(0.0, 0.0, 3.0, 3.0, 0);
 
     grid.u()(2, 2) = 1.0;
     grid.u()(2, 1) = 1.0;
@@ -165,7 +165,7 @@ void testMarkCellsPartialParticles() {
     ParticleTracer tracer(&grid);
 
     // leave one column to the right empty
-    tracer.addRectangle(0, 0, 2, 3, 0);
+    tracer.addRectangle(0.0, 0.0, 2.0, 3.0, 0);
 
     tracer.markCells();
     for (int i = 1; i <= 2; ++i)

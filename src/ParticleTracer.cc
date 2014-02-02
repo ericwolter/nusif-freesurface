@@ -45,6 +45,7 @@ void ParticleTracer::markCells()
 void ParticleTracer::addRectangle(real x1, real y1, real x2, real y2, int type)
 {
     PROG("adding particle rectangle: " << "(" << x1 << "|" << y1 << ")" << ", " << "(" << x2 << "|" << y2 << ")");
+    
     int minX = std::min((int)round(x1 / grid_->dx()), (int)round(x2 / grid_->dx()));
     int maxX = std::max((int)round(x1 / grid_->dx()), (int)round(x2 / grid_->dx()));
     int minY = std::min((int)round(y1 / grid_->dy()), (int)round(y2 / grid_->dy()));

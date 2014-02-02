@@ -8,15 +8,16 @@
 
 name BreakingDam
 
-#boundary_condition_W   free-slip    # free-slip condition at west boundary
-#boundary_condition_S   free-slip    # free-slip condition at south boundary
-#boundary_condition_E   outflow      # outflow condition at east boundary
+boundary_condition_W   free-slip    # free-slip condition at west boundary
+boundary_condition_S   free-slip    # free-slip condition at south boundary
+boundary_condition_E   outflow      # outflow condition at east boundary
+boundary_condition_N   outflow      # outflow condition at north boundary
 
 
 GX                      0.0			# Body forces (e.g. gravity)
-GY                     -10.0			#
+GY                     -1.0			#
 
-Re                     100.0			# Reynolds number
+Re                     10.0			# Reynolds number
 
 U_INIT                 0.0		   # initial value for velocity in x-direction
 V_INIT                 0.0		   # initial value for velocity in y-direction
@@ -27,10 +28,10 @@ P_INIT                 0.0		   # initial value for pressure
 # Geometry Data:
 # -------------
 
-xlength                5.0		   # domain size in x-direction
-ylength                5.0		   # domain size in y-direction
-imax                   5		   # number of interior cells in x-direction //Orginal:100
-jmax                   5		   # number of interior cells in y-direction //Orginal:25
+xlength                10.0		   # domain size in x-direction
+ylength                4.0		   # domain size in y-direction
+imax                   50		   # number of interior cells in x-direction //Orginal:100
+jmax                   20		   # number of interior cells in y-direction //Orginal:25
 
 
 # Initial Particle Position:
@@ -38,9 +39,9 @@ jmax                   5		   # number of interior cells in y-direction //Orginal
 
 ppc				16
 
-RectangleParticleX1                	2.0	 
-RectangleParticleX2	                3.0      
-RectangleParticleY1   	            3.0       
+RectangleParticleX1                	0.0	 
+RectangleParticleX2	                2.0      
+RectangleParticleY1   	            0.0       
 RectangleParticleY2                 4.0
 
 

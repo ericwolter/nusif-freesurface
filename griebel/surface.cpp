@@ -78,8 +78,8 @@ struct particleline *INIT_PARTICLES(int *N, int imax, int jmax,
     }
 
     int minX = 2.0 / delx;
-    int maxX = 3.0 / delx;
-    int minY = 3.0 / dely;
+    int maxX = 4.0 / delx;
+    int minY = 2.0 / dely;
     int maxY = 4.0 / dely;
 
     cout << "minX, maxX: " << minX << ", " << maxX << endl;

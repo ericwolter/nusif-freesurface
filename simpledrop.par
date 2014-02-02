@@ -39,8 +39,8 @@ jmax                   5		   # number of interior cells in y-direction //Orginal
 ppc				16
 
 RectangleParticleX1                	2.0	 
-RectangleParticleX2	                3.0      
-RectangleParticleY1   	            3.0       
+RectangleParticleX2	                4.0      
+RectangleParticleY1   	            2.0       
 RectangleParticleY2                 4.0
 
 

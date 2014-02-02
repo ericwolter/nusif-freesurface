@@ -1432,14 +1432,27 @@ void FluidSimulator::four_empty_neighbour(int i , int j , const real &dt, bool c
         grid_.v()(i, j) += gy_ * dt ;
         grid_.v()(i, j - 1) = grid_.v(i, j - 1, NORTH) + gy_ * dt ;
 
-        grid_.u()(i, j + 1)     = grid_.u()(i, j) ;
-        grid_.u()(i, j - 1)     = grid_.u()(i, j) ;
-        grid_.u()(i - 1, j + 1)   = grid_.u(i - 1, j, EAST) ;
-        grid_.u()(i - 1, j - 1)   = grid_.u(i - 1, j, EAST) ;
-
-        grid_.v()(i + 1, j)     = grid_.v()(i, j) ;
-        grid_.v()(i + 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
-        grid_.v()(i - 1, j)     = grid_.v()(i, j) ;
-        grid_.v()(i - 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		
+		if (grid_.isEmpty(i + 1, j + 1))
+		{
+			grid_.u()(i, j + 1)     = grid_.u()(i, j) ;
+			grid_.v()(i + 1, j)     = grid_.v()(i, j) ;
+		}
+		if (grid_.isEmpty(i + 1, j - 1))
+		{
+			grid_.u()(i, j - 1)     = grid_.u()(i, j) ;
+			grid_.v()(i + 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		}
+		if (grid_.isEmpty(i - 1, j + 1))
+		{
+			grid_.u()(i - 1, j + 1)   = grid_.u(i - 1, j, EAST) ;
+			grid_.v()(i - 1, j)     = grid_.v()(i, j) ;
+		}
+		if (grid_.isEmpty(i - 1, j - 1))
+		{
+			grid_.u()(i - 1, j - 1)   = grid_.u(i - 1, j, EAST) ;
+			grid_.v()(i - 1, j - 1)   = grid_.v(i, j - 1, NORTH) ;
+		}
+        
     }
 }

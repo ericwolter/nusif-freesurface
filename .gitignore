@@ -75,3 +75,4 @@ build/
 Build/
 *.log
 nast2d
+psi_data.txt

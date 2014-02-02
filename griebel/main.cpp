@@ -269,24 +269,61 @@ int main(int argc, char *Inputfile[])
         //
         //  Compute new temperature
         //
-        COMP_TEMP(U, V, TEMP, FLAG, imax, jmax, delt, delx, dely, gamma, Re, Pr);
+        //COMP_TEMP(U, V, TEMP, FLAG, imax, jmax, delt, delx, dely, gamma, Re, Pr);
         //
         //  Compute tentative velocity field (F,G)
         //
         COMP_FG(U, V, TEMP, F, G, FLAG, imax, jmax, delt, delx, dely, GX,
                 GY, gamma, Re, beta);
+        cout << "F:" << endl;
+        for (int j = jmax; j >= 1; --j)
+        {
+            for (int i = 1; i <= imax; ++i)
+            {
+                cout << P[i][j] << " ";
+            }
+            cout << endl;
+        }
+        cout << "G:" << endl;
+        for (int j = jmax; j >= 1; --j)
+        {
+            for (int i = 1; i <= imax; ++i)
+            {
+                cout << P[i][j] << " ";
+            }
+            cout << endl;
+        }
         //
         //  Compute right hand side for pressure equation
         //
+        cout << "- COMP_RHS" << endl;
         COMP_RHS(F, G, RHS, FLAG, imax, jmax, delt, delx, dely);
         //
         //  Solve the pressure equation by successive over relaxation
         //
+        for (int j = jmax; j >= 1; --j)
+        {
+            for (int i = 1; i <= imax; ++i)
+            {
+                cout << RHS[i][j] << " ";
+            }
+            cout << endl;
+        }        
+        cout << "- POISSON" << endl;
         if (0 < ifull)
         {
             itersor = POISSON(P, RHS, FLAG, imax, jmax, delx, dely,
                               eps, itermax, omg, &res, ifull, p_bound);
         }
+        cout << "P:" << endl;
+        for (int j = jmax; j >= 1; --j)
+        {
+            for (int i = 1; i <= imax; ++i)
+            {
+                cout << P[i][j] << " ";
+            }
+            cout << endl;
+        }        
         cout << "t= "            << t + delt  << "  "
              << "delt= "         << delt    << "  "
              << "iterations = "  << itersor << "  "
@@ -333,11 +370,12 @@ int main(int argc, char *Inputfile[])
             WRITE_bin(U, V, P, TEMP, FLAG, imax, jmax, outfile);
         }
 
-        if (strcmp(tracefile, "none"))
-        {
-            PARTICLE_TRACING(tracefile, t, imax, jmax, delx, dely, delt, U, V, FLAG,
-                             N, Particlelines, write);
-        }
+        // if (strcmp(tracefile, "none"))
+        // {
+            cout << "trace" << endl;
+            PARTICLE_TRACING(tracefile, 1, imax, jmax, delx, dely, delt, U, V, FLAG,
+                             N, Particlelines, 0);
+        // }
 
         if (strcmp(streakfile, "none"))
         {

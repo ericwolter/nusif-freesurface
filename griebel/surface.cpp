@@ -108,7 +108,7 @@ struct particleline *INIT_PARTICLES(int *N, int imax, int jmax,
                 for (int w = 1; w <= particlesPerSide; ++w)
                 {
                     std::cout << "TRACER pX,Y: " << cellX + deltaX / 2 + (q - 1) * deltaX << ", " << cellY + deltaY / 2 + (w - 1) * deltaY << std::endl;
-                    SET_PART(&Particlelines[1], cellX + deltaX / 2 + (i - 1) * deltaX, cellY + deltaY / 2 + (j - 1) * deltaY);
+                    SET_PART(&Particlelines[1], cellX + deltaX / 2 + (q - 1) * deltaX, cellY + deltaY / 2 + (w - 1) * deltaY);
                 }
             }
         }
@@ -179,6 +179,8 @@ void SET_PART(struct particleline *Partline, REAL x, REAL y)
     //  Create a particle.
     //
     part =  PARTALLOC(x, y);
+
+    cout << part->x << endl;
     //
     //  Add it to PARTLINE in the first position.
     //

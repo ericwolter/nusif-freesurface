@@ -221,21 +221,8 @@ void StaggeredGrid::setCellToObstacle(int x, int y)
 {
     obs_(x, y) = OBS; // set cell to obstacle
 
-    // it is okay to set the velocities of obstacles right here
-    // because they are never updated or moved
-    // this IS NOT the case for empty cells which change constantly
     if (x < u_.getSize(0) && y < u_.getSize(1))
         u_(x, y) = 0;
     if (x < v_.getSize(0) && y < v_.getSize(1))
         v_(x, y) = 0;
-
-    //     // configurate neighbors
-    //     if ( (x - 1) >= 0 ) // east
-    //         obs_(x - 1, y) = obs_(x - 1, y) | OBSWEST;
-    //     if ( (x + 1) < obs_.getSize(0) ) // west
-    //         obs_(x + 1, y) = obs_(x + 1, y) | OBSEAST;
-    //     if ( (y - 1) >= 0 ) // south
-    //         obs_(x, y - 1) = obs_(x, y - 1) | OBSNORTH;
-    //     if ( (y + 1) < obs_.getSize(1) ) // north
-    //         obs_(x, y + 1) = obs_(x, y + 1) | OBSSOUTH;
 }

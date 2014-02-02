@@ -94,10 +94,6 @@ public:
     {
         return obs_;
     }
-    const std::vector<Particle> &particles() const
-    {
-        return particles_;
-    }
 
     real dx() const
     {
@@ -161,11 +157,7 @@ public:
     void createCircle(real x, real y, real r);
     void createPng(const std::string &pngFilename);
     void readPng(const std::string &pngFilename);
-    void markCells();
 
-    //    // Interpolated function ( bilinear interpolation )
-    //    real u_inter ( real x , real y ) ;
-    //    real v_inter ( real x , real y ) ;
 protected:
     Array p_;   //< pressure field
     Array rhs_; //< right hand side of the pressure equation
@@ -181,8 +173,7 @@ protected:
     real ySize_;
     int imax_, jmax_;
     int ppc_;
-
-    std::vector<Particle> particles_;
+	
 };
 
 
@@ -235,92 +226,19 @@ inline int StaggeredGrid::getNumFluid()
     return sum;
 }
 
-// inline real StaggeredGrid::u(const int x, const int y, Direction dir)
-// {
-//     if (isFluid(x, y) && isFluid(x + 1, y))
-//         return u_(x, y);
-//
-//     if (dir == NORTH)
-//     {
-//         if (!isFluid(x, y) && !isFluid(x + 1, y))
-//             return -u_(x, y + 1);
-//     }
-//
-//     if (dir == SOUTH)
-//     {
-//         if (!isFluid(x, y) && !isFluid(x + 1, y))
-//             return -u_(x, y - 1);
-//     }
-//
-//     return 0;
-// }
-//
-//
-// inline real StaggeredGrid::v(const int x, const int y, Direction dir)
-// {
-//     if (isFluid(x, y) && isFluid(x, y + 1))
-//         return v_(x, y);
-//
-//     if (dir == WEST)
-//     {
-//         if (!isFluid(x, y) && !isFluid(x, y + 1))
-//             return -v_(x - 1, y);
-//     }
-//
-//     if (dir == EAST)
-//     {
-//         if (!isFluid(x, y) && !isFluid(x, y + 1))
-//             return -v_(x + 1, y);
-//     }
-//
-//     return 0;
-//
-// }
-//
-//
-// inline real StaggeredGrid::p(const int x, const int y, Direction dir)
-// {
-//     if (!isFluid(x, y))
-//     {
-//         if (dir == NORTH)
-//         {
-//             return p_(x, y + 1);
-//
-//         }
-//         else if (dir == SOUTH)
-//         {
-//             return p_(x, y - 1);
-//
-//         }
-//         else if (dir == WEST)
-//         {
-//             return p_(x - 1, y);
-//
-//         }
-//         else
-//         {
-//             return p_(x + 1, y);
-//         }
-//     }
-//
-//     return p_(x, y);
-// }
-
+// wrapper access
 inline real StaggeredGrid::u(const int x, const int y, Direction dir)
 {
-    //  if (!( (x + 1 < u_.getSize(0)) && (x >= 0) && (y >= 0) && (y < u_.getSize(1)) ))
-    //      return 0; // desert index out of bounds
-
     if (!isObstacle(x, y) && !isObstacle(x + 1, y))
         return u_(x, y);
 
-    if (dir == NORTH /*&& (y + 1 < u_.getSize(1))*/) // desert index out of bounds
+    if (dir == NORTH) 
     {
         if (isObstacle(x, y) && isObstacle(x + 1, y))
             return -u_(x, y + 1);
     }
 
-    if (dir == SOUTH /*&& (y - 1 >= 0)*/) // desert index out of bounds
+    if (dir == SOUTH) 
     {
         if (isObstacle(x, y) && isObstacle(x + 1, y))
             return -u_(x, y - 1);
@@ -328,17 +246,11 @@ inline real StaggeredGrid::u(const int x, const int y, Direction dir)
 
     if (dir == DIAG)
     {
-        //      if (y + 1 < u_.getSize(1)) // desert index out of bounds
-        //      {
         if (isObstacle(x, y) && isObstacle(x + 1, y) && isFluid(x, y + 1))
             return -u_(x, y + 1);
-        //      }
 
-        //      if (y - 1 >= 0) // desert index out of bounds
-        //      {
         if (isObstacle(x, y) && isObstacle(x + 1, y) && isFluid(x, y - 1))
             return -u_(x, y - 1);
-        //      }
     }
 
     return 0;
@@ -347,19 +259,16 @@ inline real StaggeredGrid::u(const int x, const int y, Direction dir)
 
 inline real StaggeredGrid::v(const int x, const int y, Direction dir)
 {
-    //  if (!( (y + 1 < v_.getSize(1)) && (y >= 0) && (x >= 0) && (x < v_.getSize(0)) ))
-    //      return 0; // desert index out of bounds
-
     if (!isObstacle(x, y) && !isObstacle(x, y + 1))
         return v_(x, y);
 
-    if (dir == WEST /*&& (x - 1 >= 0)*/) // desert index out of bounds
+    if (dir == WEST) 
     {
         if (isObstacle(x, y) && isObstacle(x, y + 1))
             return -v_(x - 1, y);
     }
 
-    if (dir == EAST /*&& (x + 1 < v_.getSize(0))*/) // desert index out of bounds
+    if (dir == EAST) 
     {
         if (isObstacle(x, y) && isObstacle(x, y + 1))
             return -v_(x + 1, y);
@@ -367,17 +276,11 @@ inline real StaggeredGrid::v(const int x, const int y, Direction dir)
 
     if (dir == DIAG)
     {
-        //      if (x + 1 < v_.getSize(0)) // desert index out of bounds
-        //      {
         if (isObstacle(x, y) && isObstacle(x, y + 1) && isFluid(x + 1, y))
             return -v_(x + 1, y);
-        //      }
-        //
-        //      if (x - 1 >= 0) // desert index out of bounds
-        //      {
+
         if (isObstacle(x, y) && isObstacle(x, y + 1) && isFluid(x - 1, y))
             return -v_(x - 1, y);
-        //      }
     }
 
     return 0;

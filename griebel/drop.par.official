@@ -1,16 +1,16 @@
-dam		problem: the breaking dam
+drop		problem: the splash of a liquid drop
 
 none 		infile: file to read initial values from
 none  		outfile: file to write final values
 
-5.0		xlength: domain size in x-direction
-5.0		ylength: domain size in y-direction
-5		imax: number of interior cells in x-direction
-5		jmax: number of interior cells in y-direction
+8.0		xlength: domain size in x-direction
+6.0		ylength: domain size in y-direction
+40		imax: number of interior cells in x-direction
+30		jmax: number of interior cells in y-direction
 
-5.0		t_end: final time
-0.04		delt: time stepsize
-0.5             tau:  safety factor for time stepsize control
+10.0		t_end: final time
+0.01		delt: time stepsize
+0.2             tau:  safety factor for time stepsize control
 
 1000.0		del_trace: time step for writing particles for particle tracing
 1000.0		del_inj:   time step for injecting particles
@@ -35,17 +35,17 @@ none            file to write particle positions of streaklines
                          1 = modify the equation at the boundary (book p. 37)
                          2 = copy pressure values near the boundary (book p. 39)
 
-100	       	Re: Reynolds number
+40	       	Re: Reynolds number
 1.0		Pr: Prandtl number
 0.0    		beta: coefficient of volume expansion
 0.0		GX:            
--10.0		GY: volume forces, e.g. gravity
+-1.0		GY: volume forces, e.g. gravity
 0.0		UI:
 0.0		VI: initial values
 0.0             TI:
 
 1		wW: flags for boundary conditions
 1		wO:   1 = slip         3 = inflow/outflow
-1		wN:   2 = no-slip      4 = periodic
+3		wN:   2 = no-slip      4 = periodic
 1		wS:  
  

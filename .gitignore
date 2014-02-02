@@ -73,3 +73,5 @@ $RECYCLE.BIN/
 
 build/
 Build/
+*.log
+nast2d

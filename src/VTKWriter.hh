@@ -1,11 +1,8 @@
 #ifndef VTKFILEWRITER_HH
 #define VTKFILEWRITER_HH
 
-
 #include "StaggeredGrid.hh"
 #include "ParticleTracer.hh"
-
-
 
 //*******************************************************************************************************************
 /*! Writes StaggeredGrid as vtk file

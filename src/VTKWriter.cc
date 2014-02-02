@@ -19,8 +19,6 @@ template<>           struct RealTypeToString<double>
 const char *RealTypeToString<float>::str  = "float";
 const char *RealTypeToString<double>::str = "double";
 
-
-
 VTKWriter::VTKWriter(const std::string &basename)
     : baseName_(basename),
       counter_(0)
@@ -79,12 +77,16 @@ void VTKWriter::write(const StaggeredGrid &grid, const ParticleTracer *tracer)
         }
     }
 
+    // particle tracing is optional
+    // the particle VTK file will only be written if a tracer exists
     if (tracer != NULL)
     {
         std::stringstream fileNameParticles;
         fileNameParticles << baseName_ << "_" <<  std::setw(4) << std::setfill('0') << counter_ << "_particles.vtk";
         std::ofstream fileStreamParticles(fileNameParticles.str().c_str());
 
+        // each particle has its own position so we have to use
+        // the UNSTRUCTURED_GRID visualization of ParaView
         fileStreamParticles << "# vtk DataFile Version 4.0\n";
         fileStreamParticles << "Nusif Particles VTK output\n";
         fileStreamParticles << "ASCII\n";
@@ -98,7 +100,7 @@ void VTKWriter::write(const StaggeredGrid &grid, const ParticleTracer *tracer)
         fileStreamParticles << "CELLS 0 0" << std::endl;
         fileStreamParticles << "CELL_TYPES 0" << std::endl;
         fileStreamParticles << "POINT_DATA " << tracer->particles().size() << std::endl;
-        fileStreamParticles << "SCALARS type int" << RealTypeToString<real>::str << std::endl;
+        fileStreamParticles << "SCALARS type int" << std::endl;
         fileStreamParticles << "LOOKUP_TABLE default" << std::endl;
         for (std::vector<Particle>::const_iterator p = tracer->particles().begin() ; p != tracer->particles().end(); ++p)
         {

@@ -159,17 +159,32 @@ bool SORSolver::solve(StaggeredGrid &grid)
                     if (j == jmax)   // up
                         grid.p()(i, j + 1) = grid.p()(i, j);
 
-                    // calculate p
-                    real oP = grid.p()(i, j); // old p (for residue)
+                    int number_of_empty_neighbour = 0 ;
 
-                    real old = (1 - om) * grid.p()(i, j);
-                    real factor = om * oneTerm;
-                    real upgr1 = (grid.p(i + 1, j, WEST) + grid.p(i - 1, j, EAST)) * oneDXsq;
-                    real upgr2 = (grid.p(i, j + 1, SOUTH) + grid.p(i, j - 1, NORTH)) * oneDYsq;
-                    grid.p()(i, j) = old + factor * (upgr1 + upgr2 - grid.rhs()(i - 1, j - 1));   // actual iteration step
+                    // Count the number of empty neighbour cell
+                    if (grid.isEmpty(i + 1, j))
+                        ++ number_of_empty_neighbour ;
+                    if (grid.isEmpty(i - 1, j))
+                        ++ number_of_empty_neighbour ;
+                    if (grid.isEmpty(i, j + 1))
+                        ++ number_of_empty_neighbour ;
+                    if (grid.isEmpty(i, j - 1))
+                        ++ number_of_empty_neighbour ;
 
-                    // calculate new "residue"
-                    residue += (grid.p()(i, j) - oP) * (grid.p()(i, j) - oP);
+                    if (number_of_empty_neighbour == 0)
+                    {
+                        // calculate p
+                        real oP = grid.p()(i, j); // old p (for residue)
+
+                        real old = (1 - om) * grid.p()(i, j);
+                        real factor = om * oneTerm;
+                        real upgr1 = (grid.p(i + 1, j, WEST) + grid.p(i - 1, j, EAST)) * oneDXsq;
+                        real upgr2 = (grid.p(i, j + 1, SOUTH) + grid.p(i, j - 1, NORTH)) * oneDYsq;
+                        grid.p()(i, j) = old + factor * (upgr1 + upgr2 - grid.rhs()(i - 1, j - 1));   // actual iteration step
+
+                        // calculate new "residue"
+                        residue += (grid.p()(i, j) - oP) * (grid.p()(i, j) - oP);
+                    }
                 }
             }
         }

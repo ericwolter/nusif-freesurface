@@ -269,8 +269,8 @@ int main(int argc, char *Inputfile[])
         //
         //  Compute new temperature
         //
-        //COMP_TEMP(U, V, TEMP, FLAG, imax, jmax, delt, delx, dely, gamma, Re, Pr);
-        //
+        COMP_TEMP(U, V, TEMP, FLAG, imax, jmax, delt, delx, dely, gamma, Re, Pr);
+        
         //  Compute tentative velocity field (F,G)
         //
         COMP_FG(U, V, TEMP, F, G, FLAG, imax, jmax, delt, delx, dely, GX,
@@ -280,7 +280,7 @@ int main(int argc, char *Inputfile[])
         {
             for (int i = 1; i <= imax; ++i)
             {
-                cout << P[i][j] << " ";
+                cout << F[i][j] << " ";
             }
             cout << endl;
         }
@@ -289,7 +289,7 @@ int main(int argc, char *Inputfile[])
         {
             for (int i = 1; i <= imax; ++i)
             {
-                cout << P[i][j] << " ";
+                cout << G[i][j] << " ";
             }
             cout << endl;
         }

@@ -221,9 +221,9 @@ int main(int argc, char *Inputfile[])
                        N, Particlelines);
 
             cout << "FLAG:" << endl;
-            for (int j = jmax; j >= 1; --j)
+            for (int j = jmax + 1; j >= 0; --j)
             {
-                for (int i = 1; i <= imax; ++i)
+                for (int i = 0; i <= imax + 1; ++i)
                 {
                     cout << (FLAG[i][j] & C_E ? 4 : 2) << " ";
                 }
@@ -234,27 +234,27 @@ int main(int argc, char *Inputfile[])
                             dely, delt);
 
             cout << "U:" << endl;
-            for (int j = jmax; j >= 1; --j)
+            for (int j = jmax + 1; j >= 0; --j)
             {
-                for (int i = 1; i <= imax; ++i)
+                for (int i = 0; i <= imax + 1; ++i)
                 {
                     cout << U[i][j] << " ";
                 }
                 cout << endl;
             }
             cout << "V:" << endl;
-            for (int j = jmax; j >= 1; --j)
+            for (int j = jmax + 1; j >= 0; --j)
             {
-                for (int i = 1; i <= imax; ++i)
+                for (int i = 0; i <= imax + 1; ++i)
                 {
                     cout << V[i][j] << " ";
                 }
                 cout << endl;
             }
             cout << "P:" << endl;
-            for (int j = jmax; j >= 1; --j)
+            for (int j = jmax + 1; j >= 0; --j)
             {
-                for (int i = 1; i <= imax; ++i)
+                for (int i = 0; i <= imax + 1; ++i)
                 {
                     cout << P[i][j] << " ";
                 }
@@ -270,24 +270,24 @@ int main(int argc, char *Inputfile[])
         //  Compute new temperature
         //
         COMP_TEMP(U, V, TEMP, FLAG, imax, jmax, delt, delx, dely, gamma, Re, Pr);
-        
+
         //  Compute tentative velocity field (F,G)
         //
         COMP_FG(U, V, TEMP, F, G, FLAG, imax, jmax, delt, delx, dely, GX,
                 GY, gamma, Re, beta);
         cout << "F:" << endl;
-        for (int j = jmax; j >= 1; --j)
+        for (int j = jmax + 1; j >= 0; --j)
         {
-            for (int i = 1; i <= imax; ++i)
+            for (int i = 0; i <= imax + 1; ++i)
             {
                 cout << F[i][j] << " ";
             }
             cout << endl;
         }
         cout << "G:" << endl;
-        for (int j = jmax; j >= 1; --j)
+        for (int j = jmax + 1; j >= 0; --j)
         {
-            for (int i = 1; i <= imax; ++i)
+            for (int i = 0; i <= imax + 1; ++i)
             {
                 cout << G[i][j] << " ";
             }
@@ -301,14 +301,14 @@ int main(int argc, char *Inputfile[])
         //
         //  Solve the pressure equation by successive over relaxation
         //
-        for (int j = jmax; j >= 1; --j)
+        for (int j = jmax + 1; j >= 0; --j)
         {
-            for (int i = 1; i <= imax; ++i)
+            for (int i = 0; i <= imax + 1; ++i)
             {
                 cout << RHS[i][j] << " ";
             }
             cout << endl;
-        }        
+        }
         cout << "- POISSON" << endl;
         if (0 < ifull)
         {
@@ -316,14 +316,14 @@ int main(int argc, char *Inputfile[])
                               eps, itermax, omg, &res, ifull, p_bound);
         }
         cout << "P:" << endl;
-        for (int j = jmax; j >= 1; --j)
+        for (int j = jmax + 1; j >= 0; --j)
         {
-            for (int i = 1; i <= imax; ++i)
+            for (int i = 0; i <= imax + 1; ++i)
             {
                 cout << P[i][j] << " ";
             }
             cout << endl;
-        }        
+        }
         cout << "t= "            << t + delt  << "  "
              << "delt= "         << delt    << "  "
              << "iterations = "  << itersor << "  "
@@ -372,9 +372,9 @@ int main(int argc, char *Inputfile[])
 
         // if (strcmp(tracefile, "none"))
         // {
-            cout << "trace" << endl;
-            PARTICLE_TRACING(tracefile, 1, imax, jmax, delx, dely, delt, U, V, FLAG,
-                             N, Particlelines, 0);
+        cout << "trace" << endl;
+        PARTICLE_TRACING(tracefile, 1, imax, jmax, delx, dely, delt, U, V, FLAG,
+                         N, Particlelines, 0);
         // }
 
         if (strcmp(streakfile, "none"))

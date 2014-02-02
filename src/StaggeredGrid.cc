@@ -37,7 +37,7 @@ StaggeredGrid::StaggeredGrid(int xxSize, int yySize, real ddx, real ddy)
     //    fluid cell (center):    ob(i,j) =  2
     //    empty cell (center):    ob(i,j) =  4
 
-    ob.fill(FLUID);
+    ob.fill(EMPTY); 
     obs_ = ob;
 
 }
@@ -87,7 +87,7 @@ StaggeredGrid::StaggeredGrid(const FileReader &configuration)
     //    fluid cell (center):    ob(i,j) =  2
     //    empty cell (center):    ob(i,j) =  4
 
-    ob.fill(FLUID);
+    ob.fill(EMPTY);
     obs_ = ob;
 
 }

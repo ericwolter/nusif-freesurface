@@ -4,6 +4,8 @@
 \usepackage{lmodern}
 \usepackage{graphicx}
 \usepackage{amsmath, amssymb, graphicx}
+\usepackage{listings}
+\usepackage{color}
 %\usepackage{beamerthemeshadow}
 %\beamersetuncovermixins{\opaqueness<1>{25}}{\opaqueness<2->{15}}
 \usetheme{Ilmenau}
@@ -31,45 +33,75 @@ $\beta(t) \in \left[0, \frac{\pi}{2}\right[ \mbox{f\"ur alle  } t \in \left[0,t^
 }
 
 
-\section[Creating new functions ]{Implementation} 
-\frame{\frametitle{New functions}
-%Es ist $x(t) = \Phi(t) + \begin{pmatrix} (l-h)\cos \beta(t) - \frac{b}{2} (-\sin \beta(t)) \\
-%-h\sin \beta(t)-\frac{b}{2} \cos \beta(t)\end{pmatrix}$.
-\begin{figure}[ht]
-	\centering
-	 \fbox{
-  %\includegraphics[width=0.8\textwidth]{bilder/A_in_G_standart.pdf}
-	%\caption{um 30 Grad gedreht}
-	\label{fig1}
-	}
-\end{figure}
+\section{Implementation} 
+\subsection{Creating New Code}
+\frame{\frametitle{Particle and ParticleTracer}
+\begin{itemize}
+\item \textbf{Particle(real x, real y, int type)} \\
+Has some functions which can detect its position on the grid
+\item \textbf{ParticleTracer(StaggeredGrid *grid)} \\
+Has a vector of particles
+\begin{itemize}
+\item \textbf{void markCells()}
+\item \textbf{void fillCell(int i, int j, int numParticles, int type)}
+\item \textbf{void addRectangle(real x1, real y1, real x2, real y2, int type)}
+\item \textbf{void addCircle(real x, real y, real r, int type)}
+\item \textbf{void advanceParticles(real const dt)}
+\end{itemize}
+\end{itemize}
 }
 
-\frame{\frametitle{Changing old functions}
-%Es ist $x(t) = \Phi(t) + \begin{pmatrix} (l-h)\cos \beta(t) - \frac{b}{2} (-\sin \beta(t)) \\
-%-h\sin \beta(t)-\frac{b}{2} \cos \beta(t)\end{pmatrix}$.
-\begin{figure}[ht]
-	\centering
-	 \fbox{
-  %\includegraphics[width=0.8\textwidth]{bilder/A_in_G_1.pdf}
-	%\caption{um 30 Grad gedreht}
-	\label{fig1}
-	}
-\end{figure}
+\subsection{Changing Old Classes And Functions}
+\frame{\frametitle{Types and StaggeredGrid}
+\begin{itemize}
+\item \textbf{Types.hh}:
+\begin{itemize}
+\item \textbf{flag EMPTY}
+\end{itemize}
+\item \textbf{StaggeredGrid.cc}:
+\begin{itemize}
+\item \textbf{int ppc\_}
+\item \textbf{bool isEmpty(const int x, const int y)}
+\item \textbf{void setCellToEmpty(int x, int y)}
+\item \textbf{void refreshEmpty()}
+\end{itemize}
+\end{itemize}
+}
+\frame{\frametitle{FluidSimulator}
+\begin{itemize}
+\item \textbf{FluidSimulator.cc}:
+\begin{itemize}
+\item \textbf{real rectX1\_particle\_, rectX2\_particle\_ , ...}
+\item \textbf{real circR\_particle\_, circX\_particle\_, ...}
+\item \textbf{void set\_UVP\_surface(int i, int j , const real \&dt, bool compP)}
+\item \textbf{void one\_empty\_neighbour(int i , int j , const real \&dt, bool compP)}
+\item ...
+\item \textbf{four\_empty\_neighbour(int i , int j , const real \&dt, bool compP)}
+\item \textbf{void refreshEmpty()}
+\end{itemize}
+\end{itemize}
 }
 
-\frame{\frametitle{Veranschaulichung Bedingung $(ii)$}
-%Es ist $x(t) = \Phi(t) + \begin{pmatrix} (l-h)\cos \beta(t) - \frac{b}{2} (-\sin \beta(t)) \\
-%-h\sin \beta(t)-\frac{b}{2} \cos \beta(t)\end{pmatrix}$.
-\begin{figure}[ht]
-	\centering
-	 \fbox{
-  %\includegraphics[width=0.8\textwidth]{bilder/A_in_G_2.pdf}
-	%\caption{um 30 Grad gedreht}
-	\label{fig1}
-	}
-\end{figure}
-
+\subsection{Main Algorithm}
+\frame{\frametitle{Main while-loop}
+\lstset {language=C++}
+\begin{lstlisting}
+while (n <= nrOfTimeSteps)
+{
+    ...
+    determineNextDT(safetyfac_);
+    particle_tracer_.markCells();
+    set_UVP_surface(dt_, true);
+    computeFG();
+    composeRHS();
+    solv().solve(grid_);
+    updateVelocities();
+    refreshBoundaries();
+    set_UVP_surface(dt_, false);
+    particle_tracer_.advanceParticles(dt_);
+    ...
+}
+\end{lstlisting}
 }
 
 \section{Results}

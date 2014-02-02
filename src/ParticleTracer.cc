@@ -1,5 +1,5 @@
-#include "math.h"
 #include <iostream>
+#include "math.h"
 
 #include "ParticleTracer.hh"
 
@@ -16,6 +16,8 @@ void ParticleTracer::markCells()
 {
     PROG("marking cells");
 
+    // reset all non-obstacle cells to empty
+    // cells with later be set to fluid in case they contain particles
     for (int i = 1; i <= grid_->imax(); ++i)
     {
         for (int j = 1; j <= grid_->jmax(); ++j)
@@ -26,6 +28,8 @@ void ParticleTracer::markCells()
         }
     }
 
+    // for all particles find the grid cell it belongs to and
+    // set these cells to fluid
     for (std::vector<Particle>::iterator p = particles_.begin() ; p != particles_.end(); ++p)
     {
         int i = p->getCellX(grid_->dx());
@@ -34,6 +38,7 @@ void ParticleTracer::markCells()
         grid_->setCellToFluid(i, j);
     }
 
+    // clean pressure/velocity for all remaining empty cells
     grid_->refreshEmpty();
 }
 
@@ -51,14 +56,11 @@ void ParticleTracer::addRectangle(real x1, real y1, real x2, real y2, int type)
         {
             real cellX = x * grid_->dx();
             real cellY = y * grid_->dy();
-             std::cout << "TRACER cellX,Y: " << cellX << ", " << cellY << std::endl;
 
             int particlesPerSide = (int)(sqrt(grid_->ppc()));
-             std::cout << "TRACER particlesPerSide: " << particlesPerSide << std::endl;
 
             real deltaX = grid_->dx() / (particlesPerSide);
             real deltaY = grid_->dy() / (particlesPerSide);
-             std::cout << "TRACER deltaX,Y: " << deltaX << ", " << deltaY << std::endl;
 
             for (int i = 1; i <= particlesPerSide; ++i)
             {
@@ -68,7 +70,6 @@ void ParticleTracer::addRectangle(real x1, real y1, real x2, real y2, int type)
                     real py = cellY + deltaY / 2 + (j - 1) * deltaY;
 
                     Particle p(px, py, type);
-                     std::cout << "TRACER pX,Y: " << px << ", " << py << std::endl;
                     particles_.push_back(p);
                 }
             }
@@ -79,6 +80,7 @@ void ParticleTracer::addRectangle(real x1, real y1, real x2, real y2, int type)
 void ParticleTracer::addCircle(real xc, real yc, real r, int type)
 {
     PROG("adding particle circle: " << "(" << xc << "|" << yc << "|" << r << ")");
+
     int minX = (int)round((xc - r) / grid_->dx());
     int maxX = (int)round((xc + r) / grid_->dx());
     int minY = (int)round((yc - r) / grid_->dy());
@@ -90,14 +92,11 @@ void ParticleTracer::addCircle(real xc, real yc, real r, int type)
         {
             real cellX = x * grid_->dx();
             real cellY = y * grid_->dy();
-            // std::cout << "TRACER cellX,Y: " << cellX << ", " << cellY << std::endl;
 
             int particlesPerSide = (int)(sqrt(grid_->ppc()));
-            // std::cout << "TRACER particlesPerSide: " << particlesPerSide << std::endl;
 
             real deltaX = grid_->dx() / (particlesPerSide);
             real deltaY = grid_->dy() / (particlesPerSide);
-            // std::cout << "TRACER deltaX,Y: " << deltaX << ", " << deltaY << std::endl;
 
             for (int i = 1; i <= particlesPerSide; ++i)
             {
@@ -107,11 +106,9 @@ void ParticleTracer::addCircle(real xc, real yc, real r, int type)
                     real py = cellY + deltaY / 2 + (j - 1) * deltaY;
 
                     real dist = sqrt((xc - px) * (xc - px) + (yc - py) * (yc - py));
-                    // std::cout << "TRACER p1X,Y: " << px << ", " << py << ", " << dist << std::endl;
                     if (dist <= r)
                     {
                         Particle p(px, py, type);
-                        // std::cout << "TRACER p2X,Y: " << px << ", " << py << std::endl;
                         particles_.push_back(p);
                     }
                 }
@@ -120,25 +117,26 @@ void ParticleTracer::addCircle(real xc, real yc, real r, int type)
     }
 }
 
+// this function is only used when NO particles have been specified in the
+// paramater file and ALL cells are assumed to be fluid
 void ParticleTracer::fillCell(int x, int y, int numParticles, int type)
 {
     real cellX = (x - 1) * grid_->dx();
     real cellY = (y - 1) * grid_->dy();
-    // std::cout << "TRACER cellX,Y: " << cellX << ", " << cellY << std::endl;
 
     int particlesPerSide = (int)(sqrt(grid_->ppc()));
-    // std::cout << "TRACER particlesPerSide: " << particlesPerSide << std::endl;
 
     real deltaX = grid_->dx() / (particlesPerSide);
     real deltaY = grid_->dy() / (particlesPerSide);
-    // std::cout << "TRACER deltaX,Y: " << deltaX << ", " << deltaY << std::endl;
 
     for (int i = 1; i <= particlesPerSide; ++i)
     {
         for (int j = 1; j <= particlesPerSide; ++j)
         {
-            Particle p(cellX + deltaX / 2 + (i - 1) * deltaX, cellY + deltaY / 2 + (j - 1) * deltaY, type);
-            // std::cout << "TRACER pX,Y: " << cellX + deltaX / 2 + (i - 1) * deltaX << ", " << cellY + deltaY / 2 + (j - 1) * deltaY << std::endl;
+            real px = cellX + deltaX / 2 + (i - 1) * deltaX;
+            real py = cellY + deltaY / 2 + (j - 1) * deltaY;
+
+            Particle p(px, py, type);
             particles_.push_back(p);
         }
     }
@@ -156,29 +154,21 @@ void ParticleTracer::advanceParticles(real const dt)
 {
     PROG("advancing particles");
 
-    //     grid_->u().print();
-    //     grid_->v().print();
-
     for (unsigned int i = 0; i < particles_.size(); ++i)
     {
         Particle *p = &particles_[i];
         real u = interpolateU(p->x(), p->y());
         real v = interpolateV(p->x(), p->y());
-        //         std::cout << "TRACER u,v: " << u << ", " << v << std::endl;
 
-        //         std::cout << "TRACER oldPosX,Y: " << p->x() << ", " << p->y() << std::endl;
         p->setX(p->x() + dt * u);
         p->setY(p->y() + dt * v);
-        //         std::cout << "TRACER newPosX,Y: " << p->x() << ", " << p->y() << std::endl;
 
         int newCellX = p->getCellX(grid_->dx());
         int newCellY = p->getCellY(grid_->dy());
-        //         std::cout << "TRACER cellX,Y: " << newCellX << ", " << newCellY << std::endl;
 
         // if the particle moved into an obstacle cell or outside the domain just delete it
         bool isOutsideDomain = newCellX < 1 || newCellX > grid_->imax() || newCellY < 1 || newCellY > grid_->jmax();
         bool isObstacle = grid_->isObstacle(newCellX, newCellY);
-        //         std::cout << "TRACER outside: " << isOutsideDomain << ", " << isObstacle << std::endl;
 
         if (isOutsideDomain || isObstacle)
         {
@@ -186,36 +176,26 @@ void ParticleTracer::advanceParticles(real const dt)
             // the vector has now shrunk so we need to check the element which moved into the empty place
             i--;
         }
-        //else
-        //boundary_particle(i,j,x,y,u,v, dt) ;
-
     }
 }
 
 real ParticleTracer::interpolateU(real x, real y)
 {
-    // see section 4.2.1
-    // std::cout << "interpolateU x,y: " << x << ", " << y << std::endl;
+    // see book section 4.2.1
     int i = (int)(x / grid_->dx()) + 1;
     int j = (int)((y + 0.5 * grid_->dy()) / grid_->dy()) + 1;
-    // std::cout << "interpolateU i,j: " << i << ", " << j << std::endl;
 
     real x1, x2, y1, y2;
     x1 = (i - 1) * grid_->dx();
     x2 = i * grid_->dx();
     y1 = ((j - 1) - 0.5) * grid_->dy();
     y2 = (j - 0.5) * grid_->dy();
-    // std::cout << "interpolateU x1,x2: " << x1 << ", " << x2 << std::endl;
-    // std::cout << "interpolateU y1,y2: " << y1 << ", " << y2 << std::endl;
 
-    // TODO: use u accessor function to incooperate obstacles
     real u1, u2, u3, u4;
     u1 = grid_->u(i - 1 , j - 1 , DIAG);
     u2 = grid_->u(i     , j - 1 , NORTH);
     u3 = grid_->u(i - 1 , j     , EAST);
     u4 = grid_->u()(i     , j);
-    // std::cout << "interpolateU u1,u2: " << u1 << ", " << u2 << std::endl;
-    // std::cout << "interpolateU u3,u4: " << u3 << ", " << u4 << std::endl;
 
     real u = (1 / (grid_->dx() * grid_->dy())) * (
                  (x2 - x) * (y2 - y) * u1 +
@@ -229,22 +209,16 @@ real ParticleTracer::interpolateU(real x, real y)
 
 real ParticleTracer::interpolateV(real x, real y)
 {
-    // see section 4.2.1
-
-    // std::cout << "interpolateV x,y: " << x << ", " << y << std::endl;
+    // see book section 4.2.1
     int i = (int)((x + 0.5 * grid_->dx()) / grid_->dx()) + 1;
     int j = (int)(y  / grid_->dy()) + 1;
-    // std::cout << "interpolateV i,j: " << i << ", " << j << std::endl;
 
     real x1, x2, y1, y2;
     x1 = ((i - 1) - 0.5) * grid_->dx();
     x2 = (i - 0.5) * grid_->dx();
     y1 = (j - 1) * grid_->dy();
     y2 = j * grid_->dy();
-    // std::cout << "interpolateV x1,x2: " << x1 << ", " << x2 << std::endl;
-    // std::cout << "interpolateV y1,y2: " << y1 << ", " << y2 << std::endl;
 
-    // TODO: use u accessor function to incooperate obstacles
     real v1, v2, v3, v4;
     v1 = grid_->v(i - 1 , j - 1 , DIAG);
     v2 = grid_->v(i     , j - 1 , NORTH);
@@ -260,9 +234,3 @@ real ParticleTracer::interpolateV(real x, real y)
 
     return v;
 }
-// TODO: implement a treatment for particle near the boundary
-void ParticleTracer::particle_boundary(int i , int j , real x, real y , real u , real v , const real dt)
-{
-
-}
-

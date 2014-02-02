@@ -21,8 +21,8 @@ public:
 
     void markCells();
 	void fillCell(int i, int j, int numParticles, int type);
-    void addRectangle(int x1, int y1, int x2, int y2, int type);
-    void addCircle(int x, int y, int r, int type);
+    void addRectangle(real x1, real y1, real x2, real y2, int type);
+    void addCircle(real x, real y, real r, int type);
 
     void advanceParticles(real const dt);
     void particle_boundary(int i , int j ,real x,real y , real u , real v , const real dt);

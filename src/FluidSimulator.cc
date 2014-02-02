@@ -512,7 +512,7 @@ void FluidSimulator::simulate(real duration)
     else
     {
         particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectX2_particle_ / grid_.dy()), (int)(rectY1_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
-        particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
+        particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_ / grid_.dy()), 1);
     }
 
     PROG("initial refreshBoundaries");
@@ -576,7 +576,7 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
     {
         PROG("adding particles");
         particle_tracer_.addRectangle((int)(rectX1_particle_ / grid_.dx()), (int)(rectY1_particle_ / grid_.dy()), (int)(rectX2_particle_ / grid_.dx()), (int)(rectY2_particle_ / grid_.dy()), 0);
-        particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_), 0);
+        particle_tracer_.addCircle((int)(circX_particle_ / grid_.dx()), (int)(circY_particle_ / grid_.dy()), (int)(circR_particle_ / grid_.dy()), 1);
     }
     grid_.createPng("test.png");
     particle_tracer_.markCells();
@@ -661,43 +661,43 @@ void FluidSimulator::simulateTimeStepCount(unsigned int nrOfTimeSteps)
             vtkWriter.write(grid_, &particle_tracer_);
         PROG(n << "'th timestep: determine next dt");
         determineNextDT(safetyfac_);
-//         std::cout << dt_ << std::endl;
+        //         std::cout << dt_ << std::endl;
         particle_tracer_.markCells();
-//         grid_.obs().print();
-//         grid_.u().print();
-//         grid_.v().print();
-//         grid_.p().print();
+        //         grid_.obs().print();
+        //         grid_.u().print();
+        //         grid_.v().print();
+        //         grid_.p().print();
         PROG(n << "'th timestep: set u, v, p at the free boundary");
         set_UVP_surface(dt_, true);
-//         grid_.u().print();
-//         grid_.v().print();
-//         grid_.p().print();
+        //         grid_.u().print();
+        //         grid_.v().print();
+        //         grid_.p().print();
         computeFG();
-//         grid_.f().print();
-//         grid_.g().print();
+        //         grid_.f().print();
+        //         grid_.g().print();
         PROG(n << "'th timestep: compute the right-hand side of the pressure equation");
         composeRHS();
-//         grid_.rhs().print();
+        //         grid_.rhs().print();
         PROG(n << "'th timestep: solve pressure equation");
         solv().solve(grid_);
-//         grid_.u().print();
-//         grid_.v().print();
-//         grid_.p().print();
+        //         grid_.u().print();
+        //         grid_.v().print();
+        //         grid_.p().print();
         PROG(n << "'th timestep: update u and v in fluid domain");
         updateVelocities();
-//         grid_.u().print();
-//         grid_.v().print();
-//         grid_.p().print();
+        //         grid_.u().print();
+        //         grid_.v().print();
+        //         grid_.p().print();
         PROG(n << "'th timestep: refresh boundaries");
         refreshBoundaries();
-//         grid_.u().print();
-//         grid_.v().print();
-//         grid_.p().print();
+        //         grid_.u().print();
+        //         grid_.v().print();
+        //         grid_.p().print();
         PROG(n << "'th timestep: set u, v at the free boundary");
         set_UVP_surface(dt_, false);
-//         grid_.u().print();
-//         grid_.v().print();
-//         grid_.p().print();
+        //         grid_.u().print();
+        //         grid_.v().print();
+        //         grid_.p().print();
         particle_tracer_.advanceParticles(dt_);
         if (n % normfreq == 0)
             normalization();
@@ -725,8 +725,8 @@ void FluidSimulator::normalization()
     }
 
     real pMean = psum / grid_.getNumFluid();
-//     std::cout << "norm1: " << grid_.getNumFluid() << std::endl;
-//     std::cout << "norm2: " << count << std::endl;
+    //     std::cout << "norm1: " << grid_.getNumFluid() << std::endl;
+    //     std::cout << "norm2: " << count << std::endl;
     // substract the mean
     for (int i = 1; i <= imax; i++)
     {
@@ -1288,14 +1288,14 @@ void FluidSimulator::two_empty_neighbour(int i , int j , const real &dt, bool co
 
 void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
-//     std::cout << "three_empty_neighbour: " << i << ", " << j << std::endl;
+    //     std::cout << "three_empty_neighbour: " << i << ", " << j << std::endl;
     // According to page 96 of book
     // Generally we have four option for our three empty neighbours
 
     // cell(i+1,j) , cell(i,j+1) , cell(i-1,j) are empty WNE
     if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j + 1)  && grid_.isEmpty(i - 1, j))
     {
-//         std::cout << "WNE" << std::endl;
+        //         std::cout << "WNE" << std::endl;
         if (compP)
             grid_.p()(i, j) = 0.0 ;
         grid_.u()(i, j) += gx_ * dt ;
@@ -1323,11 +1323,11 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
     // cell(i+1,j) , cell(i,j-1) , cell(i-1,j) are empty WSE
     if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i - 1, j))
     {
-//         std::cout << "WSE" << std::endl;
-//         std::cout << "grid_.v()(i, j): " << grid_.v()(i, j) << std::endl;
-//         std::cout << "grid_.u()(i, j): " << grid_.u()(i, j) << std::endl;
-//         std::cout << "grid_.u()(i - 1, j): " << grid_.u()(i - 1, j) << std::endl;
-//         std::cout << "grid_.v()(i - 1, j): " << grid_.v()(i - 1, j) << std::endl;
+        //         std::cout << "WSE" << std::endl;
+        //         std::cout << "grid_.v()(i, j): " << grid_.v()(i, j) << std::endl;
+        //         std::cout << "grid_.u()(i, j): " << grid_.u()(i, j) << std::endl;
+        //         std::cout << "grid_.u()(i - 1, j): " << grid_.u()(i - 1, j) << std::endl;
+        //         std::cout << "grid_.v()(i - 1, j): " << grid_.v()(i - 1, j) << std::endl;
 
         if (compP)
             grid_.p()(i, j) = 0.0 ;
@@ -1412,13 +1412,13 @@ void FluidSimulator::three_empty_neighbour(int i , int j , const real &dt, bool 
 
 void FluidSimulator::four_empty_neighbour(int i , int j , const real &dt, bool compP)
 {
-//     std::cout << "four_empty_neighbour:" << i << ", " << j << std::endl;
+    //     std::cout << "four_empty_neighbour:" << i << ", " << j << std::endl;
     // According to page 96 of book number 5
     if (grid_.isEmpty(i + 1, j)  && grid_.isEmpty(i - 1, j)  && grid_.isEmpty(i, j - 1)  && grid_.isEmpty(i, j + 1))
     {
-//         std::cout << "grid_.v()(i, j): " << grid_.v()(i, j) << std::endl;
-//         std::cout << "grid_.v()(i, j - 1): " << grid_.v()(i, j - 1) << std::endl;
-//         std::cout << "gy_ * dt: " << gy_ * dt << std::endl;
+        //         std::cout << "grid_.v()(i, j): " << grid_.v()(i, j) << std::endl;
+        //         std::cout << "grid_.v()(i, j - 1): " << grid_.v()(i, j - 1) << std::endl;
+        //         std::cout << "gy_ * dt: " << gy_ * dt << std::endl;
         if (compP)
             grid_.p()(i, j) = 0.0 ;
         grid_.u()(i, j) += gx_ * dt ;

@@ -6,17 +6,18 @@
 # Problem specific Data:
 # ---------------------
 
-name BreakingDam
+name Drop
 
-#boundary_condition_W   free-slip    # free-slip condition at west boundary
-#boundary_condition_S   free-slip    # free-slip condition at south boundary
-#boundary_condition_E   outflow      # outflow condition at east boundary
+boundary_condition_W   free-slip    # free-slip condition at west boundary
+boundary_condition_S   free-slip    # free-slip condition at south boundary
+boundary_condition_E   free-slip    # free-slip condition at east boundary
+boundary_condition_N   outflow      # outflow condition at north boundary
 
 
 GX                      0.0			# Body forces (e.g. gravity)
-GY                     -10.0			#
+GY                     -1.0			#
 
-Re                     100.0			# Reynolds number
+Re                     40.0			# Reynolds number
 
 U_INIT                 0.0		   # initial value for velocity in x-direction
 V_INIT                 0.0		   # initial value for velocity in y-direction
@@ -27,10 +28,10 @@ P_INIT                 0.0		   # initial value for pressure
 # Geometry Data:
 # -------------
 
-xlength                5.0		   # domain size in x-direction
-ylength                5.0		   # domain size in y-direction
-imax                   5		   # number of interior cells in x-direction //Orginal:100
-jmax                   5		   # number of interior cells in y-direction //Orginal:25
+xlength                8.0		   # domain size in x-direction
+ylength                6.0		   # domain size in y-direction
+imax                   40		   # number of interior cells in x-direction //Orginal:100
+jmax                   20		   # number of interior cells in y-direction //Orginal:25
 
 
 # Initial Particle Position:
@@ -38,18 +39,22 @@ jmax                   5		   # number of interior cells in y-direction //Orginal
 
 ppc				16
 
-RectangleParticleX1                	2.0	 
-RectangleParticleX2	                4.0      
-RectangleParticleY1   	            2.0       
-RectangleParticleY2                 4.0
+RectangleParticleX1                 0.0  
+RectangleParticleX2                 8.0      
+RectangleParticleY1                 0.0       
+RectangleParticleY2                 3.0
+
+CircleParticleX                 4.0  
+CircleParticleY                 4.0      
+CircleParticleR                 0.6      
 
 
 # Time Data:
 # ---------
 
-dt                     0.04      # time stepsize
+dt                     0.01      # time stepsize
 timesteps              125      # number of timesteps
-safetyfactor           0.5       # factor "tau" for timestep size control (<=0 means constant dt)
+safetyfactor           0.2       # factor "tau" for timestep size control (<=0 means constant dt)
 
 # Pressure Iteration Data:
 # -----------------------

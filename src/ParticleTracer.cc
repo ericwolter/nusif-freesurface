@@ -61,7 +61,7 @@ void ParticleTracer::addCircle(int x, int y, int r, int type)
 
     for (int i = -r; i < r; ++i)
     {
-        int h = (int)sqrt(r * r - x * x);
+        int h = (int)sqrt(r * r - i * i);
 
         for (int j = -h; j < h; ++j)
         {
@@ -106,29 +106,29 @@ void ParticleTracer::advanceParticles(real const dt)
 {
     PROG("advancing particles");
 
-//     grid_->u().print();
-//     grid_->v().print();
+    //     grid_->u().print();
+    //     grid_->v().print();
 
     for (unsigned int i = 0; i < particles_.size(); ++i)
     {
         Particle *p = &particles_[i];
         real u = interpolateU(p->x(), p->y());
         real v = interpolateV(p->x(), p->y());
-//         std::cout << "TRACER u,v: " << u << ", " << v << std::endl;
+        //         std::cout << "TRACER u,v: " << u << ", " << v << std::endl;
 
-//         std::cout << "TRACER oldPosX,Y: " << p->x() << ", " << p->y() << std::endl;
+        //         std::cout << "TRACER oldPosX,Y: " << p->x() << ", " << p->y() << std::endl;
         p->setX(p->x() + dt * u);
         p->setY(p->y() + dt * v);
-//         std::cout << "TRACER newPosX,Y: " << p->x() << ", " << p->y() << std::endl;
+        //         std::cout << "TRACER newPosX,Y: " << p->x() << ", " << p->y() << std::endl;
 
         int newCellX = p->getCellX(grid_->dx());
         int newCellY = p->getCellY(grid_->dy());
-//         std::cout << "TRACER cellX,Y: " << newCellX << ", " << newCellY << std::endl;
+        //         std::cout << "TRACER cellX,Y: " << newCellX << ", " << newCellY << std::endl;
 
         // if the particle moved into an obstacle cell or outside the domain just delete it
         bool isOutsideDomain = newCellX < 1 || newCellX > grid_->imax() || newCellY < 1 || newCellY > grid_->jmax();
         bool isObstacle = grid_->isObstacle(newCellX, newCellY);
-//         std::cout << "TRACER outside: " << isOutsideDomain << ", " << isObstacle << std::endl;
+        //         std::cout << "TRACER outside: " << isOutsideDomain << ", " << isObstacle << std::endl;
 
         if (isOutsideDomain || isObstacle)
         {
@@ -137,7 +137,7 @@ void ParticleTracer::advanceParticles(real const dt)
             i--;
         }
         //else
-        	//boundary_particle(i,j,x,y,u,v, dt) ;
+        //boundary_particle(i,j,x,y,u,v, dt) ;
 
     }
 }
@@ -211,7 +211,7 @@ real ParticleTracer::interpolateV(real x, real y)
     return v;
 }
 // TODO: implement a treatment for particle near the boundary
-void ParticleTracer::particle_boundary(int i , int j ,real x,real y , real u , real v , const real dt)
+void ParticleTracer::particle_boundary(int i , int j , real x, real y , real u , real v , const real dt)
 {
 
 }

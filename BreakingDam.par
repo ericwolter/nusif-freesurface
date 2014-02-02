@@ -10,7 +10,7 @@ name BreakingDam
 
 boundary_condition_W   free-slip    # free-slip condition at west boundary
 boundary_condition_S   free-slip    # free-slip condition at south boundary
-boundary_condition_E   outflow      # outflow condition at east boundary
+boundary_condition_E   free-slip      # outflow condition at east boundary
 boundary_condition_N   outflow      # outflow condition at north boundary
 
 

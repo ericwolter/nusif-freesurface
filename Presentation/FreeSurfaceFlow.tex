@@ -57,38 +57,94 @@ $\beta(t) \in \left[0, \frac{\pi}{2}\right[ \mbox{f\"ur alle  } t \in \left[0,t^
 \end{frame}	
 
 \subsection{Theory}
-	\begin{frame}{One empty neighbor}
-		\begin{figure}
-			\includegraphics[width=1\textwidth]{pic/all.pdf}
-		\end{figure}
-	\end{frame}	
+ \begin{frame}{One empty neighbor}
+   \begin{columns}
+	 	\begin{column}[c]{0.35\textwidth}
+			\begin{figure}
+				\includegraphics[height=0.8\textwidth]{pic/all.pdf}
+			\end{figure}
+		\end{column}
+		\begin{column}[c]{0.6\textwidth}
+			\begin{itemize}[<+->]
+				\item the stress tensor:
+					  $\ \sigma = (-P + \lambda div\vec{u})I+2 \mu \delta$					\item 
+$\-P+\frac{2}{Re}(n_x n_x \frac{\partial u}{\partial x} + n_x n_y( \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} ) +  n_y n_y \frac{\partial v}{\partial y} ) = K \kappa  $					  						\item
+ $2n_x m_x \frac{\partial u}{\partial x} +(n_x m_y + n_y m_x )( \frac{\partial u}{\partial y} + \frac{\partial v}{\partial x} ) + 2 n_y m_y \frac{\partial v}{\partial y} ) = 0 $
+			\end{itemize}
+		\end{column}
+	\end{columns}
+ \end{frame}	
 
 \subsection{Free surface treatment}
 	\begin{frame}{One empty neighbor}
-		\begin{figure}
+	  \begin{columns}
+	 	\begin{column}[c]{0.4\textwidth}
+		 \begin{figure}
 			\includegraphics[width=1\textwidth]{pic/one.pdf}
-		\end{figure}			
-		
+		 \end{figure}			
+		\end{column}
+			\begin{column}[c]{0.6\textwidth}
+				\begin{itemize}
+					\item  free boundary lie almost parallel to the grid lines
+					\item $ n_y \& m_x=0	\~ OR   n_x \& m_y=0  $
+					\item $ P=\frac{2}{Re} \frac{\partial u}{\partial x} $
+					\item $ \frac{\partial u}{\partial y}+ \frac{\partial v}{\partial x}=0 $
+					\item using continuity equation
+				\end{itemize}
+			\end{column}
+	 \end{columns}
 	\end{frame}	
-	
 	\begin{frame}{Two empty neighbor-common corner}
-			\includegraphics[width=0.49\textwidth]{pic/two1.pdf}
-
+	    \begin{columns}
+	 		\begin{column}[c]{0.4\textwidth}
+		 		\begin{figure}
+					\includegraphics[width=1\textwidth]{pic/two1.pdf}
+		 		\end{figure}
+			\end{column}
+			\begin{column}[c]{0.6\textwidth}
+				\begin{itemize}
+					\item $ n_y = m_x=n_x = m_y  $
+					\item $ P=\pm \frac{1}{Re}( \frac{\partial u}{\partial x}+  \frac{\partial v}{\partial x} ) $
+					\item $ \frac{\partial u}{\partial x}- \frac{\partial v}{\partial y}=0 $
+				\end{itemize}
+			\end{column}
+		\end{columns}		
 	\end{frame}	
 	
 	\begin{frame}{Two empty neighbor-opposite side}
+	  \begin{columns}
+	 	\begin{column}[c]{0.4\textwidth}
+	 	\begin{figure}
 			\includegraphics[width=0.49\textwidth]{pic/two2.pdf}
-
+		 \end{figure}
+		\end{column}
+		\begin{column}[c]{0.6\textwidth}
+				\begin{itemize}
+					\item $ u_{i,j}^{new}= u_{i,j}^{old} +\delta t g_x $
+					\item $ u_{i-1,j}^{new}= u_{i-1,j}^{old} +\delta t g_x $
+					\item $ v_{i,j}^{new}= v_{i,j}^{old} +\delta t g_y $
+					\item $ v_{i,j-1}^{new}= v_{i,j-1}^{old} +\delta t g_y $
+				\end{itemize}
+			\end{column}
+		\end{columns}
 	\end{frame}	
 	
 	\begin{frame}{Three empty neighbor}
+	  \begin{columns}
+	 	\begin{column}[c]{0.4\textwidth}
+	 	   \begin{figure}
 			\includegraphics[width=0.49\textwidth]{pic/three.pdf}
-	\end{frame}	
+			\end{figure}
+		\end{column}
+		\begin{column}[c]{0.4\textwidth}
+	 	   \begin{figure}
+	 	   			\includegraphics[width=0.49\textwidth]{pic/four.pdf}
+			\end{figure}
+		\end{column}
+	\end{columns}
+   \end{frame}	
 		
-	\begin{frame}{Four empty neighbor}
-			\includegraphics[width=0.49\textwidth]{pic/four.pdf}
-
-	\end{frame}	 	
+ 	
 \section{Implementation} 
 \subsection{Creating New Code}
 \frame{\frametitle{Particle and ParticleTracer}

@@ -1,4 +1,4 @@
-\frametitle {Main while-loop}
+\frametitle{Main while-loop}
 \lstset {language=C++}
 \begin{lstlisting}
 while (n <= nrOfTimeSteps)

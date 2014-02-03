@@ -1,4 +1,4 @@
-\frametitle {The Splash of a Liquid Drop}
+\frametitle{The Splash of a Liquid Drop}
 \begin{lstlisting}
 imax = 40,      jmax = 30,
 xlength = 8.0,  ylength = 6.0,

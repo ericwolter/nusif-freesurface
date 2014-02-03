@@ -1,19 +1,14 @@
-\frametitle{Main while-loop}
-\lstset {language=C++}
+\frametitle {The Splash of a Liquid Drop}
 \begin{lstlisting}
-while (n <= nrOfTimeSteps)
-{
-    ...
-    determineNextDT(safetyfac_);
-    particle_tracer_.markCells();
-    set_UVP_surface(dt_, true);
-    computeFG();
-    composeRHS();
-    solv().solve(grid_);
-    updateVelocities();
-    refreshBoundaries();
-    set_UVP_surface(dt_, false);
-    particle_tracer_.advanceParticles(dt_);
-    ...
-}
+imax = 40,      jmax = 30,
+xlength = 8.0,  ylength = 6.0,
+tau = 0.2,      delt = 0.01,   t_end = 10.0,
+eps = 0.001,    omg = 1.7,
+gamma = 0.5,    itermax = 500,
+GX = 0.0,       GY = -1.0,     Re = 40.0,
+UI = 0.0,       VI = 0.0,      PI = 0.0,
+ppc=16,
+
+wW = free,      wE=free,
+wS = free,      wN=out
 \end{lstlisting}
